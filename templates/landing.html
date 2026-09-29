@@ -1,0 +1,1447 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+PepaGRADE | Divine Word University
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   PEPA GRADE LANDING PAGE
+   FULL SCREEN / FULL WIDTH
+========================================================= */
+
+.pepa-landing {
+    width: 100vw;
+    max-width: 100vw;
+
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+
+    margin-top: -40px;
+
+    padding: 0;
+
+    overflow-x: hidden;
+
+    background: #ffffff;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HERO SECTION
+========================================================= */
+
+.pepa-hero {
+    position: relative;
+
+    min-height: calc(100vh - 76px);
+
+    display: flex;
+    align-items: center;
+
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(0, 35, 18, 0.92) 0%,
+            rgba(0, 50, 25, 0.78) 45%,
+            rgba(0, 0, 0, 0.35) 100%
+        ),
+        url("{% static 'images/campus.jpeg' %}");
+
+    background-size: cover;
+
+    background-position: center;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   HERO CONTENT
+========================================================= */
+
+.pepa-hero-content {
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 80px 0;
+}
+
+
+.pepa-university {
+    font-size: 16px;
+
+    font-weight: 600;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 20px;
+    margin-left: -150px;
+
+    color: #f2c500;
+
+    text-transform: uppercase;
+}
+
+
+.pepa-hero h1 {
+    margin: 0 0 12px 0;
+
+    font-size: clamp(48px, 7vw, 88px);
+
+    line-height: 0.95;
+
+    font-weight: 800;
+
+    letter-spacing: -2px;
+}
+
+
+.pepa-hero h2 {
+    margin: 0 0 25px 0;
+
+    font-size: clamp(22px, 3vw, 38px);
+
+    font-weight: 400;
+
+    line-height: 1.2;
+}
+
+
+.pepa-hero-description {
+    max-width: 720px;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+
+    color: rgba(255,255,255,0.90);
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   HERO BUTTONS
+========================================================= */
+
+.pepa-hero-buttons {
+    display: flex;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+.pepa-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 170px;
+
+    padding: 15px 28px;
+
+    border-radius: 3px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+
+    transition: all 0.25s ease;
+}
+
+
+.pepa-btn-primary {
+    background: #16803c;
+
+    color: #ffffff;
+
+    border: 1px solid #16803c;
+}
+
+
+.pepa-btn-primary:hover {
+    background: #0f622e;
+
+    border-color: #0f622e;
+
+    color: #ffffff;
+
+    transform: translateY(-2px);
+}
+
+
+.pepa-btn-secondary {
+    background: #f2c500;
+
+    color: #222222;
+
+    border: 1px solid #f2c500;
+}
+
+
+.pepa-btn-secondary:hover {
+    background: #d8af00;
+
+    border-color: #d8af00;
+
+    color: #222222;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   ABOUT SECTION
+========================================================= */
+
+.pepa-about {
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 100px 0;
+}
+
+
+.pepa-section-label {
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    color: #16803c;
+
+    margin-bottom: 15px;
+}
+
+
+.pepa-section-title {
+    font-size: clamp(30px, 4vw, 48px);
+
+    line-height: 1.15;
+
+    color: #1f2933;
+
+    margin: 0 0 25px 0;
+
+    font-weight: 700;
+}
+
+
+.pepa-about-text {
+    max-width: 900px;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+
+    color: #5f6b66;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   GREEN HIGHLIGHT STRIP
+========================================================= */
+
+.pepa-highlights {
+    width: 100%;
+
+    background: #16803c;
+
+    color: #ffffff;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+}
+
+
+.pepa-highlight {
+    padding: 38px 35px;
+
+    border-right: 1px solid rgba(255,255,255,0.18);
+}
+
+
+.pepa-highlight:last-child {
+    border-right: none;
+}
+
+
+.pepa-highlight-number {
+    display: block;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    color: #f2c500;
+
+    margin-bottom: 10px;
+}
+
+
+.pepa-highlight h3 {
+    margin: 0 0 8px 0;
+
+    font-size: 21px;
+
+    font-weight: 700;
+}
+
+
+.pepa-highlight p {
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    color: rgba(255,255,255,0.85);
+}
+
+
+/* =========================================================
+   FEATURES SECTION
+========================================================= */
+
+.pepa-features {
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 100px 0;
+}
+
+
+.pepa-feature-intro {
+    max-width: 700px;
+
+    margin-bottom: 50px;
+}
+
+
+.pepa-feature-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+
+.pepa-feature-card {
+    background: #ffffff;
+
+    border: 1px solid #e5e9e6;
+
+    padding: 35px 28px;
+
+    min-height: 230px;
+
+    transition: all 0.25s ease;
+}
+
+
+.pepa-feature-card:hover {
+    transform: translateY(-5px);
+
+    border-color: #16803c;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+
+.pepa-feature-number {
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #16803c;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 25px;
+}
+
+
+.pepa-feature-card h3 {
+    margin: 0 0 15px 0;
+
+    font-size: 20px;
+
+    color: #1f2933;
+}
+
+
+.pepa-feature-card p {
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    color: #68736e;
+}
+
+
+/* =========================================================
+   FINAL CTA
+========================================================= */
+
+.pepa-cta {
+    background: #f2f5f3;
+
+    padding: 90px 20px;
+
+    text-align: center;
+}
+
+
+.pepa-cta .pepa-section-label {
+    margin-bottom: 12px;
+}
+
+
+.pepa-cta h2 {
+    margin: 0 0 15px 0;
+
+    font-size: clamp(30px, 4vw, 48px);
+
+    color: #1f2933;
+}
+
+
+.pepa-cta p {
+    margin: 0 auto 30px auto;
+
+    max-width: 650px;
+
+    color: #66716c;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+
+.pepa-cta-buttons {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   PEPA GRADE FOOTER INFORMATION
+========================================================= */
+
+.pepa-footer-info {
+    width: 100%;
+
+    background: #0d2417;
+
+    color: #ffffff;
+
+    padding: 70px 0 0 0;
+}
+
+
+.pepa-footer-container {
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    display: grid;
+
+    grid-template-columns: 1.2fr 1fr 1fr;
+
+    gap: 70px;
+
+    padding-bottom: 55px;
+}
+
+
+/* =========================================================
+   FOOTER BRAND
+========================================================= */
+
+.pepa-footer-logo {
+    width: 85px;
+
+    height: auto;
+
+    margin-bottom: 15px;
+}
+
+
+.pepa-footer-brand h3 {
+    margin: 0 0 8px 0;
+
+    font-size: 25px;
+
+    font-weight: 700;
+}
+
+
+.pepa-footer-brand > p {
+    margin: 0 0 28px 0;
+
+    color: rgba(255,255,255,0.70);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   FOOTER HEADINGS
+========================================================= */
+
+.pepa-footer-column h4 {
+    margin: 0 0 18px 0;
+
+    color: #f2c500;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+.pepa-footer-column p {
+    margin: 0 0 12px 0;
+
+    color: rgba(255,255,255,0.75);
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+.pepa-contact-heading {
+    color: #ffffff !important;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SOCIAL MEDIA
+========================================================= */
+
+.pepa-social-links {
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.pepa-social-links a {
+    width: 38px;
+
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,0.30);
+
+    border-radius: 50%;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    transition: all 0.25s ease;
+}
+
+
+.pepa-social-links a:hover {
+    background: #f2c500;
+
+    border-color: #f2c500;
+
+    color: #222222;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   EMAIL LINKS
+========================================================= */
+
+.pepa-footer-column a {
+    color: rgba(255,255,255,0.80);
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+
+.pepa-footer-column a:hover {
+    color: #f2c500;
+}
+
+
+/* =========================================================
+   FOOTER BOTTOM
+========================================================= */
+
+.pepa-footer-bottom {
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 22px 0;
+
+    border-top: 1px solid rgba(255,255,255,0.15);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    color: rgba(255,255,255,0.55);
+
+    font-size: 13px;
+}
+
+
+.pepa-footer-bottom a {
+    color: rgba(255,255,255,0.70);
+
+    text-decoration: none;
+}
+
+
+.pepa-footer-bottom a:hover {
+    color: #f2c500;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .pepa-feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .pepa-landing {
+        width: 100vw;
+
+        max-width: 100vw;
+
+        margin-left: calc(50% - 50vw);
+
+        margin-right: calc(50% - 50vw);
+
+        margin-top: -40px;
+
+        overflow-x: hidden;
+    }
+
+
+    /* HERO */
+
+    .pepa-hero {
+        min-height: calc(100vh - 70px);
+
+        background-position: center center;
+    }
+
+
+    .pepa-hero-content {
+        width: 88%;
+
+        padding: 70px 0;
+    }
+
+
+    .pepa-university {
+        font-size: 12px;
+
+        letter-spacing: 2px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .pepa-hero h1 {
+        font-size: 52px;
+
+        letter-spacing: -1px;
+    }
+
+
+    .pepa-hero h2 {
+        font-size: 24px;
+
+        margin-top: 12px;
+    }
+
+
+    .pepa-hero-description {
+        font-size: 15px;
+
+        line-height: 1.7;
+
+        margin-bottom: 28px;
+    }
+
+
+    .pepa-hero-buttons {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        width: 100%;
+    }
+
+
+    .pepa-btn {
+        width: 100%;
+
+        min-width: 0;
+    }
+
+
+    /* ABOUT */
+
+    .pepa-about {
+        width: 88%;
+
+        padding: 70px 0;
+    }
+
+
+    .pepa-section-title {
+        font-size: 34px;
+    }
+
+
+    .pepa-about-text {
+        font-size: 15px;
+
+        line-height: 1.75;
+    }
+
+
+    /* HIGHLIGHTS */
+
+    .pepa-highlights {
+        grid-template-columns: 1fr;
+    }
+
+
+    .pepa-highlight {
+        border-right: none;
+
+        border-bottom: 1px solid rgba(255,255,255,0.18);
+
+        padding: 30px 25px;
+    }
+
+
+    .pepa-highlight:last-child {
+        border-bottom: none;
+    }
+
+
+    /* FEATURES */
+
+    .pepa-features {
+        width: 88%;
+
+        padding: 70px 0;
+    }
+
+
+    .pepa-feature-grid {
+        grid-template-columns: 1fr;
+
+        gap: 15px;
+    }
+
+
+    .pepa-feature-card {
+        min-height: auto;
+
+        padding: 30px 25px;
+    }
+
+
+    /* CTA */
+
+    .pepa-cta {
+        padding: 70px 20px;
+    }
+
+
+    .pepa-cta h2 {
+        font-size: 34px;
+    }
+
+
+    .pepa-cta-buttons {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        max-width: 400px;
+
+        margin: 0 auto;
+    }
+
+
+    .pepa-cta-buttons .pepa-btn {
+        width: 100%;
+    }
+
+
+    /* FOOTER */
+
+    .pepa-footer-info {
+        padding-top: 55px;
+    }
+
+
+    .pepa-footer-container {
+        width: 88%;
+
+        grid-template-columns: 1fr;
+
+        gap: 45px;
+
+        padding-bottom: 40px;
+    }
+
+
+    .pepa-footer-logo {
+        width: 75px;
+    }
+
+
+    .pepa-footer-brand h3 {
+        font-size: 23px;
+    }
+
+
+    .pepa-footer-column p {
+        font-size: 14px;
+    }
+
+
+    .pepa-footer-bottom {
+        width: 88%;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        padding: 20px 0;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .pepa-hero h1 {
+        font-size: 44px;
+    }
+
+
+    .pepa-hero h2 {
+        font-size: 21px;
+    }
+
+
+    .pepa-university {
+        font-size: 11px;
+    }
+
+
+    .pepa-section-title {
+        font-size: 30px;
+    }
+
+}
+
+</style>
+
+
+<div class="pepa-landing">
+
+
+    <!-- =====================================================
+         HERO SECTION
+    ====================================================== -->
+
+    <section class="pepa-hero">
+
+        <div class="pepa-hero-content">
+
+            <div class="pepa-university">
+                  <h1>
+                Serving the Nation With Quality Education Over 30 Years
+            </h1>
+
+                <h3>
+                      Divine Word University
+
+                </h3>
+              
+            </div>
+
+
+            <h1>
+                Welcome
+            </h1>
+
+
+            <h2>
+                To Divine Word University's Academic Writing Feedback Assistant
+            </h2>
+
+
+            <p class="pepa-hero-description">
+             An AI-powered Academic Writing Feedback Assistant designed to support lecturers in assessing 
+             essays, literature reviews, and project proposals with greater
+             structure, consistency, and efficiency, 
+             reducing hours of evaluation and grading to minutes 
+             while providing clear, consistent, and constructive feedback.
+            </p>
+
+
+            <div class="pepa-hero-buttons">
+
+                   <a href="{% url 'admin_login' %}"
+                      class="pepa-btn pepa-btn-secondary">
+                        Admin Portal
+                     </a>
+
+                <a
+                    href="{% url 'lecturer_login' %}"
+                    class="pepa-btn pepa-btn-primary"
+                >
+                    Lecturer Portal
+                </a>
+
+
+                <a
+                    href="{% url 'student_login' %}"
+                    class="pepa-btn pepa-btn-secondary"
+                >
+                    Student Portal
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ABOUT PEPA GRADE
+    ====================================================== -->
+
+    <section class="pepa-about">
+
+        <div class="pepa-section-label">
+            ABOUT PepaGRADE
+        </div>
+
+
+        <h2 class="pepa-section-title">
+            Supporting better assessment for Academic Papers (Essays, Literature Reviews, Proposals).
+        </h2>
+
+
+        <p class="pepa-about-text">
+            PepaGRADE provides a structured environment for
+            academic assessment by combining artificial intelligence
+            with lecturer-defined marking guides and assessment
+            criteria.
+        </p>
+
+
+        <p class="pepa-about-text">
+            The system is designed to assist lecturers in reviewing
+            student academic writing while keeping the lecturer in
+            control of the final assessment and feedback.
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         HIGHLIGHTS
+    ====================================================== -->
+
+    <section class="pepa-highlights">
+
+
+        <div class="pepa-highlight">
+
+            <span class="pepa-highlight-number">
+                01
+            </span>
+
+
+            <h3>
+                AI-Assisted
+            </h3>
+
+
+            <p>
+                Supports the assessment process through
+                AI-assisted academic writing analysis.
+            </p>
+
+        </div>
+
+
+
+        <div class="pepa-highlight">
+
+            <span class="pepa-highlight-number">
+                02
+            </span>
+
+
+            <h3>
+                Guide-Based
+            </h3>
+
+
+            <p>
+                Assessment is structured around lecturer-provided
+                marking guides and criteria.
+            </p>
+
+        </div>
+
+
+
+        <div class="pepa-highlight">
+
+            <span class="pepa-highlight-number">
+                03
+            </span>
+
+
+            <h3>
+                Lecturer Controlled
+            </h3>
+
+
+            <p>
+                Lecturers review the assessment and remain responsible
+                for the final academic decision.
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FEATURES
+    ====================================================== -->
+
+    <section class="pepa-features">
+
+        <div class="pepa-feature-intro">
+
+            <div class="pepa-section-label">
+                THE PepaGRADE PLATFORM
+            </div>
+
+
+            <h2 class="pepa-section-title">
+                Built around the academic assessment process.
+            </h2>
+
+        </div>
+
+
+
+        <div class="pepa-feature-grid">
+
+
+            <!-- FEATURE 1 -->
+
+            <div class="pepa-feature-card">
+
+                <div class="pepa-feature-number">
+                    01
+                </div>
+
+
+                <h3>
+                    AI-Powered Assessment
+                </h3>
+
+
+                <p>
+                    Analyses submitted academic writing and provides
+                    structured assessment results to support lecturer
+                    review.
+                </p>
+
+            </div>
+
+
+
+            <!-- FEATURE 2 -->
+
+            <div class="pepa-feature-card">
+
+                <div class="pepa-feature-number">
+                    02
+                </div>
+
+
+                <h3>
+                    Marking Guides
+                </h3>
+
+
+                <p>
+                    Allows lecturers to provide marking guides and
+                    assessment criteria for structured evaluation.
+                </p>
+
+            </div>
+
+
+
+            <!-- FEATURE 3 -->
+
+            <div class="pepa-feature-card">
+
+                <div class="pepa-feature-number">
+                    03
+                </div>
+
+
+                <h3>
+                    Lecturer Review
+                </h3>
+
+
+                <p>
+                    Keeps lecturers involved in reviewing AI-generated
+                    assessment results before final grades are recorded.
+                </p>
+
+            </div>
+
+
+
+            <!-- FEATURE 4 -->
+
+            <div class="pepa-feature-card">
+
+                <div class="pepa-feature-number">
+                    04
+                </div>
+
+
+                <h3>
+                    Assessment Reports
+                </h3>
+
+
+                <p>
+                    Provides structured assessment information and
+                    downloadable reports for academic records.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FINAL CTA
+    ====================================================== -->
+
+    <section class="pepa-cta">
+
+        <div class="pepa-section-label">
+            GET STARTED
+        </div>
+
+
+        <h2>
+            A more structured approach to academic assessment.
+        </h2>
+
+
+        <p>
+            Access the PepaGRADE platform through the appropriate
+            portal for your role.
+        </p>
+
+
+        <div class="pepa-cta-buttons">
+
+            <a
+                href="{% url 'lecturer_login' %}"
+                class="pepa-btn pepa-btn-primary"
+            >
+                Lecturer Portal
+            </a>
+
+
+            <a
+                href="{% url 'student_login' %}"
+                class="pepa-btn pepa-btn-secondary"
+            >
+                Student Portal
+            </a>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PEPA GRADE FOOTER INFORMATION
+    ====================================================== -->
+
+    <section class="pepa-footer-info">
+
+        <div class="pepa-footer-container">
+
+
+            <!-- =================================================
+                 BRAND / SOCIAL MEDIA
+            ================================================== -->
+
+            <div class="pepa-footer-column pepa-footer-brand">
+
+                <img
+                    src="{% static 'images/PepaGRADE_Logo.png' %}"
+                    alt="PepaGRADE Logo"
+                    class="pepa-footer-logo"
+                >
+
+
+                <h3>
+                    PepaGRADE
+                </h3>
+
+
+                <p>
+                    Academic Writing Feedback Assistant
+                </p>
+
+
+                <h4>
+                    Follow Us on Social Media
+                </h4>
+
+
+                <div class="pepa-social-links">
+
+                    <a
+                        href="#"
+                        aria-label="Facebook"
+                    >
+                        f
+                    </a>
+
+
+                    <a
+                        href="#"
+                        aria-label="X"
+                    >
+                        𝕏
+                    </a>
+
+
+                    <a
+                        href="#"
+                        aria-label="LinkedIn"
+                    >
+                        in
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 LOCATION
+            ================================================== -->
+
+            <div class="pepa-footer-column">
+
+                <h4>
+                    Our Location
+                </h4>
+
+
+                <p>
+                    Divine Word University,<br>
+                    Allotment Portion 7, Section Milinch Kranket,<br>
+                    Nabasa Road, P.O.Box 483,<br>
+                    Madang 511, Madang Province,<br>
+                    Papua New Guinea
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CONTACT
+            ================================================== -->
+
+            <div class="pepa-footer-column">
+
+                <h4>
+                    Get In Touch
+                </h4>
+
+
+                <p class="pepa-contact-heading">
+                    Customer service and support
+                </p>
+
+
+                <p>
+                    <strong>
+                        (675) 73751976
+                    </strong>
+                </p>
+
+
+                <p>
+                    Or email the team on:
+                </p>
+
+
+                <p>
+                    <a href="mailto:230203@student.dwu.ac.pg">
+                        230203@student.dwu.ac.pg
+                    </a>
+                </p>
+
+
+                <p>
+                    <a href="mailto:felithapugu@gmail.com">
+                        felithapugu@gmail.com
+                    </a>
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             FOOTER BOTTOM
+        ================================================== -->
+
+        <div class="pepa-footer-bottom">
+
+            <a href="#">
+                Privacy Policy
+            </a>
+
+
+            <span>
+                © {% now "Y" %} PepaGRADE. All Rights Reserved.
+            </span>
+
+        </div>
+
+    </section>
+
+
+</div>
+
+{% endblock %}

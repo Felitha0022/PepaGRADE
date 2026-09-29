@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    .page-header {
+        margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+        margin-bottom: 5px;
+    }
+
+    .page-actions {
+        display: flex;
+        gap: 12px;
+        margin: 20px 0;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        border: none;
+    }
+
+    .btn-add {
+        background-color: #f4c400;
+        color: #000;
+    }
+
+    .btn-add:hover {
+        background-color: #d9ad00;
+    }
+
+    .btn-back {
+        background-color: #198754;
+        color: white;
+    }
+
+    .btn-back:hover {
+        background-color: #146c43;
+    }
+
+    .btn-view {
+        background-color: #198754;
+        color: white;
+        padding: 7px 14px;
+        border-radius: 5px;
+    }
+
+    .btn-view:hover {
+        background-color: #146c43;
+    }
+
+    .student-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .student-table th {
+        background-color: #198754;
+        color: white;
+        padding: 12px;
+        text-align: left;
+    }
+
+    .student-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .student-table tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .message {
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #e8f5e9;
+        border-radius: 5px;
+    }
+
+</style>
+
+
+<div class="page-header">
+
+    <h1>Student Profiles</h1>
+
+    <p>
+        Manage student profiles and their academic work.
+    </p>
+
+</div>
+
+
+<hr>
+
+
+<!-- PAGE ACTION BUTTONS -->
+
+<div class="page-actions">
+
+    <a href="{% url 'student_create' %}" class="btn btn-add">
+        + Add Student
+    </a>
+
+</div>
+
+
+
+<!-- STUDENT TABLE -->
+
+<table class="student-table">
+
+    <thead>
+
+        <tr>
+
+            <th>Student ID</th>
+            <th>Student Name</th>
+            <th>Program</th>
+            <th>Year Level</th>
+            <th>Action</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+        {% for student in students %}
+
+        <tr>
+
+            <td>
+                {{ student.student_id }}
+            </td>
+
+            <td>
+                {{ student.full_name }}
+            </td>
+
+            <td>
+                {{ student.program }}
+            </td>
+
+            <td>
+                Year {{ student.year_level }}
+            </td>
+
+            <td>
+
+                <a
+                    href="{% url 'student_detail' student.id %}"
+                    class="btn-view"
+                >
+                    View Profile
+                </a>
+
+                <a
+                    href="{% url 'student_delete' student.id %}"
+                    style="
+                        display:inline-block;
+                        margin-left:8px;
+                        padding:7px 14px;
+                        background:#dc3545;
+                        color:white;
+                        border-radius:5px;
+                        text-decoration:none;
+                        font-weight:600;
+                    "
+                >
+                    Delete
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="5">
+                No student profiles have been created yet.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+<div class="page-actions">
+    <a href="{% url 'lecturer_dashboard' %}" class="btn btn-back">
+
+        ← Back to Dashboard
+</a>
+
+</div>
+
+
+{% endblock %}

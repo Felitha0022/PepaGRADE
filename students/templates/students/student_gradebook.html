@@ -1,0 +1,1720 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+    PepaGRADE - Gradebook
+</title>
+
+<style>
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7f5;
+    color: #26332b;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.top-header {
+    height: 70px;
+    background: #ffffff;
+    border-bottom: 1px solid #dfe7e2;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.logo {
+    display: block;
+    width: 150px;
+    height: 48px;
+    object-fit: contain;
+    object-position: left center;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+    width: 245px;
+    background: #ffffff;
+    border-right: 1px solid #dfe7e2;
+    padding: 25px 15px;
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #7a857e;
+    text-transform: uppercase;
+    margin: 5px 12px 12px;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    display: block;
+    padding: 13px 15px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    color: #37423b;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    background: #eef7f1;
+    color: #168044;
+}
+
+.nav-link.active {
+    background: #168044;
+    color: white;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.main-content {
+    margin-left: 245px;
+    padding: 105px 35px 40px;
+    min-height: 100vh;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #173b28;
+}
+
+.page-subtitle {
+    color: #6c776f;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   STUDENT INFORMATION
+========================================================= */
+
+.student-card {
+    background: white;
+    border: 1px solid #dfe7e2;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.student-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #173b28;
+    margin-bottom: 15px;
+}
+
+.student-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.info-item {
+    background: #f7faf8;
+    border-radius: 8px;
+    padding: 13px 15px;
+}
+
+.info-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #7b857e;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.info-value {
+    font-size: 14px;
+    color: #26332b;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   COURSE UNIT
+========================================================= */
+
+.unit-card {
+    background: white;
+    border: 1px solid #dfe7e2;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.unit-label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 9px;
+    color: #37423b;
+}
+
+.unit-select {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 14px;
+    border: 1px solid #cbd7cf;
+    border-radius: 7px;
+    background: white;
+    font-size: 14px;
+    color: #26332b;
+    outline: none;
+}
+
+.unit-select:focus {
+    border-color: #168044;
+    box-shadow: 0 0 0 2px rgba(22, 128, 68, 0.08);
+}
+
+
+/* =========================================================
+   GRADEBOOK CARD
+========================================================= */
+
+.gradebook-card {
+    background: white;
+    border: 1px solid #dfe7e2;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.gradebook-header {
+    padding: 20px 22px;
+    border-bottom: 1px solid #e5ebe7;
+}
+
+.gradebook-header h2 {
+    font-size: 19px;
+    color: #173b28;
+    margin-bottom: 5px;
+}
+
+.gradebook-header p {
+    font-size: 13px;
+    color: #768078;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    padding: 35px 25px;
+    text-align: center;
+}
+
+.empty-state p {
+    color: #68736c;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn {
+    border: none;
+    border-radius: 7px;
+    padding: 11px 17px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-green {
+    background: #168044;
+    color: white;
+}
+
+.btn-green:hover {
+    background: #116c38;
+}
+
+.btn-secondary {
+    background: #eef2ef;
+    color: #354139;
+}
+
+.btn-secondary:hover {
+    background: #e2e9e4;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.gradebook-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.gradebook-table th {
+    background: #f1f6f3;
+    color: #3e4a42;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #dfe7e2;
+}
+
+.gradebook-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid #e8eeea;
+    vertical-align: middle;
+}
+
+.gradebook-table input {
+    width: 100%;
+    padding: 10px 11px;
+    border: 1px solid #cbd7cf;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.gradebook-table input:focus {
+    border-color: #168044;
+    box-shadow: 0 0 0 2px rgba(22, 128, 68, 0.08);
+}
+
+.details-input {
+    min-width: 300px;
+}
+
+.mark-input {
+    min-width: 100px;
+}
+
+
+/* =========================================================
+   FINAL GRADE COLUMN
+========================================================= */
+
+.final-grade-cell {
+    width: 130px;
+    text-align: center;
+}
+
+.final-grade-display {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    min-height: 35px;
+    padding: 6px 12px;
+    background: #eef7f1;
+    color: #168044;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.final-grade-empty {
+    color: #9aa39d;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   VIEW COLUMN
+========================================================= */
+
+.view-cell {
+    width: 80px;
+    text-align: center;
+}
+
+.visibility-indicator {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 17px;
+    transition: 0.2s;
+}
+
+.visibility-indicator.visible {
+    background: #eef7f1;
+    color: #168044;
+}
+
+.visibility-indicator.visible:hover {
+    background: #dcefe3;
+}
+
+.visibility-indicator.hidden {
+    background: #fff0f0;
+    color: #b42318;
+}
+
+.visibility-indicator.hidden:hover {
+    background: #ffe1e1;
+}
+
+.visibility-x {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #b42318;
+    color: white;
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 14px;
+    text-align: center;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+========================================================= */
+
+.delete-btn {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 50%;
+    background: #fff0f0;
+    color: #b42318;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.delete-btn:hover {
+    background: #ffe1e1;
+}
+
+
+/* =========================================================
+   TABLE ACTIONS
+========================================================= */
+
+.table-actions {
+    padding: 15px 20px;
+    border-top: 1px solid #e5ebe7;
+    background: #fafcfb;
+}
+
+
+/* =========================================================
+   FINAL GRADE SECTION
+========================================================= */
+
+.final-grade-section {
+    margin-top: 25px;
+    background: white;
+    border: 1px solid #dfe7e2;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.final-grade-section h3 {
+    color: #173b28;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.final-grade-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.final-grade-input {
+    width: 150px;
+    padding: 11px 12px;
+    border: 1px solid #cbd7cf;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BOTTOM ACTIONS
+========================================================= */
+
+.bottom-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 210px;
+    }
+
+    .main-content {
+        margin-left: 210px;
+    }
+
+    .student-info {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .top-header {
+        padding: 0 15px;
+    }
+
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #dfe7e2;
+        margin-top: 70px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 30px 15px;
+    }
+
+    .top-header {
+        position: absolute;
+    }
+
+    .logo {
+        width: 140px;
+        height: 45px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="top-header">
+
+    <img
+        src="{% static 'images/PepaGRADE_Logo.png' %}"
+        class="logo"
+        alt="PepaGRADE"
+        width="150"
+        height="48"
+    >
+
+</header>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="sidebar-title">
+        PepaGRADE Dashboard
+    </div>
+
+    <a
+        href="{% url 'student_list' %}"
+        class="nav-link"
+    >
+        🏠 Dashboard
+    </a>
+
+    <div
+        class="sidebar-title"
+        style="margin-top: 25px;"
+    >
+        Lecturer Menu
+    </div>
+
+    <a
+        href="{% url 'student_list' %}"
+        class="nav-link active"
+    >
+        👨‍🎓 My Students
+    </a>
+
+    <a
+        href="#"
+        class="nav-link"
+    >
+        👤 Account
+    </a>
+
+    <a
+        href="{% url 'student_logout' %}"
+        class="nav-link"
+    >
+        🚪 Logout
+    </a>
+
+</aside>
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main class="main-content">
+
+    <h1 class="page-title">
+        Student Gradebook
+    </h1>
+
+    <p class="page-subtitle">
+        Manage assessment records and final grade information
+        for this student.
+    </p>
+
+
+    <!-- =====================================================
+         STUDENT INFORMATION
+    ===================================================== -->
+
+    <div class="student-card">
+
+        <div class="student-name">
+            {{ student.full_name }}
+        </div>
+
+        <div class="student-info">
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Student ID
+                </span>
+
+                <span class="info-value">
+                    {{ student.student_id }}
+                </span>
+
+            </div>
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Programme
+                </span>
+
+                <span class="info-value">
+                    {{ student.program }}
+                </span>
+
+            </div>
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Year Level
+                </span>
+
+                <span class="info-value">
+                    Year {{ student.year_level }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         COURSE UNIT
+    ===================================================== -->
+
+    <div class="unit-card">
+
+        <label
+            for="unitSelect"
+            class="unit-label"
+        >
+            Course Unit
+        </label>
+
+        <select
+            id="unitSelect"
+            class="unit-select"
+        >
+
+            {% for enrollment in enrollments %}
+
+                <option
+                    value="{{ enrollment.course_unit.id }}"
+
+                    {% if selected_unit and enrollment.course_unit.id == selected_unit.id %}
+                        selected
+                    {% endif %}
+                >
+
+                    {{ enrollment.course_unit.code }}
+                    -
+                    {{ enrollment.course_unit.name }}
+
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+
+    <!-- =====================================================
+         GRADEBOOK FORM
+    ===================================================== -->
+
+    <form
+        method="POST"
+        id="gradebookForm"
+    >
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="course_unit_id"
+            value="{% if selected_unit %}{{ selected_unit.id }}{% endif %}"
+        >
+
+
+        <div class="gradebook-card">
+
+
+            <!-- =================================================
+                 GRADEBOOK HEADER
+            ================================================= -->
+
+            <div class="gradebook-header">
+
+                <h2>
+                    Assessment Records
+                </h2>
+
+                {% if selected_unit %}
+
+                    <p>
+                        Enter the assessment information for
+                        {{ selected_unit.code }}
+                        -
+                        {{ selected_unit.name }}.
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        Select a course unit to manage its
+                        assessment records.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 EMPTY STATE
+            ================================================= -->
+
+            {% if not gradebook_entries %}
+
+                <div
+                    class="empty-state"
+                    id="emptyState"
+                >
+
+                    <p>
+                        No records for {{ student.full_name }}.
+                        Click the button below to enter an assessment.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-green"
+                        id="addFirstRowBtn"
+                    >
+                        + Add Assessment
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 TABLE
+            ================================================= -->
+
+            <div
+                class="table-wrapper"
+                id="tableWrapper"
+
+                {% if not gradebook_entries %}
+                    style="display:none;"
+                {% endif %}
+            >
+
+                <table class="gradebook-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Details
+                            </th>
+
+                            <th>
+                                Mark
+                            </th>
+
+                            <th>
+                                Final Grade
+                            </th>
+
+                            <th class="view-cell">
+                                View
+                            </th>
+
+                            <th class="view-cell">
+                                Delete
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="gradebookBody">
+
+
+                        {% for entry in gradebook_entries %}
+
+                            <tr class="gradebook-row">
+
+                                <!-- =================================
+                                     DETAILS
+                                ================================== -->
+
+                                <td>
+
+                                    <input
+                                        type="hidden"
+                                        name="entry_id_{{ forloop.counter }}"
+                                        value="{{ entry.id }}"
+                                        class="entry-id-input"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="assessment_type_{{ forloop.counter }}"
+                                        value="{{ entry.assessment_type }}"
+                                        class="assessment-type-input"
+                                    >
+
+                                    <input
+                                        type="text"
+                                        name="assessment_details_{{ forloop.counter }}"
+                                        class="details-input"
+                                        value="{{ entry.assessment_details }}"
+                                        placeholder="Assessment details"
+                                    >
+
+                                </td>
+
+
+                                <!-- =================================
+                                     MARK
+                                ================================== -->
+
+                                <td>
+
+                                    <input
+                                        type="number"
+                                        name="mark_{{ forloop.counter }}"
+                                        class="mark-input"
+                                        value="{{ entry.mark|default_if_none:'' }}"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        placeholder="0 - 100"
+                                    >
+
+                                </td>
+
+
+                                <!-- =================================
+                                     SAVED FINAL GRADE
+                                ================================== -->
+
+                                <td class="final-grade-cell">
+
+                                    {% if entry.final_grade %}
+
+                                        <span class="final-grade-display">
+                                            {{ entry.final_grade }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="final-grade-empty">
+                                            —
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- =================================
+                                     VIEW
+                                ================================== -->
+
+                                <td class="view-cell">
+
+                                    <button
+                                        type="button"
+                                        class="visibility-indicator
+                                        {% if entry.is_visible %}
+                                            visible
+                                        {% else %}
+                                            hidden
+                                        {% endif %}"
+                                        title="{% if entry.is_visible %}Visible to student{% else %}Hidden from student{% endif %}"
+                                        onclick="toggleVisibility(this)"
+                                    >
+
+                                        👁
+
+                                        {% if not entry.is_visible %}
+
+                                            <span class="visibility-x">
+                                                ×
+                                            </span>
+
+                                        {% endif %}
+
+                                    </button>
+
+                                    <input
+                                        type="hidden"
+                                        name="visibility_{{ forloop.counter }}"
+                                        value="{% if entry.is_visible %}1{% else %}0{% endif %}"
+                                        class="visibility-input"
+                                    >
+
+                                </td>
+
+
+                                <!-- =================================
+                                     DELETE
+                                ================================== -->
+
+                                <td class="view-cell">
+
+                                    <button
+                                        type="button"
+                                        class="delete-btn"
+                                        onclick="deleteRow(this)"
+                                        title="Remove row"
+                                    >
+                                        ✕
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+
+                <!-- ADD ASSESSMENT -->
+
+                <div class="table-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-green"
+                        id="addRowBtn"
+                    >
+                        + Add Assessment
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             FINAL GRADE
+        ===================================================== -->
+
+        <div class="final-grade-section">
+
+            <h3>
+                Final Grade
+            </h3>
+
+            <div class="final-grade-row">
+
+                <input
+                    type="text"
+                    name="final_grade"
+                    id="finalGradeInput"
+                    class="final-grade-input"
+                    value="{{ final_grade }}"
+                    placeholder="e.g. A, B+, B"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             BOTTOM ACTIONS
+        ===================================================== -->
+
+        <div class="bottom-actions">
+
+            <a
+                href="{% url 'student_detail' student.id %}"
+                class="btn btn-secondary"
+            >
+                ← Back to Student Profile
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-green"
+            >
+                Save
+            </button>
+
+        </div>
+
+
+        <!-- =====================================================
+             ROW COUNTER
+        ===================================================== -->
+
+        <input
+            type="hidden"
+            name="row_count"
+            id="rowCount"
+            value="{{ gradebook_entries|length }}"
+        >
+
+    </form>
+
+</main>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+/* =========================================================
+   INITIAL ROW COUNT
+========================================================= */
+
+let rowCount = 0;
+
+
+/* =========================================================
+   GET CURRENT ROWS
+========================================================= */
+
+function getRows() {
+
+    return document.querySelectorAll(
+        "#gradebookBody .gradebook-row"
+    );
+
+}
+
+
+/* =========================================================
+   RENUMBER ALL ROWS
+========================================================= */
+
+function renumberRows() {
+
+    const rows = getRows();
+
+    rows.forEach(
+        function(row, index) {
+
+            const number = index + 1;
+
+
+            /* ENTRY ID */
+
+            const entryIdInput =
+                row.querySelector(
+                    ".entry-id-input"
+                );
+
+            if (entryIdInput) {
+
+                entryIdInput.name =
+                    "entry_id_" + number;
+
+            }
+
+
+            /* ASSESSMENT TYPE */
+
+            const assessmentTypeInput =
+                row.querySelector(
+                    ".assessment-type-input"
+                );
+
+            if (assessmentTypeInput) {
+
+                assessmentTypeInput.name =
+                    "assessment_type_" + number;
+
+            }
+
+
+            /* DETAILS */
+
+            const detailsInput =
+                row.querySelector(
+                    ".details-input"
+                );
+
+            if (detailsInput) {
+
+                detailsInput.name =
+                    "assessment_details_" + number;
+
+            }
+
+
+            /* MARK */
+
+            const markInput =
+                row.querySelector(
+                    ".mark-input"
+                );
+
+            if (markInput) {
+
+                markInput.name =
+                    "mark_" + number;
+
+            }
+
+
+            /* VISIBILITY */
+
+            const visibilityInput =
+                row.querySelector(
+                    ".visibility-input"
+                );
+
+            if (visibilityInput) {
+
+                visibilityInput.name =
+                    "visibility_" + number;
+
+            }
+
+        }
+    );
+
+
+    rowCount = rows.length;
+
+    document.getElementById(
+        "rowCount"
+    ).value = rowCount;
+
+}
+
+
+/* =========================================================
+   COURSE UNIT CHANGE
+========================================================= */
+
+document
+    .getElementById("unitSelect")
+    .addEventListener(
+        "change",
+        function() {
+
+            const unitId =
+                this.value;
+
+            if (!unitId) {
+                return;
+            }
+
+            window.location.href =
+                "{% url 'student_gradebook' student.id %}"
+                + "?unit="
+                + unitId;
+
+        }
+    );
+
+
+/* =========================================================
+   SHOW TABLE
+========================================================= */
+
+function showTable() {
+
+    const emptyState =
+        document.getElementById(
+            "emptyState"
+        );
+
+    const tableWrapper =
+        document.getElementById(
+            "tableWrapper"
+        );
+
+    if (emptyState) {
+
+        emptyState.style.display =
+            "none";
+
+    }
+
+    if (tableWrapper) {
+
+        tableWrapper.style.display =
+            "block";
+
+    }
+
+}
+
+
+/* =========================================================
+   ADD ASSESSMENT ROW
+========================================================= */
+
+function addAssessmentRow() {
+
+    showTable();
+
+    const tbody =
+        document.getElementById(
+            "gradebookBody"
+        );
+
+    const row =
+        document.createElement(
+            "tr"
+        );
+
+    row.className =
+        "gradebook-row";
+
+
+    row.innerHTML = `
+
+        <td>
+
+            <input
+                type="hidden"
+                name="entry_id_0"
+                value=""
+                class="entry-id-input"
+            >
+
+            <input
+                type="hidden"
+                name="assessment_type_0"
+                value=""
+                class="assessment-type-input"
+            >
+
+            <input
+                type="text"
+                name="assessment_details_0"
+                class="details-input"
+                placeholder="Assessment details"
+            >
+
+        </td>
+
+
+        <td>
+
+            <input
+                type="number"
+                name="mark_0"
+                class="mark-input"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="0 - 100"
+            >
+
+        </td>
+
+
+        <td class="final-grade-cell">
+
+            <span class="final-grade-empty">
+                —
+            </span>
+
+        </td>
+
+
+        <td class="view-cell">
+
+            <button
+                type="button"
+                class="visibility-indicator hidden"
+                title="Hidden from student"
+                onclick="toggleVisibility(this)"
+            >
+
+                👁
+
+                <span class="visibility-x">
+                    ×
+                </span>
+
+            </button>
+
+            <input
+                type="hidden"
+                name="visibility_0"
+                value="0"
+                class="visibility-input"
+            >
+
+        </td>
+
+
+        <td class="view-cell">
+
+            <button
+                type="button"
+                class="delete-btn"
+                onclick="deleteRow(this)"
+                title="Remove row"
+            >
+                ✕
+            </button>
+
+        </td>
+
+    `;
+
+
+    tbody.appendChild(
+        row
+    );
+
+
+    renumberRows();
+
+}
+
+
+/* =========================================================
+   ADD FIRST ROW
+========================================================= */
+
+const addFirstRowBtn =
+    document.getElementById(
+        "addFirstRowBtn"
+    );
+
+if (addFirstRowBtn) {
+
+    addFirstRowBtn.addEventListener(
+        "click",
+        addAssessmentRow
+    );
+
+}
+
+
+/* =========================================================
+   ADD MORE ROWS
+========================================================= */
+
+const addRowBtn =
+    document.getElementById(
+        "addRowBtn"
+    );
+
+if (addRowBtn) {
+
+    addRowBtn.addEventListener(
+        "click",
+        addAssessmentRow
+    );
+
+}
+
+
+/* =========================================================
+   TOGGLE ROW VISIBILITY
+========================================================= */
+
+function toggleVisibility(button) {
+
+    const row =
+        button.closest(
+            ".gradebook-row"
+        );
+
+    if (!row) {
+        return;
+    }
+
+
+    const visibilityInput =
+        row.querySelector(
+            ".visibility-input"
+        );
+
+    if (!visibilityInput) {
+        return;
+    }
+
+
+    const currentlyVisible =
+        visibilityInput.value === "1";
+
+
+    const newVisibility =
+        !currentlyVisible;
+
+
+    visibilityInput.value =
+        newVisibility
+            ? "1"
+            : "0";
+
+
+    button.classList.toggle(
+        "visible",
+        newVisibility
+    );
+
+    button.classList.toggle(
+        "hidden",
+        !newVisibility
+    );
+
+
+    const x =
+        button.querySelector(
+            ".visibility-x"
+        );
+
+
+    if (newVisibility) {
+
+        if (x) {
+            x.remove();
+        }
+
+        button.title =
+            "Visible to student";
+
+    } else {
+
+        if (!x) {
+
+            const newX =
+                document.createElement(
+                    "span"
+                );
+
+            newX.className =
+                "visibility-x";
+
+            newX.textContent =
+                "×";
+
+            button.appendChild(
+                newX
+            );
+
+        }
+
+        button.title =
+            "Hidden from student";
+
+    }
+
+}
+
+
+/* =========================================================
+   DELETE ROW
+========================================================= */
+
+function deleteRow(button) {
+
+    const row =
+        button.closest(
+            ".gradebook-row"
+        );
+
+    if (!row) {
+        return;
+    }
+
+
+    row.remove();
+
+
+    /*
+     * IMPORTANT:
+     * Renumber the remaining rows immediately.
+     * This prevents gaps such as:
+     *
+     * entry_id_1
+     * entry_id_3
+     *
+     * after row 2 is deleted.
+     */
+
+    renumberRows();
+
+
+    /*
+     * If no rows remain, show the empty state again.
+     */
+
+    const rows =
+        getRows();
+
+    if (rows.length === 0) {
+
+        const emptyState =
+            document.getElementById(
+                "emptyState"
+            );
+
+        if (emptyState) {
+
+            emptyState.style.display =
+                "block";
+
+        }
+
+        const tableWrapper =
+            document.getElementById(
+                "tableWrapper"
+            );
+
+        if (tableWrapper) {
+
+            tableWrapper.style.display =
+                "none";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PREPARE FORM BEFORE SAVE
+========================================================= */
+
+document
+    .getElementById("gradebookForm")
+    .addEventListener(
+        "submit",
+        function() {
+
+            /*
+             * Always renumber immediately before
+             * sending the form.
+             */
+
+            renumberRows();
+
+
+            const rows =
+                getRows();
+
+
+            rows.forEach(
+                function(row, index) {
+
+                    const detailsInput =
+                        row.querySelector(
+                            ".details-input"
+                        );
+
+                    const markInput =
+                        row.querySelector(
+                            ".mark-input"
+                        );
+
+                    const assessmentInput =
+                        row.querySelector(
+                            ".assessment-type-input"
+                        );
+
+
+                    const details =
+                        detailsInput
+                            ? detailsInput.value.trim()
+                            : "";
+
+                    const mark =
+                        markInput
+                            ? markInput.value.trim()
+                            : "";
+
+
+                    /*
+                     * Only create an assessment name
+                     * when the lecturer actually entered
+                     * assessment information.
+                     */
+
+                    if (
+                        (details || mark)
+                        &&
+                        assessmentInput
+                        &&
+                        !assessmentInput.value.trim()
+                    ) {
+
+                        assessmentInput.value =
+                            "Assessment "
+                            + (index + 1);
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   INITIALIZE ROW COUNT
+========================================================= */
+
+renumberRows();
+
+</script>
+
+</body>
+
+</html>

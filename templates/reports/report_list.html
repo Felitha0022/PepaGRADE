@@ -1,0 +1,178 @@
+
+{% extends "base.html" %}
+
+{% block title %}Reports | PepaGRADE{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <h1>Reports</h1>
+
+    <p>
+        View and download AI assessment reports generated for students.
+    </p>
+
+</div>
+
+
+<div class="card">
+
+    {% if reports %}
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Student Name</th>
+
+                        <th>Assignment</th>
+
+                        <th>AI Score</th>
+
+                        <th>AI Grade</th>
+
+                        <th>Date Generated</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for report in reports %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong>
+                                {{ report.student.full_name }}
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                {{ report.student.student_id }}
+                            </small>
+
+                        </td>
+
+
+                        <td>
+                            {{ report.assessment.submission.assignment.title }}
+                        </td>
+
+
+                        <td>
+
+                            {% if report.assessment.ai_score != None %}
+
+                                {{ report.assessment.ai_score }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if report.assessment.ai_grade %}
+
+                                {{ report.assessment.ai_grade }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ report.created_at|date:"M. d, Y, g:i A" }}
+                        </td>
+
+
+                        <td>
+
+                           <a
+                            href="{% url 'report_detail' report.id %}"
+                            style="
+                                display: inline-block;
+                                background: #16803c;
+                                color: white;
+                                padding: 11px 20px;
+                                border-radius: 6px;
+                                text-decoration: none;
+                                font-weight: 600;
+                                font-size: 14px;
+                                border: none;
+                                cursor: pointer;
+                            "
+                        >
+                            View Report
+                        </a>
+
+
+                        <a
+                            href="{% url 'download_report' report.id %}"
+                            style="
+                                display: inline-block;
+                                background: #6c757d;
+                                color: white;
+                                padding: 11px 20px;
+                                border-radius: 6px;
+                                text-decoration: none;
+                                font-weight: 600;
+                                font-size: 14px;
+                                border: none;
+                                cursor: pointer;
+                            "
+                        >
+                            Download
+                        </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div style="text-align:center;padding:40px;">
+
+            <h2>No Reports Available</h2>
+
+            <p>
+                Reports will automatically appear here after an AI
+                assessment has been completed.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+

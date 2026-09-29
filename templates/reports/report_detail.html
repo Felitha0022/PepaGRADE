@@ -1,0 +1,94 @@
+
+{% extends "base.html" %}
+
+{% block title %}Assessment Report | PepaGRADE{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <h1>Assessment Report</h1>
+
+    <p>
+        Detailed assessment report for
+        <strong>{{ report.student.full_name }}</strong>.
+    </p>
+
+</div>
+
+
+<div class="card">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:25px;
+    ">
+
+        <h2 style="margin:0;">
+            {{ report.student.full_name }}
+        </h2>
+
+        <div>
+
+           <a
+            href="{% url 'download_report' report.id %}"
+            style="
+                display: inline-block;
+                background: #6c757d;
+                color: white;
+                padding: 11px 20px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 14px;
+                border: none;
+                cursor: pointer;
+            "
+        >
+            Download Report
+        </a>
+
+
+        <a
+        href="{% url 'student_reports' student.id %}"
+            style="
+                display: inline-block;
+                background: #16803c;
+                color: white;
+                padding: 11px 20px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 14px;
+                border: none;
+                cursor: pointer;
+            "
+        >
+            ← Back to Reports
+        </a>
+
+        </div>
+
+    </div>
+
+
+    <div style="
+        background:#f5f7f6;
+        padding:25px;
+        border-radius:10px;
+        white-space:pre-line;
+        line-height:1.7;
+    ">
+
+        {{ report.report_content }}
+
+    </div>
+
+</div>
+
+{% endblock %}
+

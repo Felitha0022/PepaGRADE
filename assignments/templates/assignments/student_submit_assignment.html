@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}
+PepaGRADE | Submit Assignment
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .submission-page {
+        max-width: 850px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+
+    .submission-card {
+        background: white;
+        border-radius: 10px;
+        padding: 35px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+
+    .submission-header {
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+    }
+
+
+    .submission-header h1 {
+        margin: 0 0 8px;
+        color: #16803c;
+        font-size: 28px;
+    }
+
+
+    .submission-header p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+
+    .assignment-info {
+        background: #f2f8f4;
+        border-left: 4px solid #16803c;
+        padding: 18px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+
+    .assignment-info p {
+        margin: 6px 0;
+        color: #444;
+    }
+
+
+    .upload-area {
+        border: 2px dashed #b8c9bf;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+
+    .upload-area label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+
+    .upload-area input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: white;
+    }
+
+
+    .help-text {
+        color: #777;
+        font-size: 13px;
+        margin-top: 10px;
+    }
+
+
+    .error-message {
+        color: #b42318;
+        background: #fff1f0;
+        border: 1px solid #f3c2bf;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+
+    .submission-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+
+    .submit-button {
+        background: #16803c;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+
+    .submit-button:hover {
+        background: #116b32;
+    }
+
+
+    .cancel-button {
+        background: #eee;
+        color: #333;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+
+    .cancel-button:hover {
+        background: #ddd;
+    }
+
+
+    @media (max-width: 600px) {
+
+        .submission-card {
+            padding: 22px;
+        }
+
+
+        .submission-actions {
+            flex-direction: column;
+        }
+
+
+        .submit-button,
+        .cancel-button {
+            text-align: center;
+        }
+
+    }
+
+</style>
+
+
+<div class="submission-page">
+
+    <div class="submission-card">
+
+        <!-- HEADER -->
+
+        <div class="submission-header">
+
+            <h1>
+                Submit Assignment
+            </h1>
+
+            <p>
+                Upload the academic paper for this assignment.
+            </p>
+
+        </div>
+
+
+        <!-- ASSIGNMENT INFORMATION -->
+
+        <div class="assignment-info">
+
+            <p>
+
+                <strong>
+                    Assignment:
+                </strong>
+
+                {{ assignment.title }}
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Course Unit:
+                </strong>
+
+                {{ assignment.course_unit.code }}
+
+                -
+
+                {{ assignment.course_unit.name }}
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Type:
+                </strong>
+
+                {{ assignment.get_document_type_display }}
+
+            </p>
+
+
+            {% if assignment.due_date %}
+
+                <p>
+
+                    <strong>
+                        Due:
+                    </strong>
+
+                    {{ assignment.due_date|date:"M. d, Y, g:i a" }}
+
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="upload-area">
+
+                <label for="{{ form.file.id_for_label }}">
+
+                    Select Your Paper
+
+                </label>
+
+
+                {{ form.file }}
+
+
+                <div class="help-text">
+
+                    Upload your academic paper in the
+                    supported file format.
+
+                </div>
+
+
+                {% if form.file.errors %}
+
+                    <div class="error-message">
+
+                        {{ form.file.errors }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if form.non_field_errors %}
+
+                <div class="error-message">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- BUTTONS -->
+
+            <div class="submission-actions">
+
+                <button
+                    type="submit"
+                    class="submit-button"
+                >
+
+                    Submit Paper
+
+                </button>
+
+
+                <a
+                    href="{% url 'student_dashboard' %}"
+                    class="cancel-button"
+                >
+
+                    Cancel
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,902 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assessment | PepaGRADE{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+
+
+<h1>AI Assessment</h1>
+
+<p>
+    Create and run an AI assessment for this student.
+</p>
+
+
+</div>
+
+<!-- =========================================================
+     STUDENT INFORMATION
+     ========================================================= -->
+
+<div class="card">
+
+
+<h2>Student</h2>
+
+<h3>
+    {{ student.full_name }}
+</h3>
+
+<p>
+    <strong>Student ID:</strong>
+    {{ student.student_id }}
+</p>
+
+
+</div>
+
+<!-- =========================================================
+     AI ASSESSMENT FORM
+     ========================================================= -->
+
+<div class="card">
+
+
+<form
+    method="POST"
+    enctype="multipart/form-data"
+    id="aiAssessmentForm"
+>
+
+    {% csrf_token %}
+
+    <!-- ================================================
+         ASSIGNMENT INFORMATION
+         ================================================ -->
+
+    <h2>Assignment Information</h2>
+
+    <div style="margin-bottom:20px;">
+
+        <label>
+            <strong>Assignment Title</strong>
+        </label>
+
+        {{ form.title }}
+
+    </div>
+
+
+    <div style="margin-bottom:20px;">
+
+        <label>
+            <strong>Assignment Type</strong>
+        </label>
+
+        {{ form.document_type }}
+
+    </div>
+
+
+    <!-- ================================================
+         STUDENT PAPER
+         ================================================ -->
+
+    <h2 style="margin-top:30px;">
+        Student Paper
+    </h2>
+
+    <p>
+        Upload the student's completed paper.
+    </p>
+
+    <div style="margin-bottom:20px;">
+
+        {{ form.submission_file }}
+
+    </div>
+
+
+    <!-- ================================================
+         MARKING GUIDE
+         ================================================ -->
+
+    <h2 style="margin-top:30px;">
+        Marking Guide
+    </h2>
+
+    <p>
+        Upload the marking guide or rubric that should be
+        used for the assessment.
+    </p>
+
+
+    <div style="margin-bottom:20px;">
+
+        <label>
+            <strong>Marking Guide Title</strong>
+        </label>
+
+        {{ form.marking_guide_title }}
+
+    </div>
+
+
+    <div style="margin-bottom:25px;">
+
+        <label>
+            <strong>Marking Guide File</strong>
+        </label>
+
+        {{ form.marking_guide_file }}
+
+    </div>
+
+
+    <!-- ================================================
+         FORM ERRORS
+         ================================================ -->
+
+    {% if form.errors %}
+
+        <div style="
+            background:#ffecec;
+            border:1px solid #e74c3c;
+            color:#b71c1c;
+            padding:15px;
+            border-radius:8px;
+            margin-bottom:20px;
+        ">
+
+            <strong>
+                Please correct the following errors:
+            </strong>
+
+            {{ form.errors }}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- ================================================
+         BUTTONS
+         ================================================ -->
+
+    <div style="
+        display:flex;
+        gap:12px;
+        align-items:center;
+        margin-top:25px;
+    ">
+
+        <button
+            type="submit"
+            id="runAssessmentButton"
+            style="
+                background:#16803c;
+                color:white;
+                border:none;
+                padding:13px 22px;
+                border-radius:8px;
+                font-size:16px;
+                font-weight:600;
+                cursor:pointer;
+            "
+        >
+            🤖 Run AI Assessment
+        </button>
+
+
+        <a
+            href="{% url 'student_list' %}"
+            style="
+                padding:13px 22px;
+                border-radius:8px;
+                text-decoration:none;
+                border:1px solid #ccc;
+                color:#333;
+                background:white;
+            "
+        >
+            Cancel
+        </a>
+
+    </div>
+
+</form>
+```
+
+</div>
+
+<!-- =========================================================
+     AI ANALYSIS PROGRESS MODAL
+     ========================================================= -->
+
+<div
+    id="aiProgressModal"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.65);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+
+```
+<div
+    style="
+        width:100%;
+        max-width:520px;
+        background:white;
+        border-radius:18px;
+        padding:35px;
+        box-shadow:0 20px 60px rgba(0,0,0,0.30);
+        text-align:center;
+    "
+>
+
+    <!-- Logo -->
+
+    <img
+        src="/static/images/PepaGRADE_Logo.png"
+        alt="PepaGRADE"
+        style="
+            width:80px;
+            height:80px;
+            object-fit:contain;
+            margin-bottom:15px;
+        "
+    >
+
+
+    <h2
+        style="
+            margin:0;
+            color:#16803c;
+        "
+    >
+        AI Assessment in Progress
+    </h2>
+
+
+    <p
+        style="
+            color:#666;
+            margin-top:10px;
+            margin-bottom:28px;
+        "
+    >
+        PepaGRADE is analysing the student's paper
+        against the marking guide.
+    </p>
+
+
+    <!-- Progress bar -->
+
+    <div
+        style="
+            width:100%;
+            height:8px;
+            background:#e8e8e8;
+            border-radius:10px;
+            overflow:hidden;
+            margin-bottom:30px;
+        "
+    >
+
+        <div
+            id="aiProgressBar"
+            style="
+                width:10%;
+                height:100%;
+                background:#16803c;
+                border-radius:10px;
+                transition:width 0.8s ease;
+            "
+        ></div>
+
+    </div>
+
+
+    <!-- =============================================
+         PROGRESS STEPS
+         ============================================= -->
+
+    <div
+        style="
+            text-align:left;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        "
+    >
+
+        <!-- Step 1 -->
+
+        <div
+            class="ai-progress-step"
+            id="step1"
+            style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+            "
+        >
+
+            <span
+                class="step-icon"
+                style="
+                    width:28px;
+                    height:28px;
+                    border-radius:50%;
+                    background:#16803c;
+                    color:white;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:14px;
+                "
+            >
+                ✓
+            </span>
+
+            <span>
+                Preparing AI assessment
+            </span>
+
+        </div>
+
+
+        <!-- Step 2 -->
+
+        <div
+            class="ai-progress-step"
+            id="step2"
+            style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                color:#999;
+            "
+        >
+
+            <span
+                class="step-icon"
+                style="
+                    width:28px;
+                    height:28px;
+                    border-radius:50%;
+                    background:#ddd;
+                    color:#777;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:14px;
+                "
+            >
+                2
+            </span>
+
+            <span>
+                Reading student paper
+            </span>
+
+        </div>
+
+
+        <!-- Step 3 -->
+
+        <div
+            class="ai-progress-step"
+            id="step3"
+            style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                color:#999;
+            "
+        >
+
+            <span
+                class="step-icon"
+                style="
+                    width:28px;
+                    height:28px;
+                    border-radius:50%;
+                    background:#ddd;
+                    color:#777;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:14px;
+                "
+            >
+                3
+            </span>
+
+            <span>
+                Reading marking guide
+            </span>
+
+        </div>
+
+
+        <!-- Step 4 -->
+
+        <div
+            class="ai-progress-step"
+            id="step4"
+            style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                color:#999;
+            "
+        >
+
+            <span
+                class="step-icon"
+                style="
+                    width:28px;
+                    height:28px;
+                    border-radius:50%;
+                    background:#ddd;
+                    color:#777;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:14px;
+                "
+            >
+                4
+            </span>
+
+            <span>
+                Analysing against assessment criteria
+            </span>
+
+        </div>
+
+
+        <!-- Step 5 -->
+
+        <div
+            class="ai-progress-step"
+            id="step5"
+            style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                color:#999;
+            "
+        >
+
+            <span
+                class="step-icon"
+                style="
+                    width:28px;
+                    height:28px;
+                    border-radius:50%;
+                    background:#ddd;
+                    color:#777;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:14px;
+                "
+            >
+                5
+            </span>
+
+            <span>
+                Generating feedback and grade
+            </span>
+
+        </div>
+
+
+        <!-- Step 6 -->
+
+        <div
+            class="ai-progress-step"
+            id="step6"
+            style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                color:#999;
+            "
+        >
+
+            <span
+                class="step-icon"
+                style="
+                    width:28px;
+                    height:28px;
+                    border-radius:50%;
+                    background:#ddd;
+                    color:#777;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:14px;
+                "
+            >
+                6
+            </span>
+
+            <span>
+                Saving assessment results
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <p
+        id="aiProgressMessage"
+        style="
+            margin-top:28px;
+            color:#16803c;
+            font-weight:600;
+        "
+    >
+        Please wait while PepaGRADE completes the assessment.
+    </p>
+
+
+    <p
+        style="
+            font-size:13px;
+            color:#888;
+            margin-top:8px;
+        "
+    >
+        Please do not close or refresh this page.
+    </p>
+
+</div>
+```
+
+</div>
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "aiAssessmentForm"
+            );
+
+        const button =
+            document.getElementById(
+                "runAssessmentButton"
+            );
+
+        const modal =
+            document.getElementById(
+                "aiProgressModal"
+            );
+
+        const progressBar =
+            document.getElementById(
+                "aiProgressBar"
+            );
+
+        const progressMessage =
+            document.getElementById(
+                "aiProgressMessage"
+            );
+
+
+        /*
+         * -----------------------------------------------
+         * Progress stages
+         * -----------------------------------------------
+         */
+
+        const stages = [
+
+            {
+                step: 1,
+                progress: 10,
+                message:
+                    "Preparing AI assessment..."
+            },
+
+            {
+                step: 2,
+                progress: 25,
+                message:
+                    "Reading the student's paper..."
+            },
+
+            {
+                step: 3,
+                progress: 40,
+                message:
+                    "Reading the marking guide..."
+            },
+
+            {
+                step: 4,
+                progress: 65,
+                message:
+                    "Analysing the paper against the assessment criteria..."
+            },
+
+            {
+                step: 5,
+                progress: 85,
+                message:
+                    "Generating feedback, score and grade..."
+            },
+
+            {
+                step: 6,
+                progress: 95,
+                message:
+                    "Saving the assessment results..."
+            }
+
+        ];
+
+
+        /*
+         * -----------------------------------------------
+         * Activate a progress step
+         * -----------------------------------------------
+         */
+
+        function activateStep(stepNumber) {
+
+            for (
+                let i = 1;
+                i <= 6;
+                i++
+            ) {
+
+                const step =
+                    document.getElementById(
+                        "step" + i
+                    );
+
+                if (!step) {
+                    continue;
+                }
+
+                const icon =
+                    step.querySelector(
+                        ".step-icon"
+                    );
+
+
+                if (i < stepNumber) {
+
+                    step.style.color =
+                        "#333";
+
+                    icon.style.background =
+                        "#16803c";
+
+                    icon.style.color =
+                        "white";
+
+                    icon.innerHTML =
+                        "✓";
+
+                }
+
+                else if (i === stepNumber) {
+
+                    step.style.color =
+                        "#16803c";
+
+                    step.style.fontWeight =
+                        "600";
+
+                    icon.style.background =
+                        "#16803c";
+
+                    icon.style.color =
+                        "white";
+
+                    icon.innerHTML =
+                        "●";
+
+                }
+
+                else {
+
+                    step.style.color =
+                        "#999";
+
+                    step.style.fontWeight =
+                        "normal";
+
+                    icon.style.background =
+                        "#ddd";
+
+                    icon.style.color =
+                        "#777";
+
+                    icon.innerHTML =
+                        i;
+
+                }
+
+            }
+
+        }
+
+
+        /*
+         * -----------------------------------------------
+         * Run progress animation
+         * -----------------------------------------------
+         */
+
+        function startProgress() {
+
+            let currentStage = 0;
+
+            activateStep(1);
+
+            progressBar.style.width =
+                "10%";
+
+
+            function nextStage() {
+
+                if (
+                    currentStage >=
+                    stages.length
+                ) {
+                    return;
+                }
+
+
+                const stage =
+                    stages[currentStage];
+
+
+                activateStep(
+                    stage.step
+                );
+
+
+                progressBar.style.width =
+                    stage.progress + "%";
+
+
+                progressMessage.textContent =
+                    stage.message;
+
+
+                currentStage++;
+
+
+                /*
+                 * Move to the next visual stage.
+                 *
+                 * The actual form submission continues
+                 * independently in the browser.
+                 */
+
+                if (
+                    currentStage <
+                    stages.length
+                ) {
+
+                    setTimeout(
+                        nextStage,
+                        2500
+                    );
+
+                }
+
+            }
+
+
+            setTimeout(
+                nextStage,
+                1800
+            );
+
+        }
+
+
+        /*
+         * -----------------------------------------------
+         * FORM SUBMISSION
+         * -----------------------------------------------
+         */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                /*
+                 * Allow Django to receive the normal
+                 * form submission.
+                 *
+                 * We only change what the lecturer sees
+                 * while the request is processing.
+                 */
+
+                if (
+                    form.dataset.submitting ===
+                    "true"
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * Prevent accidental double-clicks.
+                 */
+
+                form.dataset.submitting =
+                    "true";
+
+
+                /*
+                 * Show progress dialog.
+                 */
+
+                modal.style.display =
+                    "flex";
+
+
+                /*
+                 * Disable the button.
+                 */
+
+                button.disabled =
+                    true;
+
+
+                button.style.opacity =
+                    "0.7";
+
+                button.style.cursor =
+                    "not-allowed";
+
+
+                button.innerHTML =
+                    "🤖 AI Assessment Running...";
+
+
+                /*
+                 * Start progress display.
+                 */
+
+                startProgress();
+
+            }
+        );
+
+    }
+
+);
+
+</script>
+
+{% endblock %}

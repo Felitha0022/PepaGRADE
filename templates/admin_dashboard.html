@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Admin Dashboard | PepaGRADE{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   ADMIN DASHBOARD
+   ========================================================= */
+
+.admin-layout {
+    width: 100%;
+}
+
+.admin-main {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 0 60px;
+}
+
+.admin-section {
+    display: none;
+    width: 100%;
+}
+
+.admin-section.active-section {
+    display: block;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.admin-hero {
+    position: relative;
+
+    width: 100%;
+    min-height: 430px;
+
+    background-image: url("{% static 'images/damin.png' %}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+
+    margin: 0 0 50px 0;
+
+    display: flex;
+    align-items: stretch;
+}
+
+
+/* Dark overlay */
+
+.admin-hero::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 45, 24, 0.90) 0%,
+            rgba(0, 45, 24, 0.72) 45%,
+            rgba(0, 45, 24, 0.30) 100%
+        );
+
+    z-index: 1;
+}
+
+
+/* =========================================================
+   HERO TEXT
+   ========================================================= */
+
+.admin-hero-overlay {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    min-height: 430px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 55px;
+
+    max-width: 850px;
+
+    color: #ffffff;
+}
+
+
+/* ADMINISTRATOR */
+
+.admin-hero-label {
+    display: inline-block;
+
+    margin-bottom: 18px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    letter-spacing: 2.5px;
+
+    color: #ecd907;
+}
+
+
+/* Welcome heading */
+
+.admin-hero-overlay h1 {
+    margin: 0 0 18px;
+
+    font-size: 46px;
+
+    line-height: 1.15;
+
+    font-weight: 400;
+
+    color: #ffffff;
+}
+
+.admin-hero-overlay h1 strong {
+    font-weight: 700;
+
+    color: #ffffff;
+}
+
+
+/* Description */
+
+.admin-hero-overlay p {
+    margin: 0;
+
+    max-width: 700px;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   SYSTEM OVERVIEW
+   ========================================================= */
+
+#admin-overview {
+    width: 100%;
+
+    padding: 0 40px;
+}
+
+.section-heading {
+    margin-bottom: 25px;
+
+    max-width: 1200px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-heading h2 {
+    margin: 0 0 7px;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: #16803c;
+}
+
+.section-heading p {
+    margin: 0;
+
+    color: #666;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   OVERVIEW CARDS
+   ========================================================= */
+
+.overview-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding-bottom: 20px;
+}
+
+.overview-card {
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    border: 1px solid #e7ebe8;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.overview-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.09);
+}
+
+
+/* =========================================================
+   OVERVIEW ICONS
+   ========================================================= */
+
+.overview-icon {
+    width: 58px;
+
+    height: 58px;
+
+    min-width: 58px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #e9f6ee;
+
+    color: #16803c;
+
+    font-size: 26px;
+}
+
+
+/* =========================================================
+   OVERVIEW CONTENT
+   ========================================================= */
+
+.overview-content {
+    min-width: 0;
+}
+
+.overview-title {
+    margin-bottom: 5px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #666;
+}
+
+.overview-number {
+    font-size: 30px;
+
+    font-weight: 700;
+
+    color: #16803c;
+
+    line-height: 1.1;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .overview-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .admin-main {
+        padding-bottom: 40px;
+    }
+
+    .admin-hero {
+        min-height: 400px;
+
+        margin-bottom: 40px;
+    }
+
+    .admin-hero-overlay {
+        min-height: 400px;
+
+        padding: 35px;
+    }
+
+    .admin-hero-overlay h1 {
+        font-size: 36px;
+    }
+
+    .admin-hero-overlay p {
+        font-size: 15px;
+    }
+
+    #admin-overview {
+        padding: 0 25px;
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .admin-hero {
+        min-height: 420px;
+
+        background-position: center;
+    }
+
+    .admin-hero-overlay {
+        min-height: 420px;
+
+        padding: 25px;
+    }
+
+    .admin-hero-overlay h1 {
+        font-size: 30px;
+    }
+
+    .admin-hero-overlay p {
+        font-size: 14px;
+
+        line-height: 1.6;
+    }
+
+    .admin-hero-label {
+        font-size: 12px;
+
+        letter-spacing: 2px;
+    }
+
+    #admin-overview {
+        padding: 0 15px;
+    }
+
+}
+
+</style>
+
+
+<div class="admin-layout">
+
+    <main class="admin-main">
+
+
+        <!-- =================================================
+             ADMINISTRATOR HERO
+             ================================================= -->
+
+        <section
+            id="admin-dashboard"
+            class="admin-section active-section"
+        >
+
+            <div class="admin-hero">
+
+                <div class="admin-hero-overlay">
+
+                    <span class="admin-hero-label">
+                        ADMINISTRATOR
+                    </span>
+
+
+                    <h1>
+
+                        Welcome,
+
+                        <strong>
+                            {{ request.user.first_name|default:request.user.username }}
+                        </strong>.
+
+                    </h1>
+
+
+                    <p>
+
+                        Manage lecturer accounts, monitor system activity
+                        and administer the PepaGRADE academic writing
+                        assessment system.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SYSTEM OVERVIEW
+                 ================================================= -->
+
+            <div id="admin-overview">
+
+                <div class="section-heading">
+
+                    <h2>
+                        System Overview
+                    </h2>
+
+                    <p>
+                        A quick overview of lecturer accounts
+                        within the PepaGRADE system.
+                    </p>
+
+                </div>
+
+
+                <div class="overview-grid">
+
+
+                    <!-- =================================================
+                         TOTAL LECTURERS
+                         ================================================= -->
+
+                    <div class="overview-card">
+
+                        <div class="overview-icon">
+                            👨‍🏫
+                        </div>
+
+                        <div class="overview-content">
+
+                            <div class="overview-title">
+                                Total Lecturers
+                            </div>
+
+                            <div class="overview-number">
+                                {{ lecturer_count }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ACTIVE LECTURERS
+                         ================================================= -->
+
+                    <div class="overview-card">
+
+                        <div class="overview-icon">
+                            ✓
+                        </div>
+
+                        <div class="overview-content">
+
+                            <div class="overview-title">
+                                Active Lecturers
+                            </div>
+
+                            <div class="overview-number">
+                                {{ active_lecturer_count }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         INACTIVE LECTURERS
+                         ================================================= -->
+
+                    <div class="overview-card">
+
+                        <div class="overview-icon">
+                            ⏸
+                        </div>
+
+                        <div class="overview-content">
+
+                            <div class="overview-title">
+                                Inactive Lecturers
+                            </div>
+
+                            <div class="overview-number">
+                                {{ inactive_lecturer_count }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+{% endblock %}

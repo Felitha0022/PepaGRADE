@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}
+Student Reports | PepaGRADE
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <h1>
+        Assessment Reports
+    </h1>
+
+    <p>
+        View and download assessment reports for
+        {{ student.full_name }}.
+    </p>
+
+</div>
+
+
+<!-- STUDENT INFORMATION -->
+
+<div class="card">
+
+    <h2>
+        {{ student.full_name }}
+    </h2>
+
+    <p>
+        <strong>Student ID:</strong>
+        {{ student.student_id }}
+    </p>
+
+    <p>
+        <strong>Program:</strong>
+        {{ student.program }}
+    </p>
+
+    <p>
+        <strong>Year Level:</strong>
+        Year {{ student.year_level }}
+    </p>
+
+</div>
+
+
+<!-- REPORTS -->
+
+<div class="card">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            ASSESSMENTS
+        </span>
+
+        <h2>
+            Assessment Reports
+        </h2>
+
+        <p>
+            Each completed AI assessment is listed below.
+        </p>
+
+    </div>
+
+
+    {% if reports %}
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Assignment
+                        </th>
+
+                        <th>
+                            Type
+                        </th>
+
+                        <th>
+                            AI Score
+                        </th>
+
+                        <th>
+                            AI Grade
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for report in reports %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong>
+                                {{ report.assessment.submission.assignment.title }}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            {{ report.assessment.submission.assignment.get_document_type_display }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ report.assessment.ai_score|floatformat:2 }}%
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                {{ report.assessment.ai_grade }}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            {{ report.created_at|date:"d M Y, h:i A" }}
+
+                        </td>
+
+
+                        <td>
+                                <a
+                                href="{% url 'report_detail' report.id %}"
+                                style="
+                                    display: inline-block;
+                                    background: #16803c;
+                                    color: white;
+                                    padding: 10px 18px;
+                                    border-radius: 6px;
+                                    text-decoration: none;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                    border: none;
+                                    cursor: pointer;
+                                    margin-top: 0;
+                                "
+                            >
+                                View
+                            </a>
+
+
+                            <a
+                                href="{% url 'download_report' report.id %}"
+                                style="
+                                    display: inline-block;
+                                    background: #6c757d;
+                                    color: white;
+                                    padding: 10px 18px;
+                                    border-radius: 6px;
+                                    text-decoration: none;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                    border: none;
+                                    cursor: pointer;
+                                    margin-top: 0;
+                                "
+                            >
+                                Download PDF
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div
+            style="
+                padding:30px;
+                text-align:center;
+                background:#f8faf8;
+                border-radius:8px;
+            "
+        >
+
+            <h3 style="color:#16803c;">
+                No Reports Available
+            </h3>
+
+            <p style="margin-top:8px;">
+                This student does not have any completed
+                assessment reports yet.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<div style="margin-top:20px;">
+
+  <a
+    href="{% url 'student_detail' student.id %}"
+    style="
+        display: inline-block;
+        background: #6c757d;
+        color: white;
+        padding: 11px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+    "
+>
+    ← Back to Student Profile
+</a>
+</div>
+
+{% endblock %}

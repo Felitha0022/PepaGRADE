@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Lecturer | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div style="
+    max-width:650px;
+    margin:40px auto;
+">
+
+    <div class="card">
+
+        <h1>
+            Create Lecturer Account
+        </h1>
+
+        <p>
+            Create a lecturer account and provide a default
+            password. The lecturer will be required to change
+            this password during their first login.
+        </p>
+
+    </div>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button
+            type="submit"
+            class="button primary-button"
+        >
+            Create Lecturer
+        </button>
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="button secondary-button"
+        >
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

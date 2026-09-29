@@ -1,0 +1,1029 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    .assessment-result {
+        padding: 30px;
+        max-width: 1100px;
+        margin: auto;
+    }
+
+    .assessment-result h1 {
+        margin-bottom: 5px;
+    }
+
+    .assessment-result h2 {
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+
+    .result-header {
+        margin-bottom: 20px;
+    }
+
+    .overall-result {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .result-cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .result-card {
+        flex: 1;
+        min-width: 180px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .result-card-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .result-card-value {
+        font-size: 25px;
+        font-weight: bold;
+        color: #198754;
+    }
+
+    .section-box {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .criterion {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .criterion h3 {
+        margin-top: 0;
+    }
+
+    .criterion-score {
+        font-weight: bold;
+        color: #198754;
+    }
+
+    .analysis-grid {
+        display: grid;
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .analysis-card {
+        background: #f8f9fa;
+        padding: 18px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    .analysis-card strong {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .analysis-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #198754;
+    }
+
+    .analysis-list {
+        padding-left: 20px;
+    }
+
+    .analysis-list li {
+        margin-bottom: 8px;
+    }
+
+    .observation {
+        background: #f8f9fa;
+        border-left: 4px solid #198754;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 4px;
+    }
+
+    .correction-item {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .strength-item {
+        margin-bottom: 8px;
+    }
+
+    .weakness-item {
+        margin-bottom: 8px;
+    }
+
+    .back-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 18px;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .back-button:hover {
+        background: #5c636a;
+    }
+
+</style>
+
+
+<div class="assessment-result">
+
+    <div class="result-header">
+
+        <h1>
+            AI Assessment Result
+        </h1>
+
+        <p>
+            <strong>
+                {{ assessment.submission.assignment.title }}
+            </strong>
+        </p>
+
+        <p>
+            <strong>Document Type:</strong>
+            {{ assessment.submission.assignment.get_document_type_display }}
+        </p>
+
+        <hr>
+
+    </div>
+
+
+    <!-- =====================================================
+         OVERALL RESULT
+    ====================================================== -->
+
+    <section class="overall-result">
+
+        <h2>
+            Overall Result
+        </h2>
+
+        <div class="result-cards">
+
+            <div class="result-card">
+
+                <div class="result-card-label">
+                    Raw Score
+                </div>
+
+                <div class="result-card-value">
+
+                    {{ total_score|floatformat:0 }}
+                    /
+                    {{ max_score|floatformat:0 }}
+
+                </div>
+
+            </div>
+
+
+            <div class="result-card">
+
+                <div class="result-card-label">
+                    AI Grade
+                </div>
+
+                <div class="result-card-value">
+
+                    {{ assessment.ai_grade }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CRITERION SCORES
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Criterion Scores
+        </h2>
+
+
+        {% for criterion, details in assessment.criterion_scores.items %}
+
+        <div class="criterion">
+
+            <h3>
+                {{ criterion }}
+            </h3>
+
+            <p class="criterion-score">
+
+                Score:
+                {{ details.score|floatformat:0 }}
+                /
+                {{ details.max_score|floatformat:0 }}
+
+            </p>
+
+            <p>
+                {{ details.feedback }}
+            </p>
+
+        </div>
+
+        {% empty %}
+
+        <p>
+            No criterion scores were generated.
+        </p>
+
+        {% endfor %}
+
+    </section>
+
+
+    <!-- =====================================================
+         CITATION ANALYSIS
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Citation Analysis
+        </h2>
+
+
+        {% if assessment.citation_analysis %}
+
+        <div class="analysis-grid">
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    In-text citations found
+                </strong>
+
+                <div class="analysis-number">
+                    {{ assessment.citation_analysis.in_text_citations_found }}
+                </div>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Matched references
+                </strong>
+
+                <div class="analysis-number">
+                    {{ assessment.citation_analysis.matched_references }}
+                </div>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Unmatched citations
+                </strong>
+
+                <div class="analysis-number">
+                    {{ assessment.citation_analysis.unmatched_citations }}
+                </div>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Uncited references
+                </strong>
+
+                <div class="analysis-number">
+                    {{ assessment.citation_analysis.uncited_references }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if assessment.citation_analysis.unsupported_claims %}
+
+        <h3>
+            Potentially Unsupported Claims
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.citation_analysis.unsupported_claims %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.citation_analysis.citation_issues %}
+
+        <h3>
+            Citation Issues
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.citation_analysis.citation_issues %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.citation_analysis.overall_observation %}
+
+        <div class="observation">
+
+            <strong>
+                Overall Observation
+            </strong>
+
+            <p>
+                {{ assessment.citation_analysis.overall_observation }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <p>
+            No citation analysis was generated.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         REFERENCE ANALYSIS
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Reference Analysis
+        </h2>
+
+
+        {% if assessment.reference_analysis %}
+
+        <div class="analysis-grid">
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    References found
+                </strong>
+
+                <div class="analysis-number">
+                    {{ assessment.reference_analysis.references_found }}
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        {% if assessment.reference_analysis.missing_or_incomplete_references %}
+
+        <h3>
+            Missing or Incomplete References
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.reference_analysis.missing_or_incomplete_references %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.reference_analysis.duplicate_references %}
+
+        <h3>
+            Duplicate References
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.reference_analysis.duplicate_references %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.reference_analysis.formatting_issues %}
+
+        <h3>
+            Reference Formatting Issues
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.reference_analysis.formatting_issues %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.reference_analysis.potentially_suspicious_references %}
+
+        <h3>
+            References Requiring Verification
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.reference_analysis.potentially_suspicious_references %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.reference_analysis.overall_observation %}
+
+        <div class="observation">
+
+            <strong>
+                Overall Observation
+            </strong>
+
+            <p>
+                {{ assessment.reference_analysis.overall_observation }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <p>
+            No reference analysis was generated.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         GRAMMAR AND SPELLING
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Grammar & Spelling Analysis
+        </h2>
+
+
+        {% if assessment.grammar_analysis %}
+
+
+        {% if assessment.grammar_analysis.grammar_issues %}
+
+        <h3>
+            Grammar Issues
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.grammar_analysis.grammar_issues %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% else %}
+
+        <p>
+            No major grammar issues identified.
+        </p>
+
+        {% endif %}
+
+
+        {% if assessment.grammar_analysis.spelling_issues %}
+
+        <h3>
+            Spelling Issues
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.grammar_analysis.spelling_issues %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% else %}
+
+        <p>
+            No major spelling issues identified.
+        </p>
+
+        {% endif %}
+
+
+        {% if assessment.grammar_analysis.punctuation_issues %}
+
+        <h3>
+            Punctuation Issues
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.grammar_analysis.punctuation_issues %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.grammar_analysis.sentence_clarity_issues %}
+
+        <h3>
+            Sentence Clarity Issues
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.grammar_analysis.sentence_clarity_issues %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.grammar_analysis.examples_and_corrections %}
+
+        <h3>
+            Examples and Corrections
+        </h3>
+
+        {% for item in assessment.grammar_analysis.examples_and_corrections %}
+
+        <div class="correction-item">
+            {{ item }}
+        </div>
+
+        {% endfor %}
+
+        {% endif %}
+
+
+        {% if assessment.grammar_analysis.overall_observation %}
+
+        <div class="observation">
+
+            <strong>
+                Overall Observation
+            </strong>
+
+            <p>
+                {{ assessment.grammar_analysis.overall_observation }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <p>
+            No grammar analysis was generated.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         ACADEMIC WRITING ANALYSIS
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Academic Writing Analysis
+        </h2>
+
+
+        {% if assessment.academic_writing_analysis %}
+
+
+        <div class="analysis-grid">
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Academic Tone
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.academic_tone }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Clarity
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.clarity }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Coherence
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.coherence }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Sentence Structure
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.sentence_structure }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Paragraph Structure
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.paragraph_structure }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Academic Vocabulary
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.academic_vocabulary }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Repetition
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.repetition }}
+                </p>
+
+            </div>
+
+
+            <div class="analysis-card">
+
+                <strong>
+                    Overall Writing Quality
+                </strong>
+
+                <p>
+                    {{ assessment.academic_writing_analysis.overall_writing_quality }}
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        {% if assessment.academic_writing_analysis.unsupported_claims %}
+
+        <h3>
+            Unsupported Claims
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.academic_writing_analysis.unsupported_claims %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% if assessment.academic_writing_analysis.improvement_suggestions %}
+
+        <h3>
+            Improvement Suggestions
+        </h3>
+
+        <ul class="analysis-list">
+
+            {% for item in assessment.academic_writing_analysis.improvement_suggestions %}
+
+            <li>
+                {{ item }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <p>
+            No academic writing analysis was generated.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         STRENGTHS
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Strengths
+        </h2>
+
+
+        {% if assessment.strengths %}
+
+        <ul class="analysis-list">
+
+            {% for strength in assessment.strengths %}
+
+            <li class="strength-item">
+                {{ strength }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+
+        {% else %}
+
+        <p>
+            No strengths identified.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         AREAS FOR IMPROVEMENT
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Areas for Improvement
+        </h2>
+
+
+        {% if assessment.weaknesses %}
+
+        <ul class="analysis-list">
+
+            {% for weakness in assessment.weaknesses %}
+
+            <li class="weakness-item">
+                {{ weakness }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+
+        {% else %}
+
+        <p>
+            No areas for improvement identified.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         OVERALL FEEDBACK
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <h2>
+            Overall Feedback
+        </h2>
+
+        <p>
+            {{ assessment.feedback }}
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         ASSESSMENT INFORMATION
+    ====================================================== -->
+
+    <section class="section-box">
+
+        <p>
+            <strong>
+                Assessment created:
+            </strong>
+
+            {{ assessment.created_at }}
+        </p>
+
+        {% if assessment.updated_at %}
+
+        <p>
+            <strong>
+                Last updated:
+            </strong>
+
+            {{ assessment.updated_at }}
+        </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         BACK TO STUDENT PROFILE
+    ====================================================== -->
+
+    <a
+        href="{% url 'student_detail' assessment.submission.assignment.student.id %}"
+        class="back-button"
+    >
+        ← Back to Student Profile
+    </a>
+
+
+</div>
+
+{% endblock %}

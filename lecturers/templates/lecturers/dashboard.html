@@ -1,0 +1,610 @@
+
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Lecturer Dashboard | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div class="lecturer-layout">
+
+    <!-- =====================================================
+         MAIN DASHBOARD CONTENT
+    ====================================================== -->
+
+    <section class="lecturer-main">
+
+
+        <!-- =================================================
+             WELCOME SECTION
+             PHOTO IS NOW THE BACKGROUND
+        ================================================== -->
+
+        <div class="lecturer-welcome">
+
+            <!-- Dark overlay for text readability -->
+            <div class="lecturer-welcome-overlay"></div>
+
+
+            <!-- Existing Text — NOT CHANGED -->
+
+            <div class="lecturer-welcome-text">
+
+                <span class="lecturer-welcome-label">
+                    LECTURER 
+                </span>
+
+                <h1>
+                    Welcome,
+                    {{ request.user.get_full_name|default:request.user.username }}.
+                </h1>
+
+                <p style="margin-top: 150px;">
+                    PepaGRADE is an AI-powered academic writing
+                    feedback assistant designed to support lecturers
+                    in assessing student essays, project proposals
+                    and literature reviews.
+                </p>
+                <p style="margin-top: 15px;">
+                    It is designed to serve as an assisting tool for
+                    lecturers at Divine Word University to help shorten
+                    evaluation and Grading time.
+                </p>
+
+                <p style="margin-top: 80px;">
+                    Select a student from your student list to access
+                    their academic work and perform an AI assessment.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             MY STUDENTS
+        ================================================== -->
+
+        <div class="card">
+
+
+            <div class="section-heading">
+
+                <span class="section-label">
+                    STUDENT MANAGEMENT
+                </span>
+
+                <h2>
+                    My Students
+                </h2>
+
+                <p>
+                    View and manage the students assigned to
+                    your lecturer account.
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 STUDENT COUNT
+            ================================================== -->
+
+            <div
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 20px;
+                    padding: 22px;
+                    background: #f8faf8;
+                    border-radius: 10px;
+                    margin-bottom: 20px;
+                "
+            >
+
+                <div>
+
+                    <span
+                        style="
+                            display: block;
+                            color: #777;
+                            font-size: 14px;
+                        "
+                    >
+                        Total Students
+                    </span>
+
+
+                    <strong
+                        style="
+                            display: block;
+                            color: #16803c;
+                            font-size: 32px;
+                        "
+                    >
+                        {{ request.user.lecturer_profile.students.count }}
+                    </strong>
+
+                </div>
+
+                    <a
+                        href="{% url 'student_list' %}"
+                        style="
+                            display: inline-block;
+                            background: #16803c;
+                            color: white;
+                            padding: 11px 20px;
+                            border-radius: 6px;
+                            text-decoration: none;
+                            font-weight: 600;
+                            font-size: 14px;
+                            border: none;
+                            cursor: pointer;
+                        "
+                    >
+                        View My Students
+                    </a>
+            </div>
+
+
+            <!-- =================================================
+                 EXPLANATION
+            ================================================== -->
+
+            <div
+                style="
+                    padding: 20px;
+                    border-left: 4px solid #16803c;
+                    background: #f1f8f3;
+                    border-radius: 6px;
+                "
+            >
+
+                <p style="color: #555;">
+
+                    Select <strong>My Students</strong> from the
+                    sidebar to view student profiles.
+
+                    From an individual student profile, the lecturer
+                    will be able to access assignments and perform
+                    AI assessments.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+</div>
+
+
+<!-- =============================================================
+     ONLY DESIGN CHANGES
+============================================================= -->
+
+<style>
+
+    /* =========================================================
+       MAIN DASHBOARD
+    ========================================================= */
+
+    .lecturer-main {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+       WELCOME HERO
+       Automatically fits the available screen
+    ========================================================= */
+
+    .lecturer-welcome {
+
+        position: relative;
+
+        width: 100%;
+
+        min-height: clamp(300px, 42vh, 420px);
+
+        display: flex;
+
+        align-items: center;
+
+        box-sizing: border-box;
+
+        padding: clamp(30px, 5vw, 60px);
+
+        margin-bottom: 30px;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        background-image:
+            url("{% static 'images/foto1.webp' %}");
+
+        background-size: cover;
+
+        background-position: center;
+
+        background-repeat: no-repeat;
+
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.10);
+    }
+
+
+    /* =========================================================
+       DARK GREEN OVERLAY
+    ========================================================= */
+
+    .lecturer-welcome-overlay {
+
+        position: absolute;
+
+        inset: 0;
+
+        background:
+            linear-gradient(
+                90deg,
+                rgba(9, 55, 29, 0.88) 0%,
+                rgba(13, 78, 40, 0.72) 50%,
+                rgba(13, 78, 40, 0.35) 100%
+            );
+
+        z-index: 1;
+    }
+
+
+    /* =========================================================
+       TEXT ABOVE IMAGE
+    ========================================================= */
+
+    .lecturer-welcome-text {
+
+        position: relative;
+
+        z-index: 2;
+
+        width: 100%;
+
+        max-width: 720px;
+
+        box-sizing: border-box;
+
+        color: white;
+    }
+
+
+    .lecturer-welcome-label {
+
+        display: inline-block;
+
+        margin-bottom: 12px;
+
+        color: #d8f3df;
+
+        font-size: clamp(10px, 1vw, 12px);
+
+        font-weight: 700;
+
+        letter-spacing: 1.5px;
+
+        text-transform: uppercase;
+    }
+
+
+    .lecturer-welcome h1 {
+
+        margin: 0 0 10px;
+
+        color: white;
+
+        font-size: clamp(28px, 3.2vw, 38px);
+
+        line-height: 1.2;
+
+        font-weight: 700;
+    }
+
+
+    .lecturer-welcome h2 {
+
+        margin: 0 0 15px;
+
+        color: white;
+
+        font-size: clamp(19px, 2vw, 23px);
+
+        font-weight: 600;
+    }
+
+
+    .lecturer-welcome p {
+
+        margin: 0;
+
+        max-width: 680px;
+
+        color: rgba(255, 255, 255, 0.94);
+
+        font-size: clamp(13px, 1.3vw, 16px);
+
+        line-height: 1.65;
+    }
+
+
+    /* =========================================================
+       SECTION
+    ========================================================= */
+
+    .section-heading {
+
+        margin-bottom: 20px;
+
+        width: 100%;
+
+        box-sizing: border-box;
+    }
+
+
+    .section-label {
+
+        display: block;
+
+        color: #16803c;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        letter-spacing: 1.3px;
+
+        margin-bottom: 5px;
+    }
+
+
+    .section-heading h2 {
+
+        margin: 0;
+
+        color: #173d28;
+
+        font-size: clamp(22px, 2.2vw, 26px);
+
+        font-weight: 700;
+    }
+
+
+    .section-heading p {
+
+        margin: 6px 0 0;
+
+        color: #69736d;
+
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       STUDENT SUMMARY
+       Prevents overflow on small screens
+    ========================================================= */
+
+    .students-summary {
+
+        width: 100%;
+
+        box-sizing: border-box;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        flex-wrap: wrap;
+    }
+
+
+    /* =========================================================
+       BUTTON
+    ========================================================= */
+
+    .primary-button {
+
+        text-decoration: none;
+
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       TABLET
+    ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .lecturer-welcome {
+
+            min-height: 350px;
+
+            padding: 40px;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE / SMALL TABLETS
+    ========================================================= */
+
+    @media (max-width: 700px) {
+
+        .lecturer-welcome {
+
+            min-height: 430px;
+
+            padding: 30px 25px;
+
+            align-items: flex-end;
+
+            border-radius: 14px;
+        }
+
+
+        .lecturer-welcome-overlay {
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(9, 55, 29, 0.25) 0%,
+                    rgba(9, 55, 29, 0.92) 100%
+                );
+        }
+
+
+        .lecturer-welcome-text {
+
+            max-width: 100%;
+        }
+
+
+        .lecturer-welcome p {
+
+            max-width: 100%;
+        }
+
+
+        .students-summary {
+
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .primary-button {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            text-align: center;
+        }
+
+    }
+
+
+    /* =========================================================
+       SMALL PHONES
+    ========================================================= */
+
+    @media (max-width: 480px) {
+
+        .lecturer-welcome {
+
+            min-height: 460px;
+
+            padding: 25px 20px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .lecturer-welcome h1 {
+
+            font-size: 27px;
+        }
+
+
+        .lecturer-welcome h2 {
+
+            font-size: 19px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .lecturer-welcome p {
+
+            font-size: 13px;
+
+            line-height: 1.55;
+        }
+
+
+        .lecturer-welcome-label {
+
+            font-size: 9px;
+
+            letter-spacing: 1px;
+        }
+
+
+        .section-heading h2 {
+
+            font-size: 22px;
+        }
+
+
+        .section-heading p {
+
+            font-size: 13px;
+        }
+
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+    ========================================================= */
+
+    @media (max-width: 360px) {
+
+        .lecturer-welcome {
+
+            min-height: 480px;
+
+            padding: 22px 17px;
+        }
+
+
+        .lecturer-welcome h1 {
+
+            font-size: 24px;
+        }
+
+
+        .lecturer-welcome h2 {
+
+            font-size: 17px;
+        }
+
+
+        .lecturer-welcome p {
+
+            font-size: 12px;
+        }
+
+    }
+
+</style>
+
+
+
+{% endblock %}

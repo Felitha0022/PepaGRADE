@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<p>
+    Enter the student's details below.
+</p>
+
+<hr>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Save Student
+    </button>
+
+    <a href="{% url 'student_list' %}">
+        Cancel
+    </a>
+
+</form>
+
+{% endblock %}

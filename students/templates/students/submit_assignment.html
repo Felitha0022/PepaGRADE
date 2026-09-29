@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}
+Submit Assignment - PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>Submit Assignment</h1>
+
+    <div class="assignment-card">
+
+        <h2>{{ assignment.title }}</h2>
+
+        <p>
+            <strong>Course Unit:</strong>
+            {% if assignment.course_unit %}
+                {{ assignment.course_unit.code }}
+                -
+                {{ assignment.course_unit.name }}
+            {% else %}
+                Not specified
+            {% endif %}
+        </p>
+
+        <p>
+            <strong>Document Type:</strong>
+            {{ assignment.get_document_type_display }}
+        </p>
+
+        {% if assignment.description %}
+            <div class="description">
+                <strong>Instructions:</strong>
+                <p>{{ assignment.description }}</p>
+            </div>
+        {% endif %}
+
+        {% if assignment.due_date %}
+            <p>
+                <strong>Due Date:</strong>
+                {{ assignment.due_date|date:"d F Y, h:i A" }}
+            </p>
+        {% endif %}
+
+    </div>
+
+
+    <div class="upload-card">
+
+        <h2>Upload Your Assignment</h2>
+
+        <p>
+            Select your completed academic paper and upload it below.
+        </p>
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="form-group">
+
+                <label for="{{ form.file.id_for_label }}">
+                    Academic Paper
+                </label>
+
+                {{ form.file }}
+
+                {% if form.file.errors %}
+                    <div class="error">
+                        {{ form.file.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <button
+                type="submit"
+                class="submit-button"
+            >
+                Submit Assignment
+            </button>
+
+            <a
+                href="{% url 'student_dashboard' %}"
+                class="cancel-button"
+            >
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .assignment-card,
+    .upload-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .assignment-card h2,
+    .upload-card h2 {
+        margin-bottom: 15px;
+    }
+
+    .assignment-card p {
+        margin: 10px 0;
+        line-height: 1.6;
+    }
+
+    .description {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f5f7f5;
+        border-radius: 8px;
+    }
+
+    .description p {
+        margin-top: 8px;
+    }
+
+    .form-group {
+        margin: 25px 0;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+
+    .submit-button,
+    .cancel-button {
+        display: inline-block;
+        padding: 12px 22px;
+        border-radius: 8px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        margin-right: 10px;
+    }
+
+    .submit-button {
+        background: #1f7a3f;
+        color: white;
+    }
+
+    .cancel-button {
+        background: #e5e5e5;
+        color: #333;
+    }
+
+    .error {
+        color: #b00020;
+        margin-top: 8px;
+    }
+
+</style>
+
+{% endblock %}

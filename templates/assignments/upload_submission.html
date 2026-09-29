@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Upload Assignment | DWU Academic Writing Feedback Assistant
+{% endblock %}
+
+{% block content %}
+
+<h2>Upload Student Assignment</h2>
+
+<p>
+    Upload an essay, project proposal, or literature review.
+</p>
+
+{% if messages %}
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Upload Assignment
+    </button>
+
+</form>
+
+{% endblock %}

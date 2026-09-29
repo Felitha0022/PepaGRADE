@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block title %}
+Assessments | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    /* =========================================================
+       PAGE
+    ========================================================= */
+
+    .assessment-page {
+        max-width: 1150px;
+        margin: 40px auto;
+        padding: 0 25px 50px;
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        color: #1f2937;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+
+    /* =========================================================
+       SUMMARY
+    ========================================================= */
+
+    .summary-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 22px 24px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    .summary-card strong {
+        color: #15803d;
+        font-size: 20px;
+    }
+
+
+    /* =========================================================
+       ASSESSMENT CARD
+    ========================================================= */
+
+    .assessment-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 15px;
+        margin-bottom: 18px;
+        padding: 24px;
+
+        box-shadow:
+            0 4px 14px rgba(0, 0, 0, 0.04);
+
+        transition: 0.2s ease;
+    }
+
+    .assessment-card:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 7px 20px rgba(0, 0, 0, 0.07);
+    }
+
+
+    /* =========================================================
+       CARD HEADER
+    ========================================================= */
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .student-name {
+        margin: 0 0 5px;
+        font-size: 20px;
+        color: #111827;
+    }
+
+    .assignment-title {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 7px 12px;
+        border-radius: 20px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+    .status-ready {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+
+    /* =========================================================
+       CARD DETAILS
+    ========================================================= */
+
+    .card-details {
+        display: grid;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .detail-box {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+
+    .detail-label {
+        display: block;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        color: #6b7280;
+
+        text-transform: uppercase;
+
+        margin-bottom: 5px;
+    }
+
+    .detail-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+    ========================================================= */
+
+    .card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 18px;
+    }
+
+    .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 11px 18px;
+
+        border-radius: 8px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+        font-weight: 600;
+
+        transition: 0.2s ease;
+    }
+
+    .button:hover {
+        transform: translateY(-1px);
+    }
+
+    .button-primary {
+        background: #15803d;
+        color: #ffffff;
+    }
+
+    .button-primary:hover {
+        background: #166534;
+    }
+
+    .button-secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .button-secondary:hover {
+        background: #e5e7eb;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .empty-state {
+        background: #ffffff;
+        border: 1px dashed #d1d5db;
+        border-radius: 15px;
+        padding: 55px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .empty-state h2 {
+        margin: 0 0 8px;
+        color: #374151;
+        font-size: 21px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 700px) {
+
+        .assessment-page {
+            margin-top: 25px;
+            padding: 0 15px 40px;
+        }
+
+        .card-header {
+            flex-direction: column;
+        }
+
+        .card-details {
+            grid-template-columns: 1fr;
+        }
+
+        .card-actions {
+            justify-content: stretch;
+        }
+
+        .card-actions .button {
+            flex: 1;
+        }
+
+    }
+
+</style>
+
+
+<div class="assessment-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            AI Assessments
+        </h1>
+
+        <p>
+            Review student submissions and run AI-powered
+            academic assessments.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="summary-card">
+
+        <strong>
+            {{ assessment_data|length }}
+        </strong>
+
+        <span>
+            student submission{{ assessment_data|length|pluralize }}
+            available for assessment
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         ASSESSMENT LIST
+    ====================================================== -->
+
+    {% for item in assessment_data %}
+
+        <div class="assessment-card">
+
+
+            <!-- =================================================
+                 CARD HEADER
+            ================================================== -->
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2 class="student-name">
+                        {{ item.submission.assignment.student.full_name }}
+                    </h2>
+
+                    <p class="assignment-title">
+                        {{ item.submission.assignment.title }}
+                    </p>
+
+                </div>
+
+
+                {% if item.assessment %}
+
+                    <span class="status status-completed">
+                        ✓ Assessment Completed
+                    </span>
+
+                {% else %}
+
+                    <span class="status status-ready">
+                        ● Ready for Assessment
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 DETAILS
+            ================================================== -->
+
+            <div class="card-details">
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Student ID
+                    </span>
+
+                    <span class="detail-value">
+                        {{ item.submission.assignment.student.student_id }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Document Type
+                    </span>
+
+                    <span class="detail-value">
+                        {{ item.submission.assignment.get_document_type_display }}
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTION
+            ================================================== -->
+
+            <div class="card-actions">
+
+                {% if item.assessment %}
+
+                    <a
+                        href="{% url 'assessment_result' item.assessment.id %}"
+                        class="button button-secondary"
+                    >
+                        View Assessment Result
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'assess_assignment' item.submission.id %}"
+                        class="button button-primary"
+                    >
+                        ✨ Assess with AI
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+
+    {% empty %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📄
+            </div>
+
+            <h2>
+                No Student Submissions
+            </h2>
+
+            <p>
+                There are currently no student submissions
+                available for AI assessment.
+            </p>
+
+        </div>
+
+
+    {% endfor %}
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+
+{% block title %}
+Student Profile | PepaGRADE
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <h1>
+        Student Profile
+    </h1>
+
+    <p>
+        View student information and manage academic
+        activities for this student.
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     STUDENT INFORMATION
+====================================================== -->
+
+<div class="card">
+
+    <h2>
+        {{ student.full_name }}
+    </h2>
+
+    <div style="margin-top:20px;">
+
+        <p>
+            <strong>Student ID:</strong>
+            {{ student.student_id }}
+        </p>
+
+        <p>
+            <strong>Program:</strong>
+            {{ student.program }}
+        </p>
+
+        <p>
+            <strong>Year Level:</strong>
+            Year {{ student.year_level }}
+        </p>
+
+        <p>
+            <strong>Profile Created:</strong>
+            {{ student.created_at|date:"M. d, Y, g:i a" }}
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ENROLLED COURSE UNITS
+====================================================== -->
+
+<div class="card">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            COURSE ENROLLMENT
+        </span>
+
+        <h2>
+            Enrolled Course Units
+        </h2>
+
+        <p>
+            Manage the course units in which this student
+            is enrolled.
+        </p>
+
+    </div>
+
+
+    <div style="margin-top:20px;">
+
+        {% if enrollments %}
+
+            {% for enrollment in enrollments %}
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        padding:15px 18px;
+                        margin-bottom:10px;
+                        background:#f8faf8;
+                        border:1px solid #e1e8e3;
+                        border-radius:8px;
+                    "
+                >
+
+                    <div>
+
+                        <strong
+                            style="
+                                color:#16803c;
+                                font-size:16px;
+                            "
+                        >
+                            {{ enrollment.course_unit.code }}
+                        </strong>
+
+                        <span>
+                            -
+                            {{ enrollment.course_unit.name }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div
+                style="
+                    padding:20px;
+                    background:#f8faf8;
+                    border:1px solid #e1e8e3;
+                    border-radius:8px;
+                    color:#666;
+                "
+            >
+                This student is not enrolled in any
+                course units yet.
+            </div>
+
+        {% endif %}
+
+
+       <div style="margin-top:20px;">
+
+    <a
+        href="{% url 'student_enroll' student.id %}"
+        style="
+            display:inline-block;
+            background:#16803c;
+            color:white;
+            padding:11px 20px;
+            border-radius:6px;
+            text-decoration:none;
+            font-weight:600;
+            font-size:14px;
+            border:none;
+            cursor:pointer;
+        "
+    >
+        + Enroll in Course Unit
+    </a>
+
+</div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     GRADEBOOK
+====================================================== -->
+
+<div class="card">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            GRADEBOOK
+        </span>
+
+        <h2>
+            Final Grades
+        </h2>
+
+        <p>
+            Enter and manage the student's final grades
+            for each enrolled course unit.
+        </p>
+
+    </div>
+
+
+   <div style="margin-top:20px;">
+
+    <a
+        href="{% url 'student_gradebook' student.id %}"
+        style="
+            display:inline-block;
+            background:#16803c;
+            color:white;
+            padding:11px 20px;
+            border-radius:6px;
+            text-decoration:none;
+            font-weight:600;
+            font-size:14px;
+            border:none;
+            cursor:pointer;
+        "
+    >
+        + Save Grade
+    </a>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     STUDENT FUNCTIONS
+====================================================== -->
+
+<div class="card">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            STUDENT WORK
+        </span>
+
+        <h2>
+            Academic Assessment
+        </h2>
+
+        <p>
+            Select an option below to manage assignments,
+            perform AI assessments or view assessment reports.
+        </p>
+
+    </div>
+
+
+    <div class="student-function-grid">
+
+
+        <!-- =================================================
+             ASSIGNMENTS
+        ================================================== -->
+
+        <div
+            style="
+                padding:25px;
+                background:#f8faf8;
+                border:1px solid #e1e8e3;
+                border-radius:10px;
+                text-align:center;
+            "
+        >
+
+            <div
+                style="
+                    font-size:35px;
+                    margin-bottom:15px;
+                "
+            >
+                📚
+            </div>
+
+            <h3
+                style="
+                    color:#16803c;
+                    margin-bottom:8px;
+                "
+            >
+                Assignments
+            </h3>
+
+            <p
+                style="
+                    color:#666;
+                    font-size:14px;
+                    min-height:45px;
+                "
+            >
+                View the student's assignments and
+                completed assessments.
+            </p>
+
+            <!-- ASSIGNMENTS -->
+            <a
+                href="{% url 'student_assignments' student.id %}"
+                style="
+                    display:inline-block;
+                    background:#16803c;
+                    color:white;
+                    padding:11px 20px;
+                    border-radius:6px;
+                    text-decoration:none;
+                    font-weight:600;
+                    font-size:14px;
+                    border:none;
+                    cursor:pointer;
+                "
+            >
+                Assignments
+            </a>
+
+        </div>
+
+
+        <!-- =================================================
+             AI ASSESSMENT
+        ================================================== -->
+
+        <div
+            style="
+                padding:25px;
+                background:#f8faf8;
+                border:1px solid #e1e8e3;
+                border-radius:10px;
+                text-align:center;
+            "
+        >
+
+            <div
+                style="
+                    font-size:35px;
+                    margin-bottom:15px;
+                "
+            >
+                🤖
+            </div>
+
+            <h3
+                style="
+                    color:#16803c;
+                    margin-bottom:8px;
+                "
+            >
+                AI Assessment
+            </h3>
+
+            <p
+                style="
+                    color:#666;
+                    font-size:14px;
+                    min-height:45px;
+                "
+            >
+                Upload the paper and marking guide
+                to perform an AI assessment.
+            </p>
+
+           <!-- AI ASSESSMENT -->
+            <a
+                href="{% url 'student_ai_assessment' student.id %}"
+                style="
+                    display:inline-block;
+                    background:#16803c;
+                    color:white;
+                    padding:11px 20px;
+                    border-radius:6px;
+                    text-decoration:none;
+                    font-weight:600;
+                    font-size:14px;
+                    border:none;
+                    cursor:pointer;
+                "
+            >
+                AI Assessment
+            </a>
+        </div>
+
+
+        <!-- =================================================
+             REPORTS
+        ================================================== -->
+
+        <div
+            style="
+                padding:25px;
+                background:#f8faf8;
+                border:1px solid #e1e8e3;
+                border-radius:10px;
+                text-align:center;
+            "
+        >
+
+            <div
+                style="
+                    font-size:35px;
+                    margin-bottom:15px;
+                "
+            >
+                📄
+            </div>
+
+            <h3
+                style="
+                    color:#16803c;
+                    margin-bottom:8px;
+                "
+            >
+                Reports
+            </h3>
+
+            <p
+                style="
+                    color:#666;
+                    font-size:14px;
+                    min-height:45px;
+                "
+            >
+                View completed assessment reports and
+                download them as PDF files.
+            </p>
+
+            <!-- REPORTS -->
+                <a
+                    href="{% url 'student_reports' student.id %}"
+                    style="
+                        display:inline-block;
+                        background:#16803c;
+                        color:white;
+                        padding:11px 20px;
+                        border-radius:6px;
+                        text-decoration:none;
+                        font-weight:600;
+                        font-size:14px;
+                        border:none;
+                        cursor:pointer;
+                    "
+                >
+                    Reports
+                </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     BACK BUTTON
+====================================================== -->
+
+<div style="margin-top:20px;">
+
+   <!-- BACK TO STUDENTS -->
+<a
+    href="{% url 'student_list' %}"
+    style="
+        display:inline-block;
+        background:#6b7280;
+        color:white;
+        padding:11px 20px;
+        border-radius:6px;
+        text-decoration:none;
+        font-weight:600;
+        font-size:14px;
+        border:none;
+        cursor:pointer;
+    "
+>
+    ← Back to Students
+</a>
+
+</div>
+
+
+<!-- =====================================================
+     RESPONSIVE
+====================================================== -->
+
+<style>
+
+.student-function-grid {
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+    margin-top:25px;
+}
+
+
+@media (max-width: 800px) {
+
+    .student-function-grid {
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}

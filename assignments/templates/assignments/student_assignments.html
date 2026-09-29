@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+    .page-container {
+        padding: 30px;
+    }
+
+    /* =========================================================
+       PAGE HEADER
+    ========================================================= */
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+    }
+
+    .student-id {
+        color: #555;
+        margin-top: 8px;
+    }
+
+
+    /* =========================================================
+       BUTTON GROUP
+    ========================================================= */
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-create {
+        background-color: #198754;
+        color: white;
+    }
+
+    .btn-create:hover {
+        background-color: #157347;
+    }
+
+    .btn-back {
+        background-color: #6c757d;
+        color: white;
+        margin-top: 20px;
+    }
+
+    .btn-back:hover {
+        background-color: #5c636a;
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================= */
+
+    .table-container {
+        background: white;
+        border-radius: 8px;
+        overflow-x: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .assignment-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    .assignment-table th {
+        background-color: #198754;
+        color: white;
+        padding: 14px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .assignment-table td {
+        padding: 14px;
+        border-bottom: 1px solid #ddd;
+        vertical-align: middle;
+    }
+
+    .assignment-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .assignment-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+
+    /* =========================================================
+       STATUS BADGES
+    ========================================================= */
+
+    .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background-color: #d1e7dd;
+        color: #0f5132;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .not-assessed {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    .not-submitted {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+
+    /* =========================================================
+       ACTION BUTTONS
+    ========================================================= */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+
+    /* =========================================================
+       VIEW RESULTS BUTTON
+    ========================================================= */
+
+    .btn-results {
+        display: inline-block;
+        padding: 7px 14px;
+        background-color: #198754;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .btn-results:hover {
+        background-color: #157347;
+    }
+
+
+    /* =========================================================
+       MANAGE BUTTON
+    ========================================================= */
+
+    .btn-manage {
+        display: inline-block;
+        padding: 7px 14px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .btn-manage:hover {
+        background-color: #5c636a;
+    }
+
+
+    /* =========================================================
+       DELETE BUTTON
+    ========================================================= */
+
+    .btn-delete {
+        display: inline-block;
+        padding: 7px 14px;
+        background-color: #ffffff;
+        color: #b42323;
+        border: 1px solid #d9a3a3;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn-delete:hover {
+        background-color: #fdecec;
+        border-color: #b42323;
+    }
+
+
+    /* =========================================================
+       EMPTY MESSAGE
+    ========================================================= */
+
+    .empty-message {
+        padding: 25px;
+        text-align: center;
+        color: #666;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE DESIGN
+    ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .page-container {
+            padding: 20px;
+        }
+
+        .page-header {
+            display: block;
+        }
+
+        .button-group {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn {
+            width: auto;
+        }
+
+    }
+
+</style>
+
+
+<div class="page-container">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Assignments
+            </h1>
+
+            <p class="student-id">
+
+                <strong>
+                    Student ID:
+                </strong>
+
+                {{ student.student_id }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGE BUTTONS
+    ====================================================== -->
+
+    <div class="button-group">
+
+        <a
+            href="{% url 'create_assignment' student.id %}"
+            class="btn btn-create"
+        >
+            + Create Assignment
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         ASSIGNMENTS TABLE
+    ====================================================== -->
+
+    <div class="table-container">
+
+        {% if assignments %}
+
+        <table class="assignment-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Assignment Title
+                    </th>
+
+                    <th>
+                        Type
+                    </th>
+
+                    <th>
+                        Created
+                    </th>
+
+                    <th>
+                        Submission
+                    </th>
+
+                    <th>
+                        Assessment
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for assignment in assignments %}
+
+                <tr>
+
+
+                    <!-- =================================================
+                         NUMBER
+                    ================================================== -->
+
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+
+                    <!-- =================================================
+                         ASSIGNMENT TITLE
+                    ================================================== -->
+
+                    <td>
+
+                        <strong>
+                            {{ assignment.title }}
+                        </strong>
+
+                    </td>
+
+
+                    <!-- =================================================
+                         DOCUMENT TYPE
+                    ================================================== -->
+
+                    <td>
+                        {{ assignment.get_document_type_display }}
+                    </td>
+
+
+                    <!-- =================================================
+                         CREATED DATE
+                    ================================================== -->
+
+                    <td>
+                        {{ assignment.created_at|date:"d M Y" }}
+                    </td>
+
+
+                    <!-- =================================================
+                         SUBMISSION STATUS
+                    ================================================== -->
+
+                    <td>
+
+                        {% if assignment.latest_submission %}
+
+                            <span class="status">
+                                Submitted
+                            </span>
+
+                        {% else %}
+
+                            <span class="status not-submitted">
+                                Not Submitted
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- =================================================
+                         ASSESSMENT STATUS
+                    ================================================== -->
+
+                    <td>
+
+                        {% if assignment.assessment %}
+
+                            <span class="status">
+                                Completed
+                            </span>
+
+                        {% elif assignment.latest_submission %}
+
+                            <span class="status not-assessed">
+                                Not Assessed
+                            </span>
+
+                        {% else %}
+
+                            <span class="status not-submitted">
+                                Not Available
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- =================================================
+                         ACTION
+                    ================================================== -->
+
+                    <td>
+
+                        <div class="action-buttons">
+
+
+                            {% if assignment.assessment %}
+
+                                <!-- Assessment completed -->
+
+                                <a
+                                    href="{% url 'assessment_result' assignment.assessment.id %}"
+                                    class="btn-results"
+                                >
+                                    View Results
+                                </a>
+
+                            {% else %}
+
+                                <!--
+                                    Assignment is not yet assessed.
+                                    Lecturer must use Manage to:
+                                    1. Upload assignment submission
+                                    2. Upload marking guide
+                                    3. Run AI assessment
+                                -->
+
+                                <a
+                                    href="{% url 'assignment_detail' assignment.id %}"
+                                    class="btn-manage"
+                                >
+                                    Manage
+                                </a>
+
+                            {% endif %}
+
+
+                            <!-- =================================================
+                                 DELETE ASSIGNMENT
+                            ================================================== -->
+
+                            <form
+                                method="post"
+                                action="{% url 'delete_assignment' assignment.id %}"
+                                style="display: inline;"
+                                onsubmit="return confirm(
+                                    'Are you sure you want to delete this assignment? This action cannot be undone.'
+                                );"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn-delete"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+            <!-- =================================================
+                 NO ASSIGNMENTS
+            ================================================== -->
+
+            <div class="empty-message">
+
+                <p>
+                    No assignments have been created
+                    for this student yet.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         BACK TO STUDENT
+    ====================================================== -->
+
+    <a
+        href="{% url 'student_detail' student.id %}"
+        class="btn btn-back"
+    >
+        ← Back to Student
+    </a>
+
+
+</div>
+
+{% endblock %}

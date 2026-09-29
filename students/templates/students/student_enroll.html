@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}
+Enroll Student | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 700px; margin: 40px auto;">
+
+    <h1>Enroll Student</h1>
+
+    <p>
+        Student:
+        <strong>{{ student.full_name }}</strong>
+    </p>
+
+    <p>
+        Student ID:
+        <strong>{{ student.student_id }}</strong>
+    </p>
+
+    <hr>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Enroll Student
+        </button>
+
+        <a href="{% url 'student_detail' student.id %}">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

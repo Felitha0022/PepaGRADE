@@ -1,0 +1,540 @@
+{% extends "base.html" %}
+
+{% block title %}
+Administrator Account | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            PROFILE
+        </span>
+
+        <h1>
+            Administrator Account
+        </h1>
+
+        <p>
+            Manage administrator account information and security.
+        </p>
+
+    </div>
+
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- BACK TO DASHBOARD -->
+
+    <div style="margin-bottom:25px;">
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="admin-button secondary-button"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CURRENT PROFILE -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            Profile Information
+        </h2>
+
+        <p>
+            Current administrator account details.
+        </p>
+
+
+        <!-- PROFILE PICTURE -->
+
+        <div
+            style="
+                margin:25px 0;
+                display:flex;
+                align-items:center;
+                gap:20px;
+            "
+        >
+
+            {% if profile.profile_picture %}
+
+                <img
+                    src="{{ profile.profile_picture.url }}"
+                    alt="Administrator Profile Picture"
+                    style="
+                        width:120px;
+                        height:120px;
+                        object-fit:cover;
+                        border-radius:50%;
+                    "
+                >
+
+            {% else %}
+
+                <div
+                    style="
+                        width:120px;
+                        height:120px;
+                        border-radius:50%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:42px;
+                        font-weight:bold;
+                        border:2px solid #ccc;
+                    "
+                >
+                    {{ request.user.username|first|upper }}
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- CURRENT DETAILS -->
+
+        <div
+            style="
+                display:grid;
+                grid-template-columns:180px 1fr;
+                gap:15px 20px;
+                margin-bottom:30px;
+            "
+        >
+
+            <strong>
+                First Name
+            </strong>
+
+            <span>
+                {{ request.user.first_name|default:"Not provided" }}
+            </span>
+
+
+            <strong>
+                Last Name
+            </strong>
+
+            <span>
+                {{ request.user.last_name|default:"Not provided" }}
+            </span>
+
+
+            <strong>
+                Username
+            </strong>
+
+            <span>
+                {{ request.user.username }}
+            </span>
+
+
+            <strong>
+                Email
+            </strong>
+
+            <span>
+                {{ request.user.email|default:"Not provided" }}
+            </span>
+
+
+            <strong>
+                Account Type
+            </strong>
+
+            <span>
+                Administrator
+            </span>
+
+
+            <strong>
+                Account Status
+            </strong>
+
+            <span>
+                Active
+            </span>
+
+        </div>
+
+
+        <!-- TWO BUTTONS -->
+
+        <div
+            style="
+                display:flex;
+                gap:15px;
+                flex-wrap:wrap;
+            "
+        >
+
+            <button
+                type="button"
+                class="admin-button primary-button"
+                onclick="showEditProfile()"
+            >
+                Edit Profile
+            </button>
+
+
+            <button
+                type="button"
+                class="admin-button secondary-button"
+                onclick="showChangePassword()"
+            >
+                Change Password
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- EDIT PROFILE -->
+    <!-- ================================================= -->
+
+    <div
+        id="edit-profile-section"
+        class="card"
+        style="display:none; margin-top:25px;"
+    >
+
+        <h2>
+            Edit Profile
+        </h2>
+
+        <p>
+            Update the administrator's personal information.
+        </p>
+
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="update_profile"
+            >
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    Profile Picture
+                </label>
+
+                <input
+                    type="file"
+                    name="profile_picture"
+                    accept="image/*"
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    First Name
+                </label>
+
+                <input
+                    type="text"
+                    name="first_name"
+                    value="{{ request.user.first_name }}"
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    Last Name
+                </label>
+
+                <input
+                    type="text"
+                    name="last_name"
+                    value="{{ request.user.last_name }}"
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    value="{{ request.user.username }}"
+                    required
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ request.user.email }}"
+                >
+
+            </div>
+
+
+            <div
+                style="
+                    display:flex;
+                    gap:15px;
+                    flex-wrap:wrap;
+                "
+            >
+
+                <button
+                    type="submit"
+                    class="admin-button primary-button"
+                >
+                    Save Profile
+                </button>
+
+
+                <button
+                    type="button"
+                    class="admin-button secondary-button"
+                    onclick="hideEditProfile()"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CHANGE PASSWORD -->
+    <!-- ================================================= -->
+
+    <div
+        id="change-password-section"
+        class="card"
+        style="display:none; margin-top:25px;"
+    >
+
+        <h2>
+            Change Password
+        </h2>
+
+        <p>
+            Change the administrator password.
+        </p>
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="change_password"
+            >
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    Current Password
+                </label>
+
+                <input
+                    type="password"
+                    name="current_password"
+                    required
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    New Password
+                </label>
+
+                <input
+                    type="password"
+                    name="new_password"
+                    required
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label>
+                    Confirm New Password
+                </label>
+
+                <input
+                    type="password"
+                    name="confirm_password"
+                    required
+                >
+
+            </div>
+
+
+            <div
+                style="
+                    display:flex;
+                    gap:15px;
+                    flex-wrap:wrap;
+                "
+            >
+
+                <button
+                    type="submit"
+                    class="admin-button primary-button"
+                >
+                    Change Password
+                </button>
+
+
+                <button
+                    type="button"
+                    class="admin-button secondary-button"
+                    onclick="hideChangePassword()"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ACCOUNT SESSION -->
+    <!-- KEEP THIS SECTION -->
+    <!-- ================================================= -->
+
+    <div class="card" style="margin-top:25px;">
+
+        <h2>
+            Account Session
+        </h2>
+
+        <p>
+            Log out of the PepaGRADE administrator account.
+        </p>
+
+        <a
+            href="{% url 'admin_logout' %}"
+            class="admin-button secondary-button"
+        >
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script>
+
+function showEditProfile() {
+
+    document.getElementById(
+        'edit-profile-section'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'change-password-section'
+    ).style.display = 'none';
+
+}
+
+
+function hideEditProfile() {
+
+    document.getElementById(
+        'edit-profile-section'
+    ).style.display = 'none';
+
+}
+
+
+function showChangePassword() {
+
+    document.getElementById(
+        'change-password-section'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'edit-profile-section'
+    ).style.display = 'none';
+
+}
+
+
+function hideChangePassword() {
+
+    document.getElementById(
+        'change-password-section'
+    ).style.display = 'none';
+
+}
+
+</script>
+
+{% endblock %}

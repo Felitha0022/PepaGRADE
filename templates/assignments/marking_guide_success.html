@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+
+            <h2 class="text-success mb-3">
+                Marking Guide Uploaded Successfully
+            </h2>
+
+            <p class="lead">
+                Your marking guide has been uploaded and its text
+                has been extracted successfully.
+            </p>
+
+            <div class="mt-4">
+
+                <a href="{% url 'upload_marking_guide' %}"
+                   class="btn btn-primary">
+                    Upload Another Marking Guide
+                </a>
+
+                <a href="{% url 'dashboard' %}"
+                   class="btn btn-secondary">
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

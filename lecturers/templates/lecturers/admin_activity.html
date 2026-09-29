@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}
+System Activity | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <div class="section-heading">
+
+        <span class="section-label">
+            SYSTEM
+        </span>
+
+        <h1>
+            System Activity
+        </h1>
+
+        <p>
+            View and manage activity performed within PepaGRADE.
+        </p>
+
+    </div>
+
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:25px;
+        gap:15px;
+        flex-wrap:wrap;
+    ">
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="admin-button secondary-button"
+        >
+            ← Back to Dashboard
+        </a>
+
+
+        {% if activities %}
+
+            <form
+                method="POST"
+                action="{% url 'clear_activity' %}"
+                onsubmit="return confirm(
+                    'Are you sure you want to delete ALL activity logs? This cannot be undone.'
+                );"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="admin-button primary-button"
+                >
+                    Delete All Logs
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="card">
+
+        {% if activities %}
+
+            <div style="overflow-x:auto;">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                User
+                            </th>
+
+                            <th>
+                                Activity
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                IP Address
+                            </th>
+
+                            <th>
+                                Date & Time
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for activity in activities %}
+
+                            <tr>
+
+                                <td>
+                                    {{ forloop.counter }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if activity.user %}
+
+                                        <strong>
+                                            {{ activity.user.username }}
+                                        </strong>
+
+                                    {% else %}
+
+                                        Unknown User
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+                                    {{ activity.get_action_display }}
+                                </td>
+
+
+                                <td>
+                                    {{ activity.description|default:"No description provided." }}
+                                </td>
+
+
+                                <td>
+                                    {{ activity.ip_address|default:"—" }}
+                                </td>
+
+
+                                <td>
+                                    {{ activity.created_at|date:"d M Y, h:i A" }}
+                                </td>
+
+
+                                <td>
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'delete_activity' activity.id %}"
+                                        onsubmit="return confirm(
+                                            'Delete this activity log?'
+                                        );"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="admin-button secondary-button"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <p>
+                No activity logs are available.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

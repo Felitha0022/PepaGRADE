@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+
+Lecturer Login | PepaGRADE
+
+{% endblock %}
+
+{% block main_class %}
+login-container-page
+{% endblock %}
+
+{% block content %}
+
+<div class="login-page">
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            <img
+                src="{% static 'images/PepaGRADE_Logo.png' %}"
+                alt="PepaGRADE Logo"
+            >
+        </div>
+
+        <h1>
+            Lecturer Portal
+        </h1>
+
+        <p class="subtitle">
+            Sign in to access the PepaGRADE lecturer dashboard.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                Sign In
+            </button>
+
+        </form>
+
+
+        <div class="login-footer">
+
+            <a href="{% url 'landing_page' %}">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   LECTURER LOGIN PAGE
+========================================================= */
+
+.login-page {
+    min-height: calc(100vh - 76px);
+    min-height: calc(100dvh - 76px);
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 50px 20px;
+
+    background-image:
+
+        linear-gradient(
+            rgba(0, 35, 18, 0.78),
+            rgba(0, 35, 18, 0.78)
+        ),
+
+        url("{% static 'images/campus.jpeg' %}");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+
+}
+
+
+/* =========================================================
+   LOGIN CARD
+========================================================= */
+
+.login-card {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    padding: 40px;
+
+    background: rgba(255, 255, 255, 0.97);
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.25);
+
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.login-logo {
+
+    text-align: center;
+
+    margin-bottom: 15px;
+
+}
+
+
+.login-logo img {
+
+    width: 90px;
+
+    height: auto;
+
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+.login-card h1 {
+
+    text-align: center;
+
+    margin-bottom: 10px;
+
+    color: #003b20;
+
+    font-size: 30px;
+
+}
+
+
+/* =========================================================
+   SUBTITLE
+========================================================= */
+
+.subtitle {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-bottom: 30px;
+
+    line-height: 1.5;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-group {
+
+    margin-bottom: 20px;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+    color: #333;
+
+}
+
+
+.form-group input {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    font-size: 16px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.form-group input:focus {
+
+    border-color: #198754;
+
+    box-shadow:
+        0 0 0 3px rgba(25, 135, 84, 0.12);
+
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+========================================================= */
+
+.login-button {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #198754;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.login-button:hover {
+
+    background: #146c43;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.message {
+
+    background: #f8d7da;
+
+    color: #842029;
+
+    padding: 12px;
+
+    border-radius: 6px;
+
+    margin-bottom: 20px;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.login-footer {
+
+    text-align: center;
+
+    margin-top: 25px;
+
+}
+
+
+.login-footer a {
+
+    text-decoration: none;
+
+    color: #198754;
+
+    font-weight: 600;
+
+}
+
+
+.login-footer a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .login-page {
+
+        padding: 30px 15px;
+
+    }
+
+    .login-card {
+
+        padding: 30px 25px;
+
+    }
+
+    .login-card h1 {
+
+        font-size: 26px;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Add Assignment</h1>
+
+<p>
+    Student:
+    <strong>{{ student.full_name }}</strong>
+</p>
+
+<p>
+    Student ID:
+    <strong>{{ student.student_id }}</strong>
+</p>
+
+<hr>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Create Assignment
+    </button>
+
+    <a href="{% url 'student_detail' student.id %}">
+        Cancel
+    </a>
+
+</form>
+
+{% endblock %}

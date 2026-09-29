@@ -1,0 +1,1987 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+PepaGRADE Student Portal
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   STUDENT PORTAL
+========================================================= */
+
+.student-portal {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   MAKE STUDENT PAGE FULL WIDTH
+========================================================= */
+
+.container:has(.student-portal) {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   STUDENT NAVIGATION
+   Home + My Courses = CENTER
+   Student Profile = RIGHT
+========================================================= */
+
+.student-navigation {
+    width: 100%;
+    min-height: 64px;
+    background: #ffffff;
+    border-bottom: 1px solid #e1e8e4;
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+
+    align-items: center;
+
+    padding: 0 35px;
+
+    box-sizing: border-box;
+
+    position: relative;
+    z-index: 1000;
+}
+
+
+/* =========================================================
+   CENTER NAVIGATION
+========================================================= */
+
+.student-navigation-center {
+    grid-column: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+}
+
+
+.student-nav-link,
+.course-dropdown-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 18px;
+
+    text-decoration: none;
+
+    color: #333;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    border-radius: 6px;
+
+    background: transparent;
+    border: none;
+
+    cursor: pointer;
+
+    font-family: inherit;
+}
+
+
+.student-nav-link:hover,
+.course-dropdown-button:hover {
+    background: #16803c;
+    color: white;
+}
+
+
+.student-nav-link.active {
+    background: #16803c;
+    color: white;
+}
+
+
+/* =========================================================
+   COURSE DROPDOWN
+========================================================= */
+
+.course-dropdown {
+    position: relative;
+}
+
+
+.course-dropdown-button {
+    font-family: inherit;
+}
+
+
+.course-dropdown-content {
+    display: none;
+
+    position: absolute;
+
+    top: calc(100% + 5px);
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    min-width: 300px;
+
+    background: white;
+
+    border: 1px solid #ddd;
+    border-radius: 7px;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+
+    z-index: 2000;
+
+    overflow: hidden;
+}
+
+
+.course-dropdown-content.show {
+    display: block;
+}
+
+
+.course-dropdown-content a {
+    display: block;
+
+    padding: 13px 16px;
+
+    color: #333;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+.course-dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+
+.course-dropdown-content a:hover {
+    background: #f1f8f3;
+    color: #16803c;
+}
+
+
+/* =========================================================
+   STUDENT PROFILE - RIGHT SIDE
+========================================================= */
+
+.navigation-profile {
+    grid-column: 3;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    position: relative;
+}
+
+
+.profile-dropdown {
+    position: relative;
+}
+
+
+.profile-button {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 6px 10px;
+
+    background: transparent;
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+}
+
+
+.profile-button:hover {
+    background: #f1f8f3;
+}
+
+
+.profile-picture-small,
+.profile-placeholder {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #16803c;
+    color: white;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+.profile-name {
+    color: #333;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    max-width: 150px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.profile-arrow {
+    color: #555;
+    font-size: 11px;
+}
+
+
+.profile-dropdown-content {
+    display: none;
+
+    position: absolute;
+
+    top: calc(100% + 7px);
+    right: 0;
+
+    min-width: 230px;
+
+    background: white;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+
+    overflow: hidden;
+
+    z-index: 2000;
+}
+
+
+.profile-dropdown-content.show {
+    display: block;
+}
+
+
+.profile-dropdown-header {
+    padding: 15px 16px;
+
+    background: #f4f7f5;
+
+    border-bottom: 1px solid #e1e8e4;
+}
+
+
+.profile-dropdown-header strong {
+    display: block;
+
+    color: #333;
+
+    font-size: 14px;
+
+    margin-bottom: 4px;
+}
+
+
+.profile-dropdown-header span {
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+.profile-dropdown-content a {
+    display: block;
+
+    padding: 12px 16px;
+
+    color: #333;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #eee;
+}
+
+
+.profile-dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+
+.profile-dropdown-content a:hover {
+    background: #f1f8f3;
+    color: #16803c;
+}
+
+
+.profile-dropdown-content .logout-link {
+    color: #b42318;
+}
+
+
+.profile-dropdown-content .logout-link:hover {
+    background: #fff2f0;
+    color: #b42318;
+}
+
+
+/* =========================================================
+   HOME SLIDESHOW
+========================================================= */
+
+.student-slideshow {
+    width: 100%;
+    height: 430px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background: #eeeeee;
+}
+
+
+.slide {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    transition: opacity 0.8s ease-in-out;
+}
+
+
+.slide.active {
+    opacity: 1;
+}
+
+
+.slide img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+
+.slide-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 30px;
+
+    background: rgba(0,0,0,0.28);
+
+    box-sizing: border-box;
+}
+
+
+.slide-overlay h2 {
+    color: white;
+
+    font-size: 38px;
+
+    margin: 0;
+
+    text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+}
+
+
+/* =========================================================
+   ACADEMIC WRITING SUPPORT
+========================================================= */
+
+.academic-support {
+    width: 100%;
+
+    padding: 55px 8%;
+
+    box-sizing: border-box;
+
+    background: white;
+}
+
+
+.academic-support h2 {
+    color: #16803c;
+
+    font-size: 30px;
+
+    margin-bottom: 20px;
+}
+
+
+.academic-support > p {
+    max-width: 1000px;
+
+    line-height: 1.8;
+
+    color: #555;
+
+    font-size: 16px;
+
+    margin-bottom: 14px;
+}
+
+
+.support-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 25px;
+
+    margin-top: 35px;
+}
+
+
+.support-card {
+    padding: 28px;
+
+    border: 1px solid #e1e1e1;
+
+    border-radius: 10px;
+
+    background: #f9fbfa;
+
+    box-sizing: border-box;
+}
+
+
+.support-card h3 {
+    color: #16803c;
+
+    font-size: 19px;
+
+    margin-bottom: 12px;
+}
+
+
+.support-card p {
+    color: #555;
+
+    line-height: 1.7;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   PEPA GRADE FOOTER / CONTACT SECTION
+========================================================= */
+
+.student-footer {
+    width: 100%;
+
+    background: #f4f7f5;
+
+    border-top: 1px solid #dfe7e2;
+
+    padding: 50px 8% 35px;
+
+    box-sizing: border-box;
+}
+
+
+.footer-top {
+    text-align: center;
+
+    margin-bottom: 40px;
+}
+
+
+.footer-logo {
+    width: 110px;
+
+    height: auto;
+
+    margin-bottom: 18px;
+}
+
+
+.footer-top h3 {
+    color: #16803c;
+
+    font-size: 21px;
+
+    margin: 5px 0 12px;
+}
+
+
+.social-text {
+    color: #555;
+
+    font-size: 16px;
+
+    margin-bottom: 18px;
+}
+
+
+.social-icons {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.social-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #16803c;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+
+.social-icon:hover {
+    background: #0f642f;
+}
+
+
+.footer-information {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 45px;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding-top: 35px;
+
+    border-top: 1px solid #d9e2dc;
+}
+
+
+.footer-column h4 {
+    color: #16803c;
+
+    font-size: 18px;
+
+    margin-bottom: 12px;
+}
+
+
+.footer-column p {
+    color: #555;
+
+    line-height: 1.7;
+
+    margin: 0 0 10px;
+}
+
+
+.footer-column strong {
+    color: #333;
+}
+
+
+.privacy-section {
+    text-align: center;
+
+    margin-top: 35px;
+
+    padding-top: 25px;
+
+    border-top: 1px solid #d9e2dc;
+}
+
+
+.privacy-section a {
+    color: #16803c;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+.privacy-section a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   SELECTED COURSE PAGE
+========================================================= */
+
+.course-content {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 240px 1fr;
+
+    min-height: 500px;
+}
+
+
+/* =========================================================
+   GREEN STUDENT PORTAL SIDEBAR
+========================================================= */
+
+.portal-sidebar {
+    background: #16803c;
+
+    padding: 28px 18px;
+
+    box-sizing: border-box;
+
+    color: white;
+}
+
+
+.portal-sidebar h3 {
+    color: white;
+
+    font-size: 21px;
+
+    margin: 0 0 20px;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid rgba(255,255,255,0.25);
+}
+
+
+.sidebar-link {
+    display: block;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 13px 12px;
+
+    border-radius: 6px;
+
+    margin-bottom: 6px;
+
+    font-size: 15px;
+}
+
+
+.sidebar-link:hover {
+    background: rgba(255,255,255,0.16);
+
+    color: white;
+}
+
+
+/* =========================================================
+   COURSE MAIN CONTENT
+========================================================= */
+
+.course-main {
+    padding: 40px 50px;
+
+    box-sizing: border-box;
+
+    background: white;
+}
+
+
+.course-breadcrumb {
+    color: #777;
+
+    font-size: 14px;
+
+    margin-bottom: 20px;
+}
+
+
+.course-breadcrumb a {
+    color: #16803c;
+
+    text-decoration: none;
+}
+
+
+.course-main h2 {
+    color: #16803c;
+
+    font-size: 30px;
+
+    margin-bottom: 15px;
+}
+
+
+.course-description {
+    color: #555;
+
+    line-height: 1.7;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   ASSIGNMENTS
+========================================================= */
+
+.assignment-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(280px, 1fr));
+
+    gap: 25px;
+}
+
+
+.assignment-card {
+    border: 1px solid #e1e1e1;
+
+    border-radius: 10px;
+
+    padding: 25px;
+
+    background: #fafafa;
+}
+
+
+.assignment-card h3 {
+    color: #16803c;
+
+    margin-top: 0;
+
+    margin-bottom: 15px;
+}
+
+
+.assignment-card p {
+    color: #555;
+
+    line-height: 1.6;
+}
+
+
+.assignment-button {
+    display: inline-block;
+
+    margin-top: 15px;
+
+    padding: 11px 18px;
+
+    background: #16803c;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+
+    font-weight: 600;
+}
+
+
+.assignment-button:hover {
+    background: #0f642f;
+}
+
+
+.empty-state {
+    padding: 30px;
+
+    border: 1px dashed #ccc;
+
+    border-radius: 8px;
+
+    color: #777;
+
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .student-navigation {
+        grid-template-columns: 1fr;
+
+        gap: 5px;
+
+        padding: 10px 20px;
+    }
+
+
+    .student-navigation-center {
+        grid-column: 1;
+
+        justify-content: center;
+
+        order: 1;
+    }
+
+
+    .navigation-profile {
+        grid-column: 1;
+
+        justify-content: center;
+
+        order: 2;
+
+        padding-bottom: 5px;
+    }
+
+
+    .student-slideshow {
+        height: 320px;
+    }
+
+
+    .slide-overlay h2 {
+        font-size: 28px;
+    }
+
+
+    .academic-support {
+        padding: 40px 25px;
+    }
+
+
+    .support-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .footer-information {
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+    }
+
+
+    .student-footer {
+        padding: 40px 25px 30px;
+    }
+
+
+    .course-content {
+        grid-template-columns: 1fr;
+    }
+
+
+    .portal-sidebar {
+        width: 100%;
+    }
+
+
+    .course-main {
+        padding: 30px 25px;
+    }
+
+
+    .assignment-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 500px) {
+
+    .student-navigation-center {
+        flex-wrap: wrap;
+    }
+
+
+    .student-nav-link,
+    .course-dropdown-button {
+        padding: 9px 13px;
+
+        font-size: 14px;
+    }
+
+
+    .course-dropdown-content {
+        min-width: 250px;
+    }
+
+
+    .profile-name {
+        max-width: 120px;
+    }
+
+
+    .student-slideshow {
+        height: 260px;
+    }
+
+
+    .slide-overlay h2 {
+        font-size: 23px;
+    }
+
+
+    .academic-support h2 {
+        font-size: 25px;
+    }
+
+}
+
+</style>
+
+
+<div class="student-portal">
+
+
+    <!-- =====================================================
+         STUDENT NAVIGATION
+         HOME + MY COURSES CENTER
+         PROFILE RIGHT
+    ====================================================== -->
+
+    <nav class="student-navigation">
+
+
+        <!-- CENTER NAVIGATION -->
+
+        <div class="student-navigation-center">
+
+
+            <!-- HOME -->
+
+            <a href="{% url 'student_dashboard' %}"
+               class="student-nav-link {% if not selected_unit %}active{% endif %}">
+
+                Home
+
+            </a>
+
+
+            <!-- MY COURSES -->
+
+            <div class="course-dropdown">
+
+                <button type="button"
+                        class="course-dropdown-button"
+                        onclick="toggleCourses()">
+
+                    My Courses ▼
+
+                </button>
+
+
+                <div id="courseDropdown"
+                     class="course-dropdown-content">
+
+
+                    {% if enrollments %}
+
+                        {% for enrollment in enrollments %}
+
+                            <a href="{% url 'student_dashboard' %}?unit={{ enrollment.course_unit.id }}">
+
+                                {{ enrollment.course_unit.code }}
+                                -
+                                {{ enrollment.course_unit.name }}
+
+                            </a>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <a href="#">
+
+                            No course units enrolled
+
+                        </a>
+
+                    {% endif %}
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             STUDENT PROFILE - RIGHT SIDE
+        ================================================== -->
+
+        <div class="navigation-profile">
+
+            <div class="profile-dropdown">
+
+
+                <button type="button"
+                        class="profile-button"
+                        onclick="toggleProfile()">
+
+
+                    {% if student.profile_picture %}
+
+                        <img src="{{ student.profile_picture.url }}"
+                             alt="Profile Picture"
+                             class="profile-picture-small">
+
+                    {% else %}
+
+                        <div class="profile-placeholder">
+
+                            {{ student.full_name|first|upper }}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <span class="profile-name">
+
+                        {{ student.full_name }}
+
+                    </span>
+
+
+                    <span class="profile-arrow">
+
+                        ▼
+
+                    </span>
+
+
+                </button>
+
+
+                <div id="profileDropdown"
+                     class="profile-dropdown-content">
+
+
+                    <div class="profile-dropdown-header">
+
+                        <strong>
+
+                            {{ student.full_name }}
+
+                        </strong>
+
+                        <span>
+
+                            Student Account
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Placeholder links until
+                         profile/account pages are implemented -->
+
+                    <a href="#">
+
+                        My Profile
+
+                    </a>
+
+
+                    <a href="#">
+
+                        Account Details
+
+                    </a>
+
+
+                    <a href="{% url 'student_change_password' %}">
+
+                        Change Password
+
+                    </a>
+
+
+                    <a href="{% url 'student_logout' %}"
+                       class="logout-link">
+
+                        Logout
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         HOME PAGE
+         ONLY SHOWN WHEN NO COURSE IS SELECTED
+    ====================================================== -->
+
+    {% if not selected_unit %}
+
+
+        <!-- =================================================
+             SLIDESHOW
+        ================================================== -->
+
+        <section class="student-slideshow">
+
+
+            <div class="slide active">
+
+                <img
+                    src="{% static 'images/damin.png' %}"
+                    alt="PepaGRADE"
+                >
+
+
+                <div class="slide-overlay">
+
+                    <h2>
+
+                        Academic Excellence at
+                        Divine Word University
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="slide">
+
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=80"
+                     alt="Students working together">
+
+
+                <div class="slide-overlay">
+
+                    <h2>
+
+                        Supporting Better
+                        Academic Writing
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="slide">
+
+                <img src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1800&q=80"
+                     alt="Academic books and study">
+
+
+                <div class="slide-overlay">
+
+                    <h2>
+
+                        Learn. Write. Improve.
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             ACADEMIC WRITING SUPPORT
+        ================================================== -->
+
+        <section class="academic-support">
+
+
+            <h2>
+
+                Academic Writing Support
+
+            </h2>
+
+
+            <p>
+
+                PepaGRADE is a web-based, AI-powered Academic Writing
+                Feedback Assistant developed for Divine Word University.
+
+            </p>
+
+
+            <p>
+
+                The system supports the academic assessment process by
+                providing structured feedback on student academic writing
+                based on lecturer-provided assessment criteria.
+
+            </p>
+
+
+            <p>
+
+                Students can use the portal to access their enrolled
+                course units, view assignments, submit academic papers
+                and view grades released by their lecturers.
+
+            </p>
+
+
+
+            <div class="support-grid">
+
+
+                <!-- ACADEMIC WRITING -->
+
+                <div class="support-card">
+
+                    <h3>
+
+                        ✍ Academic Writing
+
+                    </h3>
+
+
+                    <p>
+
+                        Access and submit academic papers such as essays,
+                        project proposals and literature reviews.
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- AI FEEDBACK -->
+
+                <div class="support-card">
+
+                    <h3>
+
+                        🤖 AI-Powered Feedback
+
+                    </h3>
+
+
+                    <p>
+
+                        PepaGRADE supports academic assessment using
+                        lecturer-provided marking guides and assessment
+                        criteria.
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- GRADEBOOK -->
+
+                <div class="support-card">
+
+                    <h3>
+
+                        📊 Gradebook
+
+                    </h3>
+
+
+                    <p>
+
+                        View grades that have been released by your lecturer.
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PEPA GRADE FOOTER / CONTACT INFORMATION
+        ================================================== -->
+
+        <footer class="student-footer">
+
+
+            <div class="footer-top">
+
+
+                <!-- EXISTING PEPA GRADE LOGO -->
+
+                <img src="{% static 'images/PepaGRADE_Logo.png' %}"
+                     alt="PepaGRADE Logo"
+                     class="footer-logo">
+
+
+                <h3>
+
+                    PepaGRADE
+
+                </h3>
+
+
+                <p class="social-text">
+
+                    Follow Us on Social Media
+
+                </p>
+
+
+
+                <div class="social-icons">
+
+
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="Facebook">
+
+                        f
+
+                    </a>
+
+
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="Instagram">
+
+                        ◎
+
+                    </a>
+
+
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="Twitter">
+
+                        𝕏
+
+                    </a>
+
+
+                    <a href="#"
+                       class="social-icon"
+                       aria-label="LinkedIn">
+
+                        in
+
+                    </a>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- FOOTER INFORMATION -->
+
+            <div class="footer-information">
+
+
+                <!-- LOCATION -->
+
+                <div class="footer-column">
+
+
+                    <h4>
+
+                        Our Location
+
+                    </h4>
+
+
+                    <p>
+
+                        Divine Word University,
+                        Allotment Portion 7,
+                        Section Milinch Kranket,
+                        Nabasa Road,
+                        P.O.Box 483, Madang 511,
+                        Madang Province,
+                        Papua New Guinea
+
+                    </p>
+
+
+                </div>
+
+
+
+                <!-- CONTACT -->
+
+                <div class="footer-column">
+
+
+                    <h4>
+
+                        Get In Touch
+
+                    </h4>
+
+
+                    <p>
+
+                        <strong>
+
+                            Customer service and support
+
+                        </strong>
+
+                    </p>
+
+
+                    <p>
+
+                        (675) 73751976
+
+                    </p>
+
+
+                    <p>
+
+                        Or email the team on:
+
+                    </p>
+
+
+                    <p>
+
+                        230203@student.dwu.ac.pg
+
+                    </p>
+
+
+                    <p>
+
+                        felithapugu@gmail.com
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- PRIVACY -->
+
+            <div class="privacy-section">
+
+
+                <a href="#">
+
+                    Privacy Policy
+
+                </a>
+
+
+            </div>
+
+
+        </footer>
+
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         SELECTED COURSE PAGE
+         ONLY SHOWN WHEN A COURSE IS SELECTED
+    ====================================================== -->
+
+    {% if selected_unit %}
+
+
+        <section class="course-content">
+
+
+            <!-- =================================================
+                 GREEN STUDENT PORTAL SIDEBAR
+            ================================================== -->
+
+            <aside class="portal-sidebar">
+
+
+                <h3>
+
+                    Student Portal
+
+                </h3>
+
+
+
+                <a href="{% url 'student_gradebook_page' %}"
+                   class="sidebar-link">
+
+                    📊 Gradebook
+
+                </a>
+
+
+
+                <a href="{% url 'student_dashboard' %}"
+                   class="sidebar-link">
+
+                    📝 My Assignments
+
+                </a>
+
+
+
+                <a href="{% url 'student_logout' %}"
+                   class="sidebar-link">
+
+                    🚪 Logout
+
+                </a>
+
+
+            </aside>
+
+
+
+            <!-- =================================================
+                 COURSE CONTENT
+            ================================================== -->
+
+            <main class="course-main">
+
+
+                <!-- BREADCRUMB -->
+
+                <div class="course-breadcrumb">
+
+
+                    <a href="{% url 'student_dashboard' %}">
+
+                        Home
+
+                    </a>
+
+
+                    &nbsp;›&nbsp;
+
+
+                    My Courses
+
+
+                    &nbsp;›&nbsp;
+
+
+                    {{ selected_unit.code }}
+
+
+                </div>
+
+
+
+                <!-- COURSE TITLE -->
+
+                <h2>
+
+                    {{ selected_unit.code }}
+                    -
+                    {{ selected_unit.name }}
+
+                </h2>
+
+
+
+                <!-- COURSE DESCRIPTION -->
+
+                {% if selected_unit.description %}
+
+                    <p class="course-description">
+
+                        {{ selected_unit.description }}
+
+                    </p>
+
+                {% endif %}
+
+
+
+                <!-- ASSIGNMENTS HEADING -->
+
+                <h3 style="margin-bottom:20px;">
+
+                    Assignments
+
+                </h3>
+
+
+
+                <!-- ASSIGNMENT LIST -->
+
+                {% if assignments %}
+
+
+                    <div class="assignment-grid">
+
+
+                        {% for assignment in assignments %}
+
+
+                            <div class="assignment-card">
+
+
+                                <h3>
+
+                                    {{ assignment.title }}
+
+                                </h3>
+
+
+
+                                <p>
+
+                                    <strong>
+
+                                        Type:
+
+                                    </strong>
+
+                                    {{ assignment.get_document_type_display }}
+
+                                </p>
+
+
+
+                                {% if assignment.description %}
+
+                                    <p>
+
+                                        {{ assignment.description }}
+
+                                    </p>
+
+                                {% endif %}
+
+
+
+                                {% if assignment.due_date %}
+
+                                    <p>
+
+                                        <strong>
+
+                                            Due:
+
+                                        </strong>
+
+                                        {{ assignment.due_date }}
+
+                                    </p>
+
+                                {% endif %}
+
+
+
+                                {% if assignment.allow_submission %}
+
+
+                                    <a href="{% url 'student_submit_assignment' assignment.id %}"
+                                       class="assignment-button">
+
+                                        Submit Assignment
+
+                                    </a>
+
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div class="empty-state">
+
+                        No assignments are currently available
+                        for this course unit.
+
+                    </div>
+
+
+                {% endif %}
+
+
+            </main>
+
+
+        </section>
+
+
+    {% endif %}
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   COURSE DROPDOWN
+========================================================= */
+
+function toggleCourses() {
+
+    const dropdown =
+        document.getElementById("courseDropdown");
+
+    if (!dropdown) {
+        return;
+    }
+
+    /* Close profile dropdown if open */
+
+    const profileDropdown =
+        document.getElementById("profileDropdown");
+
+    if (profileDropdown) {
+
+        profileDropdown.classList.remove("show");
+
+    }
+
+    dropdown.classList.toggle("show");
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN
+========================================================= */
+
+function toggleProfile() {
+
+    const dropdown =
+        document.getElementById("profileDropdown");
+
+    if (!dropdown) {
+        return;
+    }
+
+    /* Close course dropdown if open */
+
+    const courseDropdown =
+        document.getElementById("courseDropdown");
+
+    if (courseDropdown) {
+
+        courseDropdown.classList.remove("show");
+
+    }
+
+    dropdown.classList.toggle("show");
+}
+
+
+/* =========================================================
+   CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
+========================================================= */
+
+window.addEventListener("click", function(event) {
+
+
+    const courseDropdown =
+        document.getElementById("courseDropdown");
+
+    const courseButton =
+        document.querySelector(".course-dropdown-button");
+
+
+    if (
+        courseDropdown &&
+        courseButton &&
+        !courseButton.contains(event.target) &&
+        !courseDropdown.contains(event.target)
+    ) {
+
+        courseDropdown.classList.remove("show");
+
+    }
+
+
+
+    const profileDropdown =
+        document.getElementById("profileDropdown");
+
+    const profileButton =
+        document.querySelector(".profile-button");
+
+
+    if (
+        profileDropdown &&
+        profileButton &&
+        !profileButton.contains(event.target) &&
+        !profileDropdown.contains(event.target)
+    ) {
+
+        profileDropdown.classList.remove("show");
+
+    }
+
+});
+
+
+/* =========================================================
+   SLIDESHOW
+========================================================= */
+
+let currentSlide = 0;
+
+
+const slides =
+    document.querySelectorAll(".slide");
+
+
+function showSlide(index) {
+
+    if (!slides.length) {
+
+        return;
+
+    }
+
+
+    slides.forEach(function(slide) {
+
+        slide.classList.remove("active");
+
+    });
+
+
+    slides[index].classList.add("active");
+
+}
+
+
+function nextSlide() {
+
+    if (!slides.length) {
+
+        return;
+
+    }
+
+
+    currentSlide =
+        (currentSlide + 1) % slides.length;
+
+
+    showSlide(currentSlide);
+
+}
+
+
+if (slides.length > 0) {
+
+    setInterval(nextSlide, 5000);
+
+}
+
+</script>
+
+{% endblock %}
+
