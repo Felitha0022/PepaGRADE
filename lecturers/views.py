@@ -612,6 +612,8 @@ def create_lecturer(request):
 
             user = form.save()
 
+            default_password = form.cleaned_data['default_password']
+
             ActivityLog.objects.create(
                 user=request.user,
                 action='create_lecturer',
@@ -624,11 +626,10 @@ def create_lecturer(request):
                 ),
             )
 
-            messages.success(
-                request,
-                f'Lecturer "{user.username}" '
-                f'was created successfully.'
-            )
+            request.session['lecturer_created'] = {
+                'username': user.username,
+                'default_password': default_password,
+            }
 
             return redirect(
                 'lecturer_list'
@@ -671,13 +672,25 @@ def lecturer_list(request):
         'lecturer_profile'
     )
 
+    created_lecturer = request.session.pop(
+    'lecturer_created',
+    None
+)
+
+    deleted_lecturer = request.session.pop(
+    'lecturer_deleted',
+    None
+)
+
     return render(
-        request,
-        'lecturers/lecturer_list.html',
-        {
-            'lecturers': lecturers
-        }
-    )
+    request,
+    'lecturers/lecturer_list.html',
+    {
+        'lecturers': lecturers,
+        'created_lecturer': created_lecturer,
+        'deleted_lecturer': deleted_lecturer,
+    }
+)
 
 
 # =========================================================
@@ -787,10 +800,9 @@ def delete_lecturer(request, lecturer_id):
         )
     )
 
-    messages.success(
-        request,
-        f'Lecturer account "{lecturer_username}" was deleted successfully.'
-    )
+    request.session['lecturer_deleted'] = {
+    'username': lecturer_username,
+    }
 
     return redirect(
         'lecturer_list'

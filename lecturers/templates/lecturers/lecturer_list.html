@@ -4,6 +4,206 @@
 
 {% block content %}
 
+{% if created_lecturer %}
+
+<div
+    id="successModal"
+    style="
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.55);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;
+    "
+>
+
+    <div
+        style="
+            background:white;
+            width:90%;
+            max-width:480px;
+            border-radius:12px;
+            padding:30px;
+            box-shadow:0 10px 40px rgba(0,0,0,0.25);
+            text-align:center;
+        "
+    >
+
+        <div
+            style="
+                font-size:48px;
+                margin-bottom:10px;
+            "
+        >
+            ✓
+        </div>
+
+        <h2
+            style="
+                margin-bottom:10px;
+                color:#16803c;
+            "
+        >
+            Lecturer Account Created
+        </h2>
+
+        <p>
+            The lecturer account was created successfully.
+        </p>
+
+        <div
+            style="
+                background:#f5f5f5;
+                padding:15px;
+                border-radius:8px;
+                margin:20px 0;
+                text-align:left;
+            "
+        >
+
+            <p style="margin:5px 0;">
+                <strong>Username:</strong>
+                {{ created_lecturer.username }}
+            </p>
+
+            <p style="margin:10px 0 5px 0;">
+                <strong>Default Password:</strong>
+            </p>
+
+            <div
+                style="
+                    background:white;
+                    border:1px solid #ddd;
+                    padding:10px;
+                    border-radius:5px;
+                    font-family:monospace;
+                    font-size:16px;
+                    word-break:break-all;
+                "
+            >
+                {{ created_lecturer.default_password }}
+            </div>
+
+        </div>
+
+        <p
+            style="
+                font-size:13px;
+                color:#666;
+                margin-bottom:20px;
+            "
+        >
+            Give these login details to the lecturer.
+            The lecturer will be required to change the
+            default password during their first login.
+        </p>
+
+        <button
+            type="button"
+            onclick="closeSuccessModal()"
+            style="
+                padding:10px 30px;
+                background:#16803c;
+                color:white;
+                border:none;
+                border-radius:5px;
+                font-weight:600;
+                cursor:pointer;
+            "
+        >
+            Close
+        </button>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% if deleted_lecturer %}
+
+<div
+    id="deleteSuccessModal"
+    style="
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.55);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;
+    "
+>
+
+    <div
+        style="
+            background:white;
+            width:90%;
+            max-width:430px;
+            border-radius:12px;
+            padding:30px;
+            box-shadow:0 10px 40px rgba(0,0,0,0.25);
+            text-align:center;
+        "
+    >
+
+        <div
+            style="
+                font-size:48px;
+                margin-bottom:10px;
+            "
+        >
+            ✓
+        </div>
+
+        <h2
+            style="
+                margin-bottom:10px;
+                color:#16803c;
+            "
+        >
+            Lecturer Account Deleted
+        </h2>
+
+        <p>
+            Lecturer account
+            <strong>
+                "{{ deleted_lecturer.username }}"
+            </strong>
+            was deleted successfully.
+        </p>
+
+        <button
+            type="button"
+            onclick="closeDeleteModal()"
+            style="
+                margin-top:20px;
+                padding:10px 30px;
+                background:#16803c;
+                color:white;
+                border:none;
+                border-radius:5px;
+                font-weight:600;
+                cursor:pointer;
+            "
+        >
+            Close
+        </button>
+
+    </div>
+
+</div>
+
+{% endif %}
+
 <div class="dashboard-header">
 
 
@@ -211,7 +411,30 @@ function confirmDelete(username) {
     );
 
 }
+function closeSuccessModal() {
 
+    const modal = document.getElementById(
+        'successModal'
+    );
+
+    if (modal) {
+        modal.remove();
+    }
+
+}
+
+
+function closeDeleteModal() {
+
+    const modal = document.getElementById(
+        'deleteSuccessModal'
+    );
+
+    if (modal) {
+        modal.remove();
+    }
+
+}
 </script>
 
 {% endblock %}
