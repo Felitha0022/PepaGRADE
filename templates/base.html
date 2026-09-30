@@ -1771,77 +1771,82 @@
 
         </div>
 
-
         <div class="top-right">
 
-            {% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated %}
 
-                {% if request.user.is_superuser %}
+        {% if request.user.is_superuser %}
 
-                    <span class="top-dashboard-title">
-                        Administrator Dashboard
-                    </span>
+            <a
+                href="{% url 'admin_account' %}"
+                style="
+                    display:flex;
+                    align-items:center;
+                    gap:10px;
+                    text-decoration:none;
+                    color:inherit;
+                "
+            >
 
-                {% elif request.user.lecturer_profile %}
+                {% if request.user.admin_profile.profile_picture %}
 
-                    <a
-                        href="{% url 'lecturer_dashboard' %}"
-                        class="top-dashboard-title"
+                    <img
+                        src="{{ request.user.admin_profile.profile_picture.url }}"
+                        alt="Administrator Profile Picture"
+                        style="
+                            width:42px;
+                            height:42px;
+                            border-radius:50%;
+                            object-fit:cover;
+                            border:2px solid #16803c;
+                        "
                     >
-                        Dashboard
-                    </a>
+
+                {% else %}
+
+                    <div
+                        style="
+                            width:42px;
+                            height:42px;
+                            border-radius:50%;
+                            background:#16803c;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            font-weight:700;
+                            font-size:16px;
+                        "
+                    >
+                        {{ request.user.first_name|first|upper }}
+                    </div>
 
                 {% endif %}
 
-            {% else %}
-            <div
-    style="
-        display:flex;
-        align-items:center;
-        gap:10px;
-        margin-left:auto;
-    "
->
-    
-    <!-- Administrator Profile Picture -->
-    {% if request.user.profile_picture %}
-        <img
-            src="{{ request.user.profile_picture.url }}"
-            alt="Administrator Profile Picture"
-            style="
-                width:42px;
-                height:42px;
-                border-radius:50%;
-                object-fit:cover;
-                border:2px solid #16803c;
-            "
-        >
-    {% else %}
-        <div
-            style="
-                width:42px;
-                height:42px;
-                border-radius:50%;
-                background:#16803c;
-                color:white;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-weight:700;
-                font-size:16px;
-            "
-        >
-            {{ request.user.first_name|first|upper }}
-        </div>
+                <span
+                    style="
+                        font-weight:600;
+                    "
+                >
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </span>
+
+            </a>
+
+        {% elif request.user.lecturer_profile %}
+
+            <a
+                href="{% url 'lecturer_dashboard' %}"
+                class="top-dashboard-title"
+            >
+                Dashboard
+            </a>
+
+        {% endif %}
+
     {% endif %}
 
-
-             
-                </div>
-
-            {% endif %}
-
-        </div>
+</div>
 
     </nav>
 
