@@ -1131,3 +1131,274 @@ def admin_account(request):
             'profile': profile
         }
     )
+# =========================================================
+# LECTURER ACCOUNT
+# =========================================================
+
+@login_required
+def lecturer_account(request):
+
+    # Administrators should use the administrator account.
+    if request.user.is_superuser:
+
+        return redirect(
+            'admin_account'
+        )
+
+
+    # Only lecturers can access this page.
+    if not hasattr(
+        request.user,
+        'lecturer_profile'
+    ):
+
+        messages.error(
+            request,
+            'You do not have lecturer permission.'
+        )
+
+        return redirect(
+            'lecturer_login'
+        )
+
+
+    # Get the logged-in lecturer's profile.
+    profile = request.user.lecturer_profile
+
+
+    if request.method == 'POST':
+
+        action = request.POST.get(
+            'action'
+        )
+
+
+        # =================================================
+        # UPDATE PROFILE
+        # =================================================
+
+        if action == 'update_profile':
+
+            first_name = request.POST.get(
+                'first_name',
+                ''
+            ).strip()
+
+            last_name = request.POST.get(
+                'last_name',
+                ''
+            ).strip()
+
+            email = request.POST.get(
+                'email',
+                ''
+            ).strip()
+
+            username = request.POST.get(
+                'username',
+                ''
+            ).strip()
+
+
+            # ---------------------------------------------
+            # CHECK USERNAME
+            # ---------------------------------------------
+
+            if not username:
+
+                messages.error(
+                    request,
+                    'Username cannot be empty.'
+                )
+
+            elif User.objects.filter(
+                username=username
+            ).exclude(
+                id=request.user.id
+            ).exists():
+
+                messages.error(
+                    request,
+                    'That username is already in use.'
+                )
+
+            else:
+
+                # -----------------------------------------
+                # UPDATE USER INFORMATION
+                # -----------------------------------------
+
+                request.user.first_name = first_name
+
+                request.user.last_name = last_name
+
+                request.user.email = email
+
+                request.user.username = username
+
+                request.user.save()
+
+
+                # -----------------------------------------
+                # UPDATE PROFILE PICTURE
+                # -----------------------------------------
+
+                if request.FILES.get(
+                    'profile_picture'
+                ):
+
+                    profile.profile_picture = (
+                        request.FILES['profile_picture']
+                    )
+
+                    profile.save()
+
+
+                # -----------------------------------------
+                # ACTIVITY LOG
+                # -----------------------------------------
+
+                ActivityLog.objects.create(
+                    user=request.user,
+                    action='other',
+                    description=(
+                        'Lecturer updated account information.'
+                    ),
+                    ip_address=request.META.get(
+                        'REMOTE_ADDR'
+                    )
+                )
+
+
+                messages.success(
+                    request,
+                    'Account information updated successfully.'
+                )
+
+
+                return redirect(
+                    'lecturer_account'
+                )
+
+
+        # =================================================
+        # CHANGE PASSWORD
+        # =================================================
+
+        elif action == 'change_password':
+
+            current_password = request.POST.get(
+                'current_password',
+                ''
+            )
+
+            new_password = request.POST.get(
+                'new_password',
+                ''
+            )
+
+            confirm_password = request.POST.get(
+                'confirm_password',
+                ''
+            )
+
+
+            # ---------------------------------------------
+            # CHECK CURRENT PASSWORD
+            # ---------------------------------------------
+
+            if not request.user.check_password(
+                current_password
+            ):
+
+                messages.error(
+                    request,
+                    'The current password is incorrect.'
+                )
+
+
+            elif not new_password:
+
+                messages.error(
+                    request,
+                    'Please enter a new password.'
+                )
+
+
+            elif new_password != confirm_password:
+
+                messages.error(
+                    request,
+                    'Passwords do not match.'
+                )
+
+
+            elif len(new_password) < 8:
+
+                messages.error(
+                    request,
+                    'Password must contain at least 8 characters.'
+                )
+
+
+            else:
+
+                # -----------------------------------------
+                # SAVE NEW PASSWORD
+                # -----------------------------------------
+
+                request.user.set_password(
+                    new_password
+                )
+
+                request.user.save()
+
+
+                # Keep lecturer logged in.
+                update_session_auth_hash(
+                    request,
+                    request.user
+                )
+
+
+                # Lecturer no longer needs to change
+                # the default password.
+                profile.must_change_password = False
+
+                profile.save()
+
+
+                # -----------------------------------------
+                # ACTIVITY LOG
+                # -----------------------------------------
+
+                ActivityLog.objects.create(
+                    user=request.user,
+                    action='password_change',
+                    description=(
+                        'Lecturer changed their password.'
+                    ),
+                    ip_address=request.META.get(
+                        'REMOTE_ADDR'
+                    )
+                )
+
+
+                messages.success(
+                    request,
+                    'Password changed successfully.'
+                )
+
+
+                return redirect(
+                    'lecturer_account'
+                )
+
+
+    return render(
+        request,
+        'lecturers/lecturer_account.html',
+        {
+            'profile': profile
+        }
+    )

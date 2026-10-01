@@ -1860,14 +1860,63 @@
 
         {% elif request.user.lecturer_profile %}
 
-            <a
-                href="{% url 'lecturer_dashboard' %}"
-                class="top-dashboard-title"
+    <a
+        href="{% url 'lecturer_account' %}"
+        style="
+            display:flex;
+            align-items:center;
+            gap:10px;
+            text-decoration:none;
+            color:inherit;
+        "
+    >
+
+        {% if request.user.lecturer_profile.profile_picture %}
+
+            <img
+                src="{{ request.user.lecturer_profile.profile_picture.url }}"
+                alt="Lecturer Profile Picture"
+                style="
+                    width:42px;
+                    height:42px;
+                    border-radius:50%;
+                    object-fit:cover;
+                    border:2px solid #16803c;
+                "
             >
-                Dashboard
-            </a>
+
+        {% else %}
+
+            <div
+                style="
+                    width:42px;
+                    height:42px;
+                    border-radius:50%;
+                    background:#16803c;
+                    color:white;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-weight:700;
+                    font-size:16px;
+                "
+            >
+                {{ request.user.first_name|first|upper }}
+            </div>
 
         {% endif %}
+
+        <span
+            style="
+                font-weight:600;
+            "
+        >
+            {{ request.user.get_full_name|default:request.user.username }}
+        </span>
+
+    </a>
+
+{% endif %}
 
     {% endif %}
 
@@ -1918,7 +1967,7 @@
                         >
 
                             <span class="side-panel-icon">
-                                <i class="test-fa">&#xf015;</i>
+                                <i class="pepa-fa">&#xf015;</i>
                             </span>
                             <span>
                                 Dashboard
@@ -1986,7 +2035,7 @@
                         >
 
                             <span class="side-panel-icon">
-                                🏠
+                                  <i class="pepa-fa">&#xf015;</i>
                             </span>
 
                             <span>
@@ -2013,13 +2062,12 @@
 
 
                         <a
-                            href="#"
+                            href="{% url 'lecturer_account' %}"
                             class="side-panel-link"
-                            onclick="return false;"
                         >
 
                             <span class="side-panel-icon">
-                                👤
+                                <i class="pepa-fa">&#xf007;</i>
                             </span>
 
                             <span>
@@ -2027,7 +2075,6 @@
                             </span>
 
                         </a>
-
 
                     {% endif %}
 
@@ -2063,7 +2110,7 @@
                         >
 
                             <span class="side-panel-icon">
-                                🚪
+                                  <i class="pepa-fa">&#xf2f5;</i>
                             </span>
 
                             <span>

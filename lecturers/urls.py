@@ -18,6 +18,7 @@ from .views import (
     lecturer_list,
     toggle_lecturer_status,
     delete_lecturer,
+    lecturer_account,
 )
 
 
@@ -134,5 +135,10 @@ path(
         'logout/',
         lecturer_logout,
         name='lecturer_logout'
+    ),
+        path(
+        'account/',
+        lecturer_account,
+        name='lecturer_account'
     ),
 ]
