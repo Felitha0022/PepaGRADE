@@ -3,7 +3,7 @@ import os
 import logging
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from google import genai
 from mistralai.client import Mistral
 
 from .prompt_builder import build_assessment_prompt
@@ -15,201 +15,130 @@ logger = logging.getLogger(__name__)
 
 
 class AIAssessmentError(Exception):
-    """
-    Custom error used when all AI assessment services fail.
-    """
+    """Raised when AI assessment cannot be completed."""
     pass
 
 
-# ============================================================
-# CLEAN AI RESPONSE
-# ============================================================
-
-def clean_json_response(response_text):
+def clean_json_response(result):
     """
-    Clean and convert an AI response into a Python dictionary.
+    Clean and validate the AI response.
+
+    The AI should return JSON, but this function also handles
+    Markdown code fences in case the model adds them.
     """
 
-    if response_text is None:
-        raise ValueError(
-            "The AI service returned an empty response."
-        )
+    # Already a Python dictionary
+    if isinstance(result, dict):
+        data = result
 
-    # --------------------------------------------------------
-    # Already a dictionary
-    # --------------------------------------------------------
-
-    if isinstance(response_text, dict):
-
-        result = response_text
-
-    # --------------------------------------------------------
-    # String response
-    # --------------------------------------------------------
-
-    elif isinstance(response_text, str):
-
-        result = response_text.strip()
-
-        if not result:
-
-            raise ValueError(
-                "The AI service returned an empty response."
-            )
-
-        # Remove Markdown JSON code fences
-        if result.startswith("```json"):
-
-            result = result[7:]
-
-        elif result.startswith("```"):
-
-            result = result[3:]
-
-        if result.endswith("```"):
-
-            result = result[:-3]
-
-        result = result.strip()
-
-        try:
-
-            result = json.loads(
-                result
-            )
-
-        except json.JSONDecodeError as error:
-
-            logger.error(
-                "Invalid JSON returned by AI: %s",
-                result[:1000]
-            )
-
-            raise ValueError(
-                "The AI service returned an invalid JSON response."
-            ) from error
-
-    # --------------------------------------------------------
-    # List response
-    # --------------------------------------------------------
-
-    elif isinstance(response_text, list):
-
-        text_parts = []
-
-        for item in response_text:
-
-            if isinstance(item, str):
-
-                text_parts.append(item)
-
-            elif isinstance(item, dict):
-
-                # Common structured response formats
-                if "text" in item:
-
-                    text_parts.append(
-                        str(item["text"])
-                    )
-
-                elif "content" in item:
-
-                    text_parts.append(
-                        str(item["content"])
-                    )
-
-        combined_text = "".join(
-            text_parts
-        ).strip()
-
-        if not combined_text:
-
-            raise ValueError(
-                "The AI service returned an empty structured response."
-            )
+    # Convert string response into a dictionary
+    elif isinstance(result, str):
+        text = result.strip()
 
         # Remove Markdown code fences
-        if combined_text.startswith("```json"):
+        if text.startswith("```"):
+            lines = text.splitlines()
 
-            combined_text = combined_text[7:]
+            if lines and lines[0].strip().startswith("```"):
+                lines = lines[1:]
 
-        elif combined_text.startswith("```"):
+            if lines and lines[-1].strip() == "```":
+                lines = lines[:-1]
 
-            combined_text = combined_text[3:]
+            text = "\n".join(lines).strip()
 
-        if combined_text.endswith("```"):
-
-            combined_text = combined_text[:-3]
-
-        combined_text = combined_text.strip()
+            # Remove "json" if it appears immediately after the fence
+            if text.lower().startswith("json"):
+                text = text[4:].strip()
 
         try:
+            data = json.loads(text)
 
-            result = json.loads(
-                combined_text
-            )
-
-        except json.JSONDecodeError as error:
-
-            logger.error(
-                "Invalid JSON returned by AI: %s",
-                combined_text[:1000]
-            )
-
-            raise ValueError(
-                "The AI service returned an invalid JSON response."
-            ) from error
+        except json.JSONDecodeError as exc:
+            logger.error("AI returned invalid JSON: %s", text[:2000])
+            raise ValueError("AI returned invalid JSON.") from exc
 
     else:
-
         raise ValueError(
-            "The AI service returned an unexpected response format."
+            f"Unsupported AI response type: {type(result).__name__}"
         )
 
-    # --------------------------------------------------------
-    # Final validation
-    # --------------------------------------------------------
+    if not isinstance(data, dict):
+        raise ValueError("AI response must be a JSON object.")
 
-    if not isinstance(result, dict):
-
+    if "criterion_scores" not in data:
         raise ValueError(
-            "The AI service returned an unexpected assessment format."
+            "AI response does not contain 'criterion_scores'."
         )
 
-    if "criterion_scores" not in result:
-
+    if not isinstance(data["criterion_scores"], dict):
         raise ValueError(
-            "The AI assessment is missing criterion scores."
+            "'criterion_scores' must be a JSON object."
         )
 
-    return result
+    return data
 
 
 # ============================================================
-# DEEPSEEK — PRIMARY AI SERVICE
+# GEMINI - PRIMARY AI
 # ============================================================
 
-def assess_with_deepseek(prompt):
+def assess_with_gemini(prompt):
+    """
+    Assess the student's paper using Google Gemini.
 
-    api_key = os.getenv(
-        "DEEPSEEK_API_KEY"
-    )
+    Gemini is the primary AI provider for PepaGRADE.
+    """
+
+    api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
-
         raise ValueError(
-            "DEEPSEEK_API_KEY was not found."
+            "GEMINI_API_KEY was not found."
         )
 
-    client = OpenAI(
-        api_key=api_key,
-        base_url="https://api.deepseek.com"
+    client = genai.Client(api_key=api_key)
+
+    response = client.models.generate_content(
+        model="gemini-3.5-flash-lite",
+        contents=prompt,
+        config={
+            "temperature": 0.2,
+            "response_mime_type": "application/json",
+        },
     )
 
-    response = client.chat.completions.create(
+    result = response.text
 
-        model="deepseek-flash",
+    logger.info(
+        "Gemini assessment response received."
+    )
 
+    return clean_json_response(result)
+
+
+# ============================================================
+# MISTRAL - BACKUP AI
+# ============================================================
+
+def assess_with_mistral(prompt):
+    """
+    Assess the student's paper using Mistral.
+
+    Mistral is used only if Gemini fails.
+    """
+
+    api_key = os.getenv("MISTRAL_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "MISTRAL_API_KEY was not found."
+        )
+
+    client = Mistral(api_key=api_key)
+
+    response = client.chat.complete(
+        model="mistral-small-latest",
         messages=[
             {
                 "role": "system",
@@ -217,377 +146,315 @@ def assess_with_deepseek(prompt):
                     "You are an academic writing assessment assistant. "
                     "Return ONLY valid JSON. "
                     "Do not use Markdown code fences."
-                )
+                ),
             },
             {
                 "role": "user",
-                "content": prompt
-            }
+                "content": prompt,
+            },
         ],
-
-        response_format={
-            "type": "json_object"
-        },
-
-        max_tokens=8192,
-
-        temperature=0.2
     )
 
-    # --------------------------------------------------------
-    # Get response content safely
-    # --------------------------------------------------------
-
     message = response.choices[0].message
-
     result = message.content
 
     logger.info(
-        "DeepSeek returned response type: %s",
-        type(result).__name__
+        "Mistral backup assessment response received."
     )
 
-    return clean_json_response(
-        result
-    )
+    return clean_json_response(result)
 
 
 # ============================================================
-# MISTRAL — BACKUP AI SERVICE
-# ============================================================
-
-def assess_with_mistral(prompt):
-
-    api_key = os.getenv(
-        "MISTRAL_API_KEY"
-    )
-
-    if not api_key:
-
-        raise ValueError(
-            "MISTRAL_API_KEY was not found."
-        )
-
-    client = Mistral(
-        api_key=api_key
-    )
-
-    response = client.chat.complete(
-
-        model="mistral-small-latest",
-
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
-
-    # --------------------------------------------------------
-    # Get Mistral response
-    # --------------------------------------------------------
-
-    message = response.choices[0].message
-
-    result = message.content
-
-    logger.info(
-        "Mistral returned response type: %s",
-        type(result).__name__
-    )
-
-    return clean_json_response(
-        result
-    )
-
-
-# ============================================================
-# DEMO ASSESSMENT — PRESENTATION FALLBACK
+# DEMO FALLBACK
 # ============================================================
 
 def get_demo_assessment():
-
     """
-    Returns a pre-generated assessment result for
-    demonstration purposes when live AI services
-    are unavailable.
+    Emergency fallback assessment.
 
-    This does NOT call an external AI API.
+    This is only used when both Gemini and Mistral are unavailable.
+
+    It allows the application to continue functioning during
+    development/demo situations.
     """
 
     return {
-
         "criterion_scores": {
-
             "Content and Relevance": {
                 "score": 18,
                 "max_score": 25,
+                "performance_level": "Good",
+                "rubric_requirement": (
+                    "The submission should address the requirements "
+                    "of the marking guide."
+                ),
+                "evidence": (
+                    "The submission addresses the main topic "
+                    "but some areas require further development."
+                ),
                 "feedback": (
-                    "The paper addresses the selected topic "
-                    "and presents relevant ideas."
-                )
+                    "Develop the content further and provide stronger "
+                    "supporting evidence."
+                ),
+                "weak_area": True,
+                "lecturer_review": (
+                    "Review whether the discussion sufficiently "
+                    "addresses the requirements of this criterion."
+                ),
             },
-
-            "Organization and Structure": {
-                "score": 16,
-                "max_score": 20,
-                "feedback": (
-                    "The paper follows a generally logical "
-                    "structure, although some sections could "
-                    "be developed further."
-                )
-            },
-
             "Evidence and Analysis": {
                 "score": 14,
                 "max_score": 20,
+                "performance_level": "Good",
+                "rubric_requirement": (
+                    "The submission should provide relevant evidence "
+                    "and demonstrate analysis."
+                ),
+                "evidence": (
+                    "Some evidence and analysis are present, "
+                    "but deeper analysis is needed."
+                ),
                 "feedback": (
-                    "Relevant evidence is included, but "
-                    "deeper analysis and stronger supporting "
-                    "evidence would improve the discussion."
-                )
+                    "Strengthen the analysis and connect evidence "
+                    "more clearly to the discussion."
+                ),
+                "weak_area": True,
+                "lecturer_review": (
+                    "Review the quality and relevance of supporting evidence."
+                ),
             },
-
+            "Organization and Structure": {
+                "score": 16,
+                "max_score": 20,
+                "performance_level": "Very Good",
+                "rubric_requirement": (
+                    "The submission should be logically organized "
+                    "and clearly structured."
+                ),
+                "evidence": (
+                    "The paper follows a generally logical structure "
+                    "with some areas that could be improved."
+                ),
+                "feedback": (
+                    "Improve transitions between sections "
+                    "and maintain consistent organization."
+                ),
+                "weak_area": False,
+                "lecturer_review": (
+                    "Review whether all sections follow the required structure."
+                ),
+            },
             "Academic Writing": {
                 "score": 15,
                 "max_score": 20,
+                "performance_level": "Very Good",
+                "rubric_requirement": (
+                    "The submission should use clear, appropriate "
+                    "academic language."
+                ),
+                "evidence": (
+                    "Academic language is generally appropriate "
+                    "with some grammatical and clarity issues."
+                ),
                 "feedback": (
-                    "The writing is generally understandable "
-                    "and appropriate for academic work, with "
-                    "some areas requiring grammatical revision."
-                )
+                    "Proofread the paper and improve sentence clarity."
+                ),
+                "weak_area": False,
+                "lecturer_review": (
+                    "Review grammar, sentence structure, and academic tone."
+                ),
             },
-
             "Referencing": {
                 "score": 8,
                 "max_score": 15,
+                "performance_level": "Satisfactory",
+                "rubric_requirement": (
+                    "Sources should be appropriately cited and referenced."
+                ),
+                "evidence": (
+                    "Some sources are referenced, but consistency "
+                    "and completeness need improvement."
+                ),
                 "feedback": (
-                    "References are included, although "
-                    "citation consistency and formatting "
-                    "could be improved."
-                )
-            }
+                    "Improve citation consistency and ensure all "
+                    "sources are properly referenced."
+                ),
+                "weak_area": True,
+                "lecturer_review": (
+                    "Review citations and references against the "
+                    "required referencing style."
+                ),
+            },
         },
 
-        "total_score": 71,
-
-        "ai_score": 71,
-
-        "ai_grade": "B",
-
-        "grade": "B",
-
         "citation_analysis": {
-            "in_text_citations_found": 0,
+            "citation_count": 0,
             "matched_references": 0,
             "unmatched_citations": 0,
             "uncited_references": 0,
-            "unsupported_claims": [],
-            "citation_issues": [],
-            "overall_observation": (
-                "The paper contains citations, but citation "
-                "consistency should be improved."
-            )
+            "observations": (
+                "Citation analysis could not be completed because "
+                "the primary AI service was unavailable."
+            ),
         },
 
         "reference_analysis": {
-            "references_found": 0,
-            "missing_or_incomplete_references": [],
-            "duplicate_references": [],
-            "formatting_issues": [],
-            "potentially_suspicious_references": [],
-            "overall_observation": (
-                "References are present and generally relevant. "
-                "Some formatting improvements are recommended."
-            )
+            "reference_count": 0,
+            "quality": "Not assessed",
+            "observations": (
+                "Reference analysis could not be completed because "
+                "the primary AI service was unavailable."
+            ),
         },
 
         "grammar_analysis": {
-            "grammar_issues": [],
-            "spelling_issues": [],
-            "punctuation_issues": [],
-            "sentence_clarity_issues": [],
-            "examples_and_corrections": [],
-            "overall_observation": (
-                "The writing is generally clear. Several "
-                "sentences could be revised for grammar, "
-                "punctuation, and clarity."
-            )
+            "errors_found": 0,
+            "severity": "Not assessed",
+            "observations": (
+                "Grammar analysis could not be completed because "
+                "the primary AI service was unavailable."
+            ),
         },
 
         "academic_writing_analysis": {
-            "academic_tone": (
-                "The submission generally maintains an "
-                "appropriate academic tone."
+            "clarity": "Not assessed",
+            "coherence": "Not assessed",
+            "academic_tone": "Not assessed",
+            "observations": (
+                "Academic writing analysis could not be completed "
+                "because the AI service was unavailable."
             ),
-            "clarity": (
-                "The main ideas are generally understandable."
-            ),
-            "coherence": (
-                "The discussion demonstrates a generally "
-                "logical flow."
-            ),
-            "sentence_structure": (
-                "Some sentences could be revised for clarity "
-                "and grammatical accuracy."
-            ),
-            "paragraph_structure": (
-                "The paragraphs generally follow a recognizable "
-                "academic structure."
-            ),
-            "academic_vocabulary": (
-                "The submission uses generally appropriate "
-                "academic vocabulary."
-            ),
-            "repetition": (
-                "Some ideas may be expressed repeatedly."
-            ),
-            "unsupported_claims": [],
-            "overall_writing_quality": (
-                "The submission demonstrates a satisfactory "
-                "level of academic writing."
-            ),
-            "improvement_suggestions": [
-                "Strengthen transitions between ideas.",
-                "Improve sentence-level clarity.",
-                "Use more precise academic language."
-            ]
         },
 
         "strengths": [
-            "The topic is clearly identified.",
-            "The discussion contains relevant ideas.",
-            "The paper follows a recognizable academic structure.",
-            "The paper demonstrates an understanding of the topic."
+            "The submission addresses the main topic.",
+            "The overall structure is understandable.",
+            "The paper demonstrates an attempt to use academic writing."
         ],
 
         "weaknesses": [
-            "Some arguments require deeper analysis.",
-            "Some sections need stronger supporting evidence.",
-            "Citation formatting needs greater consistency.",
-            "Some sentences require grammatical improvement."
+            "Some areas require deeper analysis.",
+            "Referencing needs improvement.",
+            "Some sections require stronger supporting evidence."
         ],
 
-        "feedback": (
-            "The paper demonstrates a satisfactory understanding "
-            "of the selected topic and meets several of the "
-            "assessment criteria. The strongest areas are the "
-            "relevance of the discussion and the overall structure. "
-            "Further improvement is recommended in the areas of "
-            "critical analysis, supporting evidence, citation "
-            "consistency, and sentence-level clarity."
+        "overall_feedback": (
+            "The submission demonstrates an understanding of the topic, "
+            "but several areas require further development. The lecturer "
+            "should review the identified weak areas and confirm the "
+            "final assessment."
         ),
+
+        "grade": "B",
 
         "demo_mode": True,
 
-        "assessment_source": "Demo Assessment"
+        "assessment_source": "Demo Assessment",
     }
 
 
 # ============================================================
-# MAIN AI ASSESSMENT FUNCTION
+# MAIN ASSESSMENT FUNCTION
 # ============================================================
 
 def assess_submission(
     submission_text,
     marking_guide_text,
-    document_type
+    document_type=None,
 ):
+    """
+    Assess a student's academic submission.
 
-    # ========================================================
-    # BUILD PROMPT
-    # ========================================================
+    AI priority:
 
-    try:
+        1. Gemini 3.8 Flash
+        2. Mistral Small
+        3. Demo fallback
 
-        prompt = build_assessment_prompt(
+    The marking guide is dynamically supplied by the lecturer.
+    PepaGRADE does not use a fixed marking rubric.
+    """
 
-            assignment_text=submission_text,
-
-            marking_guide_text=marking_guide_text,
-
-            document_type=document_type
-        )
-
-    except Exception as error:
-
-        logger.exception(
-            "Failed to build AI assessment prompt."
-        )
-
+    if not submission_text:
         raise AIAssessmentError(
-            f"Unable to prepare the AI assessment: {error}"
-        ) from error
+            "The student submission is empty."
+        )
 
+    if not marking_guide_text:
+        raise AIAssessmentError(
+            "The marking guide is empty."
+        )
 
-    # ========================================================
-    # 1. TRY DEEPSEEK FIRST
-    # ========================================================
+    # --------------------------------------------------------
+    # BUILD DYNAMIC ASSESSMENT PROMPT
+    # --------------------------------------------------------
+
+    prompt = build_assessment_prompt(
+        submission_text=submission_text,
+        marking_guide_text=marking_guide_text,
+        document_type=document_type,
+    )
+
+    # --------------------------------------------------------
+    # 1. TRY GEMINI FIRST
+    # --------------------------------------------------------
 
     try:
+        logger.info(
+            "Starting AI assessment using Gemini 3.8 Flash."
+        )
+
+        result = assess_with_gemini(prompt)
+
+        result["demo_mode"] = False
+        result["assessment_source"] = "Gemini 3.8 Flash"
 
         logger.info(
-            "Attempting AI assessment using DeepSeek."
+            "Gemini assessment completed successfully."
         )
 
-        result = assess_with_deepseek(
-            prompt
+        return result
+
+    except Exception as exc:
+        logger.exception(
+            "Gemini assessment failed: %s",
+            exc,
         )
 
-        logger.info(
-            "DeepSeek assessment completed successfully."
-        )
-
-        return clean_json_response(
-            result
-        )
-
-    except Exception as deepseek_error:
-
-        logger.warning(
-            "DeepSeek assessment failed: %s",
-            deepseek_error
-        )
-
-
-    # ========================================================
-    # 2. TRY MISTRAL
-    # ========================================================
+    # --------------------------------------------------------
+    # 2. TRY MISTRAL BACKUP
+    # --------------------------------------------------------
 
     try:
-
         logger.info(
-            "DeepSeek failed. Attempting Mistral backup."
+            "Starting backup AI assessment using Mistral."
         )
 
-        result = assess_with_mistral(
-            prompt
-        )
+        result = assess_with_mistral(prompt)
+
+        result["demo_mode"] = False
+        result["assessment_source"] = "Mistral"
 
         logger.info(
             "Mistral backup assessment completed successfully."
         )
 
-        return clean_json_response(
-            result
-        )
+        return result
 
-    except Exception as mistral_error:
-
-        logger.error(
+    except Exception as exc:
+        logger.exception(
             "Mistral backup assessment failed: %s",
-            mistral_error
+            exc,
         )
 
-
-    # ========================================================
-    # 3. USE DEMO ASSESSMENT
-    # ========================================================
+    # --------------------------------------------------------
+    # 3. FINAL DEMO FALLBACK
+    # --------------------------------------------------------
 
     logger.warning(
-        "Live AI services unavailable. "
-        "Using demonstration assessment."
+        "Gemini and Mistral were unavailable. "
+        "Using demo assessment fallback."
     )
 
     return get_demo_assessment()

@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+
+{% block title %}
+Account Details - PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.account-page {
+    width: 100%;
+
+    min-height: calc(100vh - 80px);
+
+    background: #f6f8f7;
+
+    padding: 40px 8%;
+
+    box-sizing: border-box;
+}
+
+
+.account-container {
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    background: white;
+
+    border: 1px solid #dfe5e1;
+
+    border-radius: 10px;
+
+    padding: 35px;
+
+    box-sizing: border-box;
+}
+
+
+.account-header {
+    margin-bottom: 30px;
+
+    border-bottom: 1px solid #e1e8e4;
+
+    padding-bottom: 20px;
+}
+
+
+.account-header h2 {
+    margin: 0 0 8px;
+
+    color: #16803c;
+
+    font-size: 28px;
+}
+
+
+.account-header p {
+    margin: 0;
+
+    color: #666;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   ACCOUNT INFORMATION
+========================================================= */
+
+.account-information {
+    border: 1px solid #e1e8e4;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+
+.account-row {
+    display: grid;
+
+    grid-template-columns: 220px 1fr;
+
+    border-bottom: 1px solid #e1e8e4;
+}
+
+
+.account-row:last-child {
+    border-bottom: none;
+}
+
+
+.account-label {
+    padding: 16px 18px;
+
+    background: #f4f7f5;
+
+    color: #555;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.account-value {
+    padding: 16px 18px;
+
+    color: #333;
+
+    font-size: 14px;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   PROFILE PICTURE
+========================================================= */
+
+.account-profile-picture {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+.account-profile-picture img,
+.account-profile-placeholder {
+    width: 55px;
+
+    height: 55px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+
+.account-profile-placeholder {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #16803c;
+
+    color: white;
+
+    font-weight: 700;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.account-actions {
+    margin-top: 25px;
+
+    display: flex;
+
+    gap: 12px;
+}
+
+
+.account-button {
+    display: inline-block;
+
+    padding: 11px 20px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.edit-profile-button {
+    background: #16803c;
+
+    color: white;
+}
+
+
+.edit-profile-button:hover {
+    background: #0f642f;
+}
+
+
+.back-button {
+    background: white;
+
+    color: #333;
+
+    border: 1px solid #ccd6d0;
+}
+
+
+.back-button:hover {
+    background: #f1f8f3;
+
+    color: #16803c;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .account-page {
+        padding: 25px 18px;
+    }
+
+
+    .account-container {
+        padding: 25px 20px;
+    }
+
+
+    .account-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .account-label {
+        padding-bottom: 8px;
+    }
+
+
+    .account-value {
+        padding-top: 8px;
+    }
+
+
+    .account-actions {
+        flex-direction: column;
+    }
+
+
+    .account-button {
+        text-align: center;
+    }
+
+}
+
+</style>
+
+
+<div class="account-page">
+
+
+    <div class="account-container">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="account-header">
+
+            <h2>
+                Account Details
+            </h2>
+
+            <p>
+                View your student account information.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             ACCOUNT INFORMATION
+        ================================================== -->
+
+        <div class="account-information">
+
+
+            <!-- PROFILE PICTURE -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Profile Picture
+
+                </div>
+
+
+                <div class="account-value">
+
+                    <div class="account-profile-picture">
+
+
+                        {% if student.profile_picture %}
+
+                            <img
+                                src="{{ student.profile_picture.url }}"
+                                alt="Profile Picture"
+                            >
+
+                        {% else %}
+
+                            <div class="account-profile-placeholder">
+
+                                {{ student.full_name|first|upper }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STUDENT ID -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Student ID
+
+                </div>
+
+                <div class="account-value">
+
+                    {{ student.student_id }}
+
+                </div>
+
+            </div>
+
+
+            <!-- FULL NAME -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Full Name
+
+                </div>
+
+                <div class="account-value">
+
+                    {{ student.full_name }}
+
+                </div>
+
+            </div>
+
+
+            <!-- PROGRAM -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Program
+
+                </div>
+
+                <div class="account-value">
+
+                    {{ student.program }}
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR LEVEL -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Year Level
+
+                </div>
+
+                <div class="account-value">
+
+                    Year {{ student.year_level }}
+
+                </div>
+
+            </div>
+
+
+            <!-- USERNAME -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Username
+
+                </div>
+
+                <div class="account-value">
+
+                    {{ request.user.username }}
+
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Email
+
+                </div>
+
+                <div class="account-value">
+
+                    {% if request.user.email %}
+
+                        {{ request.user.email }}
+
+                    {% else %}
+
+                        Not provided
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCOUNT STATUS -->
+
+            <div class="account-row">
+
+                <div class="account-label">
+
+                    Account Status
+
+                </div>
+
+                <div class="account-value">
+
+                    {% if request.user.is_active %}
+
+                        Active
+
+                    {% else %}
+
+                        Inactive
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="account-actions">
+
+
+            <a
+                href="{% url 'student_profile' %}"
+                class="account-button edit-profile-button"
+            >
+
+                Edit Profile
+
+            </a>
+
+
+            <a
+                href="{% url 'student_dashboard' %}"
+                class="account-button back-button"
+            >
+
+                ← Back to Student Portal
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

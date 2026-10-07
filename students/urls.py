@@ -13,6 +13,8 @@ from .views import (
     student_logout,
     student_gradebook_page,
     student_delete,
+    student_profile,
+    student_account_details,
 )
 
 
@@ -50,6 +52,18 @@ urlpatterns = [
         'change-password/',
         student_change_password,
         name='student_change_password'
+    ),
+
+        path(
+        'profile/',
+        student_profile,
+        name='student_profile'
+    ),
+
+    path(
+        'account-details/',
+        student_account_details,
+        name='student_account_details'
     ),
 
     path(

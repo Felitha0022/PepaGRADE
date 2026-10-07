@@ -15,6 +15,7 @@ from reportlab.platypus import (
 )
 
 from students.models import StudentProfile
+from assessment.views import calculate_suggested_grade
 from .models import Report
 
 
@@ -190,6 +191,19 @@ def report_detail(request, report_id):
     student = assignment.student
 
     # ---------------------------------------------------------
+    # DOCUMENT TYPE DISPLAY
+    # ---------------------------------------------------------
+
+    document_type_display = {
+        "essay": "Essay",
+        "proposal": "Project Proposal",
+        "literature_review": "Literature Review",
+    }.get(
+        assignment.document_type,
+        assignment.document_type
+    )
+
+    # ---------------------------------------------------------
     # PREPARE CRITERION SCORES
     # ---------------------------------------------------------
 
@@ -260,7 +274,7 @@ def report_detail(request, report_id):
             score = maximum
 
         # -----------------------------------------------------
-        # CALCULATE CRITERION PERCENTAGE
+        # CRITERION PERCENTAGE
         # -----------------------------------------------------
 
         if maximum > 0:
@@ -298,9 +312,34 @@ def report_detail(request, report_id):
                     1
                 ),
 
+                "performance_level": details.get(
+                    "performance_level",
+                    ""
+                ),
+
+                "rubric_requirement": details.get(
+                    "rubric_requirement",
+                    ""
+                ),
+
+                "evidence": details.get(
+                    "evidence",
+                    ""
+                ),
+
                 "feedback": details.get(
                     "feedback",
                     "No feedback was provided."
+                ),
+
+                "weak_area": details.get(
+                    "weak_area",
+                    False
+                ),
+
+                "lecturer_review": details.get(
+                    "lecturer_review",
+                    ""
                 ),
             }
         )
@@ -320,6 +359,14 @@ def report_detail(request, report_id):
         calculated_percentage = 0
 
     # ---------------------------------------------------------
+    # CALCULATE SUGGESTED GRADE
+    # ---------------------------------------------------------
+
+    suggested_grade = calculate_suggested_grade(
+        calculated_percentage
+    )
+
+    # ---------------------------------------------------------
     # CONTEXT
     # ---------------------------------------------------------
 
@@ -332,6 +379,8 @@ def report_detail(request, report_id):
         "assignment": assignment,
 
         "student": student,
+
+        "document_type_display": document_type_display,
 
         "criterion_scores": criterion_scores,
 
@@ -349,6 +398,8 @@ def report_detail(request, report_id):
             calculated_percentage,
             2
         ),
+
+        "suggested_grade": suggested_grade,
 
         "strengths":
             assessment.strengths or [],
@@ -434,7 +485,20 @@ def download_report(request, report_id):
     student = assignment.student
 
     # ---------------------------------------------------------
-    # CALCULATE RAW SCORE
+    # DOCUMENT TYPE DISPLAY
+    # ---------------------------------------------------------
+
+    document_type_display = {
+        "essay": "Essay",
+        "proposal": "Project Proposal",
+        "literature_review": "Literature Review",
+    }.get(
+        assignment.document_type,
+        assignment.document_type
+    )
+
+    # ---------------------------------------------------------
+    # CALCULATE SCORES DIRECTLY FROM CURRENT ASSESSMENT
     # ---------------------------------------------------------
 
     total_score = 0
@@ -449,6 +513,10 @@ def download_report(request, report_id):
 
         if not isinstance(details, dict):
             continue
+
+        # -----------------------------------------------------
+        # SCORE
+        # -----------------------------------------------------
 
         try:
 
@@ -466,6 +534,10 @@ def download_report(request, report_id):
 
             score = 0
 
+        # -----------------------------------------------------
+        # MAX SCORE
+        # -----------------------------------------------------
+
         try:
 
             maximum = float(
@@ -482,6 +554,10 @@ def download_report(request, report_id):
 
             maximum = 0
 
+        # -----------------------------------------------------
+        # VALIDATE SCORE VALUES
+        # -----------------------------------------------------
+
         if score < 0:
             score = 0
 
@@ -491,20 +567,76 @@ def download_report(request, report_id):
         if maximum > 0 and score > maximum:
             score = maximum
 
+        # -----------------------------------------------------
+        # CRITERION PERCENTAGE
+        # -----------------------------------------------------
+
+        if maximum > 0:
+
+            criterion_percentage = (
+                score / maximum
+            ) * 100
+
+        else:
+
+            criterion_percentage = 0
+
+        # -----------------------------------------------------
+        # TOTAL SCORE
+        # -----------------------------------------------------
+
         total_score += score
 
         max_score += maximum
 
+        # -----------------------------------------------------
+        # STORE COMPLETE CRITERION INFORMATION
+        # -----------------------------------------------------
+
         criterion_scores.append(
-            (
-                criterion,
-                score,
-                maximum
-            )
+            {
+                "name": criterion,
+
+                "score": score,
+
+                "max_score": maximum,
+
+                "percentage": criterion_percentage,
+
+                "performance_level": details.get(
+                    "performance_level",
+                    ""
+                ),
+
+                "rubric_requirement": details.get(
+                    "rubric_requirement",
+                    ""
+                ),
+
+                "evidence": details.get(
+                    "evidence",
+                    ""
+                ),
+
+                "feedback": details.get(
+                    "feedback",
+                    "No feedback was provided."
+                ),
+
+                "weak_area": details.get(
+                    "weak_area",
+                    False
+                ),
+
+                "lecturer_review": details.get(
+                    "lecturer_review",
+                    ""
+                ),
+            }
         )
 
     # ---------------------------------------------------------
-    # CALCULATE PERCENTAGE
+    # CALCULATE FINAL PERCENTAGE
     # ---------------------------------------------------------
 
     if max_score > 0:
@@ -516,6 +648,18 @@ def download_report(request, report_id):
     else:
 
         percentage = 0
+
+    # ---------------------------------------------------------
+    # CALCULATE SUGGESTED GRADE
+    #
+    # IMPORTANT:
+    # The PDF calculates the grade from the current criterion
+    # scores instead of relying on the stored ai_grade value.
+    # ---------------------------------------------------------
+
+    suggested_grade = calculate_suggested_grade(
+        percentage
+    )
 
     # ---------------------------------------------------------
     # PDF RESPONSE
@@ -607,12 +751,14 @@ def download_report(request, report_id):
     def add_list(story, items):
 
         if not items:
+
             story.append(
                 Paragraph(
                     "None provided.",
                     normal_style
                 )
             )
+
             return
 
         for item in items:
@@ -727,7 +873,7 @@ def download_report(request, report_id):
             ),
             Paragraph(
                 safe_text(
-                    assignment.document_type
+                    document_type_display
                 ),
                 small_style
             )
@@ -827,12 +973,22 @@ def download_report(request, report_id):
         ],
         [
             Paragraph(
-                "<b>AI Grade</b>",
+                "<b>AI Score</b>",
+                small_style
+            ),
+            Paragraph(
+                f"{percentage:.2f}%",
+                small_style
+            )
+        ],
+        [
+            Paragraph(
+                "<b>AI Suggested Grade</b>",
                 small_style
             ),
             Paragraph(
                 safe_text(
-                    assessment.ai_grade
+                    suggested_grade
                 ),
                 small_style
             )
@@ -904,7 +1060,36 @@ def download_report(request, report_id):
     story.append(
         Spacer(
             1,
-            12
+            8
+        )
+    )
+
+    # ---------------------------------------------------------
+    # GRADING SCALE
+    # ---------------------------------------------------------
+
+    story.append(
+        Paragraph(
+            "<b>DWU Suggested Grading Scale:</b> "
+            "F (0–49), P (50–55), UP (56–65), "
+            "C (66–75), D (76–85), HD (86–100).",
+            small_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "The AI Suggested Grade is calculated from the "
+            "final AI assessment percentage. The lecturer "
+            "remains responsible for the final official grade.",
+            small_style
+        )
+    )
+
+    story.append(
+        Spacer(
+            1,
+            8
         )
     )
 
@@ -937,37 +1122,54 @@ def download_report(request, report_id):
                 "<b>Percentage</b>",
                 small_style
             ),
+            Paragraph(
+                "<b>Performance</b>",
+                small_style
+            ),
+            Paragraph(
+                "<b>Feedback</b>",
+                small_style
+            ),
         ]
     ]
 
-    for criterion, score, maximum in criterion_scores:
-
-        if maximum > 0:
-
-            criterion_percentage = (
-                score / maximum
-            ) * 100
-
-        else:
-
-            criterion_percentage = 0
+    for item in criterion_scores:
 
         criterion_data.append(
             [
                 Paragraph(
-                    safe_text(criterion),
+                    safe_text(
+                        item["name"]
+                    ),
                     small_style
                 ),
+
                 Paragraph(
-                    f"{score:.2f}",
+                    f'{item["score"]:.2f}',
                     small_style
                 ),
+
                 Paragraph(
-                    f"{maximum:.2f}",
+                    f'{item["max_score"]:.2f}',
                     small_style
                 ),
+
                 Paragraph(
-                    f"{criterion_percentage:.1f}%",
+                    f'{item["percentage"]:.1f}%',
+                    small_style
+                ),
+
+                Paragraph(
+                    safe_text(
+                        item["performance_level"]
+                    ) or "Not specified",
+                    small_style
+                ),
+
+                Paragraph(
+                    safe_text(
+                        item["feedback"]
+                    ),
                     small_style
                 ),
             ]
@@ -976,11 +1178,14 @@ def download_report(request, report_id):
     criterion_table = Table(
         criterion_data,
         colWidths=[
-            230,
-            80,
-            80,
-            90
-        ]
+            105,
+            45,
+            50,
+            60,
+            75,
+            145
+        ],
+        repeatRows=1
     )
 
     criterion_table.setStyle(
@@ -1008,20 +1213,20 @@ def download_report(request, report_id):
                 (
                     "ALIGN",
                     (1, 1),
-                    (-1, -1),
+                    (3, -1),
                     "CENTER"
                 ),
                 (
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
-                    5
+                    4
                 ),
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
-                    5
+                    4
                 ),
                 (
                     "TOPPADDING",
@@ -1042,6 +1247,82 @@ def download_report(request, report_id):
     story.append(
         criterion_table
     )
+
+    # ---------------------------------------------------------
+    # DETAILED CRITERION INFORMATION
+    # ---------------------------------------------------------
+
+    story.append(
+        Paragraph(
+            "Detailed Criterion Feedback",
+            heading_style
+        )
+    )
+
+    for item in criterion_scores:
+
+        story.append(
+            Paragraph(
+                f"<b>{safe_text(item['name'])}</b> — "
+                f"{item['score']:.2f} / "
+                f"{item['max_score']:.2f} "
+                f"({item['percentage']:.1f}%)",
+                normal_style
+            )
+        )
+
+        if item["performance_level"]:
+
+            story.append(
+                Paragraph(
+                    "<b>Performance Level:</b> "
+                    + safe_text(
+                        item["performance_level"]
+                    ),
+                    normal_style
+                )
+            )
+
+        if item["rubric_requirement"]:
+
+            story.append(
+                Paragraph(
+                    "<b>Rubric Requirement:</b> "
+                    + safe_text(
+                        item["rubric_requirement"]
+                    ),
+                    normal_style
+                )
+            )
+
+        if item["evidence"]:
+
+            story.append(
+                Paragraph(
+                    "<b>Evidence:</b> "
+                    + safe_text(
+                        item["evidence"]
+                    ),
+                    normal_style
+                )
+            )
+
+        story.append(
+            Paragraph(
+                "<b>Feedback:</b> "
+                + safe_text(
+                    item["feedback"]
+                ),
+                normal_style
+            )
+        )
+
+        story.append(
+            Spacer(
+                1,
+                4
+            )
+        )
 
     # ---------------------------------------------------------
     # CITATION ANALYSIS
@@ -1412,7 +1693,7 @@ def download_report(request, report_id):
     )
 
     # ---------------------------------------------------------
-    # WEAKNESSES
+    # AREAS FOR IMPROVEMENT
     # ---------------------------------------------------------
 
     story.append(
@@ -1464,7 +1745,8 @@ def download_report(request, report_id):
             "This report was generated by PepaGRADE. "
             "The AI assessment is intended to support lecturer "
             "review and does not replace the lecturer's academic "
-            "judgment.",
+            "judgment. The AI Suggested Grade is not the final "
+            "official grade unless confirmed by the lecturer.",
             small_style
         )
     )

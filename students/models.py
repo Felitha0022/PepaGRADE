@@ -38,6 +38,12 @@ class StudentProfile(models.Model):
 
     year_level = models.PositiveIntegerField()
 
+    profile_picture = models.ImageField(
+        upload_to='student_profiles/',
+        blank=True,
+        null=True
+    )
+
     must_change_password = models.BooleanField(
         default=True
     )

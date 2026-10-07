@@ -9,8 +9,15 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>
     PepaGRADE - Gradebook
@@ -76,7 +83,7 @@ a {
     left: 0;
     bottom: 0;
     width: 245px;
-    background: #ffffff;
+    background: #043e1ff8;
     border-right: 1px solid #dfe7e2;
     padding: 25px 15px;
     overflow-y: auto;
@@ -85,7 +92,7 @@ a {
 .sidebar-title {
     font-size: 13px;
     font-weight: bold;
-    color: #7a857e;
+    color: #e9eeeb;
     text-transform: uppercase;
     margin: 5px 12px 12px;
     letter-spacing: 0.5px;
@@ -96,7 +103,7 @@ a {
     padding: 13px 15px;
     margin-bottom: 5px;
     border-radius: 8px;
-    color: #37423b;
+    color: #e9efeb;
     font-size: 14px;
     transition: 0.2s;
 }
@@ -218,7 +225,7 @@ a {
 }
 
 .unit-select:focus {
-    border-color: #168044;
+    border-color: #9ac7ae;
     box-shadow: 0 0 0 2px rgba(22, 128, 68, 0.08);
 }
 
@@ -364,23 +371,22 @@ a {
     text-align: center;
 }
 
-.final-grade-display {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 45px;
-    min-height: 35px;
-    padding: 6px 12px;
-    background: #eef7f1;
-    color: #168044;
+.final-grade-row-input {
+    width: 100px !important;
+    min-width: 100px;
+    padding: 10px 11px;
+    border: 1px solid #cbd7cf;
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    font-weight: 600;
+    color: #26332b;
+    outline: none;
 }
 
-.final-grade-empty {
-    color: #9aa39d;
-    font-size: 13px;
+.final-grade-row-input:focus {
+    border-color: #168044;
+    box-shadow: 0 0 0 2px rgba(22, 128, 68, 0.08);
 }
 
 
@@ -469,40 +475,6 @@ a {
     padding: 15px 20px;
     border-top: 1px solid #e5ebe7;
     background: #fafcfb;
-}
-
-
-/* =========================================================
-   FINAL GRADE SECTION
-========================================================= */
-
-.final-grade-section {
-    margin-top: 25px;
-    background: white;
-    border: 1px solid #dfe7e2;
-    border-radius: 12px;
-    padding: 22px;
-}
-
-.final-grade-section h3 {
-    color: #173b28;
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.final-grade-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.final-grade-input {
-    width: 150px;
-    padding: 11px 12px;
-    border: 1px solid #cbd7cf;
-    border-radius: 7px;
-    font-size: 14px;
 }
 
 
@@ -609,7 +581,8 @@ a {
         href="{% url 'student_list' %}"
         class="nav-link"
     >
-        🏠 Dashboard
+        <i class="fa-solid fa-house"></i>
+        Dashboard
     </a>
 
     <div
@@ -623,21 +596,24 @@ a {
         href="{% url 'student_list' %}"
         class="nav-link active"
     >
-        👨‍🎓 My Students
+        <i class="fa-solid fa-user-graduate"></i>
+        My Students
     </a>
 
     <a
         href="#"
         class="nav-link"
     >
-        👤 Account
+        <i class="fa-solid fa-user"></i>
+        Account
     </a>
 
     <a
         href="{% url 'student_logout' %}"
         class="nav-link"
     >
-        🚪 Logout
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
     </a>
 
 </aside>
@@ -730,20 +706,19 @@ a {
             class="unit-select"
         >
 
-            {% for enrollment in enrollments %}
+            <option value="">
+                Select a course unit
+            </option>
+
+            {% for course_unit in course_units %}
 
                 <option
-                    value="{{ enrollment.course_unit.id }}"
-
-                    {% if selected_unit and enrollment.course_unit.id == selected_unit.id %}
+                    value="{{ course_unit.id }}"
+                    {% if selected_unit and course_unit.id == selected_unit.id %}
                         selected
                     {% endif %}
                 >
-
-                    {{ enrollment.course_unit.code }}
-                    -
-                    {{ enrollment.course_unit.name }}
-
+                    {{ course_unit.code }} - {{ course_unit.name }}
                 </option>
 
             {% endfor %}
@@ -766,7 +741,7 @@ a {
 
         <input
             type="hidden"
-            name="course_unit_id"
+            name="course_unit"
             value="{% if selected_unit %}{{ selected_unit.id }}{% endif %}"
         >
 
@@ -937,42 +912,32 @@ a {
 
 
                                 <!-- =================================
-                                     SAVED FINAL GRADE
+                                     FINAL GRADE
                                 ================================== -->
 
                                 <td class="final-grade-cell">
 
-                                    {% if entry.final_grade %}
-
-                                        <span class="final-grade-display">
-                                            {{ entry.final_grade }}
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="final-grade-empty">
-                                            —
-                                        </span>
-
-                                    {% endif %}
+                                    <input
+                                        type="text"
+                                        name="final_grade_{{ forloop.counter }}"
+                                        class="final-grade-row-input"
+                                        value="{{ entry.final_grade }}"
+                                        placeholder="e.g. A, B+, B"
+                                        maxlength="10"
+                                    >
 
                                 </td>
 
 
                                 <!-- =================================
-                                     VIEW
+                                     VISIBILITY
                                 ================================== -->
 
                                 <td class="view-cell">
 
                                     <button
                                         type="button"
-                                        class="visibility-indicator
-                                        {% if entry.is_visible %}
-                                            visible
-                                        {% else %}
-                                            hidden
-                                        {% endif %}"
+                                        class="visibility-indicator {% if entry.is_visible %}visible{% else %}hidden{% endif %}"
                                         title="{% if entry.is_visible %}Visible to student{% else %}Hidden from student{% endif %}"
                                         onclick="toggleVisibility(this)"
                                     >
@@ -1047,32 +1012,6 @@ a {
 
 
         <!-- =====================================================
-             FINAL GRADE
-        ===================================================== -->
-
-        <div class="final-grade-section">
-
-            <h3>
-                Final Grade
-            </h3>
-
-            <div class="final-grade-row">
-
-                <input
-                    type="text"
-                    name="final_grade"
-                    id="finalGradeInput"
-                    class="final-grade-input"
-                    value="{{ final_grade }}"
-                    placeholder="e.g. A, B+, B"
-                >
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
              BOTTOM ACTIONS
         ===================================================== -->
 
@@ -1108,6 +1047,7 @@ a {
 
     </form>
 
+
 </main>
 
 
@@ -1116,6 +1056,7 @@ a {
 ========================================================= -->
 
 <script>
+
 
 /* =========================================================
    INITIAL ROW COUNT
@@ -1207,6 +1148,21 @@ function renumberRows() {
 
                 markInput.name =
                     "mark_" + number;
+
+            }
+
+
+            /* FINAL GRADE */
+
+            const finalGradeInput =
+                row.querySelector(
+                    ".final-grade-row-input"
+                );
+
+            if (finalGradeInput) {
+
+                finalGradeInput.name =
+                    "final_grade_" + number;
 
             }
 
@@ -1364,9 +1320,13 @@ function addAssessmentRow() {
 
         <td class="final-grade-cell">
 
-            <span class="final-grade-empty">
-                —
-            </span>
+            <input
+                type="text"
+                name="final_grade_0"
+                class="final-grade-row-input"
+                placeholder="e.g. A, B+, B"
+                maxlength="10"
+            >
 
         </td>
 
@@ -1496,6 +1456,13 @@ function toggleVisibility(button) {
         !currentlyVisible;
 
 
+    /*
+     * IMPORTANT:
+     * Store exactly 1 or 0.
+     * The lecturer's Python view converts
+     * this into True or False.
+     */
+
     visibilityInput.value =
         newVisibility
             ? "1"
@@ -1576,23 +1543,8 @@ function deleteRow(button) {
     row.remove();
 
 
-    /*
-     * IMPORTANT:
-     * Renumber the remaining rows immediately.
-     * This prevents gaps such as:
-     *
-     * entry_id_1
-     * entry_id_3
-     *
-     * after row 2 is deleted.
-     */
-
     renumberRows();
 
-
-    /*
-     * If no rows remain, show the empty state again.
-     */
 
     const rows =
         getRows();
@@ -1639,8 +1591,8 @@ document
         function() {
 
             /*
-             * Always renumber immediately before
-             * sending the form.
+             * Make sure every row has the correct
+             * sequential field names.
              */
 
             renumberRows();
@@ -1668,6 +1620,16 @@ document
                             ".assessment-type-input"
                         );
 
+                    const finalGradeInput =
+                        row.querySelector(
+                            ".final-grade-row-input"
+                        );
+
+                    const visibilityInput =
+                        row.querySelector(
+                            ".visibility-input"
+                        );
+
 
                     const details =
                         detailsInput
@@ -1679,15 +1641,19 @@ document
                             ? markInput.value.trim()
                             : "";
 
+                    const finalGrade =
+                        finalGradeInput
+                            ? finalGradeInput.value.trim()
+                            : "";
+
 
                     /*
-                     * Only create an assessment name
-                     * when the lecturer actually entered
-                     * assessment information.
+                     * Create an assessment name
+                     * automatically when necessary.
                      */
 
                     if (
-                        (details || mark)
+                        (details || mark || finalGrade)
                         &&
                         assessmentInput
                         &&
@@ -1697,6 +1663,30 @@ document
                         assessmentInput.value =
                             "Assessment "
                             + (index + 1);
+
+                    }
+
+
+                    /*
+                     * Every row MUST submit a visibility
+                     * value.
+                     *
+                     * Existing rows keep their current
+                     * state.
+                     *
+                     * New rows default to hidden.
+                     */
+
+                    if (
+                        visibilityInput
+                        &&
+                        visibilityInput.value !== "1"
+                        &&
+                        visibilityInput.value !== "0"
+                    ) {
+
+                        visibilityInput.value =
+                            "0";
 
                     }
 
@@ -1718,3 +1708,4 @@ renumberRows();
 </body>
 
 </html>
+

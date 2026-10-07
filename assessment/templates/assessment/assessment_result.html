@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -18,6 +17,10 @@
     .assessment-result h2 {
         margin-top: 25px;
         margin-bottom: 15px;
+    }
+
+    .assessment-result h3 {
+        margin-top: 20px;
     }
 
     .result-header {
@@ -57,6 +60,32 @@
         font-size: 25px;
         font-weight: bold;
         color: #198754;
+    }
+
+    /* AI SUGGESTED GRADE */
+    .grade-card {
+        background: #eaf7ef;
+        border: 2px solid #198754;
+    }
+
+    .grade-card .result-card-label {
+        color: #198754;
+        font-weight: 600;
+    }
+
+    .grade-card .result-card-value {
+        font-size: 32px;
+        color: #198754;
+    }
+
+    .grade-note {
+        margin-top: 20px;
+        padding: 15px;
+        background: #fff8df;
+        border-left: 4px solid #f2c500;
+        border-radius: 5px;
+        color: #555;
+        line-height: 1.6;
     }
 
     .section-box {
@@ -161,6 +190,10 @@
 
 <div class="assessment-result">
 
+    <!-- =====================================================
+         RESULT HEADER
+    ====================================================== -->
+
     <div class="result-header">
 
         <h1>
@@ -195,6 +228,8 @@
 
         <div class="result-cards">
 
+            <!-- RAW SCORE -->
+
             <div class="result-card">
 
                 <div class="result-card-label">
@@ -212,19 +247,76 @@
             </div>
 
 
+            <!-- PERCENTAGE -->
+
             <div class="result-card">
 
                 <div class="result-card-label">
-                    AI Grade
+                    AI Score
                 </div>
 
                 <div class="result-card-value">
 
-                    {{ assessment.ai_grade }}
+                    {{ percentage|floatformat:2 }}%
 
                 </div>
 
             </div>
+
+
+            <!-- SUGGESTED GRADE -->
+
+            <div class="result-card grade-card">
+
+                <div class="result-card-label">
+                    AI Suggested Grade
+                </div>
+
+                <div class="result-card-value">
+
+                    {{ suggested_grade }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- GRADE EXPLANATION -->
+
+        <div class="grade-note">
+
+            <strong>
+                Suggested Grade:
+            </strong>
+
+            The grade above is automatically calculated from
+            the final AI assessment percentage using the
+            DWU grading scale.
+
+            <br><br>
+
+            <strong>
+                DWU Grading Scale:
+            </strong>
+
+            F = 0–49%,
+            P = 50–55%,
+            UP = 56–65%,
+            C = 66–75%,
+            D = 76–85%,
+            HD = 86–100%.
+
+            <br><br>
+
+            <strong>
+                Lecturer Review:
+            </strong>
+
+            The AI suggested grade is provided as an assessment
+            aid. The lecturer remains responsible for reviewing
+            the assessment and determining the final grade.
 
         </div>
 
@@ -259,9 +351,60 @@
 
             </p>
 
+            {% if details.performance_level %}
+
             <p>
-                {{ details.feedback }}
+                <strong>
+                    Performance Level:
+                </strong>
+
+                {{ details.performance_level }}
+
             </p>
+
+            {% endif %}
+
+
+            {% if details.rubric_requirement %}
+
+            <p>
+                <strong>
+                    Rubric Requirement:
+                </strong>
+
+                {{ details.rubric_requirement }}
+
+            </p>
+
+            {% endif %}
+
+
+            {% if details.evidence %}
+
+            <p>
+                <strong>
+                    Evidence:
+                </strong>
+
+                {{ details.evidence }}
+
+            </p>
+
+            {% endif %}
+
+
+            {% if details.feedback %}
+
+            <p>
+                <strong>
+                    Feedback:
+                </strong>
+
+                {{ details.feedback }}
+
+            </p>
+
+            {% endif %}
 
         </div>
 
@@ -290,7 +433,6 @@
         {% if assessment.citation_analysis %}
 
         <div class="analysis-grid">
-
 
             <div class="analysis-card">
 
@@ -431,7 +573,6 @@
 
         <div class="analysis-grid">
 
-
             <div class="analysis-card">
 
                 <strong>
@@ -443,7 +584,6 @@
                 </div>
 
             </div>
-
 
         </div>
 
@@ -976,9 +1116,19 @@
             Overall Feedback
         </h2>
 
+        {% if assessment.feedback %}
+
         <p>
             {{ assessment.feedback }}
         </p>
+
+        {% else %}
+
+        <p>
+            No overall feedback was generated.
+        </p>
+
+        {% endif %}
 
     </section>
 

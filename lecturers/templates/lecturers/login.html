@@ -33,14 +33,6 @@ login-container-page
             Sign in to access the PepaGRADE lecturer dashboard.
         </p>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
         <form method="POST">
 
             {% csrf_token %}
@@ -315,26 +307,6 @@ login-container-page
 
 }
 
-
-/* =========================================================
-   MESSAGE
-========================================================= */
-
-.message {
-
-    background: #f8d7da;
-
-    color: #842029;
-
-    padding: 12px;
-
-    border-radius: 6px;
-
-    margin-bottom: 20px;
-
-    font-size: 14px;
-
-}
 
 
 /* =========================================================

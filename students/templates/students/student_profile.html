@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Profile - PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.profile-page {
+    width: 100%;
+    min-height: calc(100vh - 80px);
+
+    background: #f6f8f7;
+
+    padding: 40px 8%;
+
+    box-sizing: border-box;
+}
+
+
+.profile-container {
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    background: white;
+
+    border: 1px solid #dfe5e1;
+
+    border-radius: 10px;
+
+    padding: 35px;
+
+    box-sizing: border-box;
+}
+
+
+.profile-header {
+    margin-bottom: 30px;
+
+    border-bottom: 1px solid #e1e8e4;
+
+    padding-bottom: 20px;
+}
+
+
+.profile-header h2 {
+    margin: 0 0 8px;
+
+    color: #16803c;
+
+    font-size: 28px;
+}
+
+
+.profile-header p {
+    margin: 0;
+
+    color: #666;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   CURRENT PROFILE PICTURE
+========================================================= */
+
+.current-profile {
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    margin-bottom: 30px;
+
+    padding: 20px;
+
+    background: #f7faf8;
+
+    border: 1px solid #e1e8e4;
+
+    border-radius: 8px;
+}
+
+
+.current-profile img,
+.profile-placeholder-large {
+    width: 100px;
+
+    height: 100px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+
+.profile-placeholder-large {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #16803c;
+
+    color: white;
+
+    font-size: 36px;
+
+    font-weight: 700;
+}
+
+
+.current-profile-text h3 {
+    margin: 0 0 5px;
+
+    color: #333;
+
+    font-size: 18px;
+}
+
+
+.current-profile-text p {
+    margin: 0;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.profile-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 22px;
+}
+
+
+.form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.form-group label {
+    color: #333;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.form-group input {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #ccd6d0;
+
+    border-radius: 6px;
+
+    font-size: 15px;
+
+    box-sizing: border-box;
+}
+
+
+.form-group input:focus {
+    outline: none;
+
+    border-color: #16803c;
+
+    box-shadow: 0 0 0 2px rgba(22,128,60,0.10);
+}
+
+
+.help-text {
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ERRORS
+========================================================= */
+
+.form-errors {
+    color: #b42318;
+
+    background: #fff2f0;
+
+    border: 1px solid #f1b8b1;
+
+    border-radius: 6px;
+
+    padding: 10px 12px;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.profile-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 10px;
+}
+
+
+.save-button {
+    padding: 12px 22px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: #16803c;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.save-button:hover {
+    background: #0f642f;
+}
+
+
+.back-button {
+    padding: 11px 20px;
+
+    border: 1px solid #ccd6d0;
+
+    border-radius: 6px;
+
+    background: white;
+
+    color: #333;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+
+.back-button:hover {
+    background: #f1f8f3;
+
+    color: #16803c;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .profile-page {
+        padding: 25px 18px;
+    }
+
+
+    .profile-container {
+        padding: 25px 20px;
+    }
+
+
+    .current-profile {
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+
+    .profile-actions {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .save-button,
+    .back-button {
+        text-align: center;
+
+        width: 100%;
+
+        box-sizing: border-box;
+    }
+
+}
+
+</style>
+
+
+<div class="profile-page">
+
+
+    <div class="profile-container">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="profile-header">
+
+            <h2>
+                My Profile
+            </h2>
+
+            <p>
+                Update your name and profile picture.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             CURRENT PROFILE
+        ================================================== -->
+
+        <div class="current-profile">
+
+
+            {% if student.profile_picture %}
+
+                <img
+                    src="{{ student.profile_picture.url }}"
+                    alt="Profile Picture"
+                >
+
+            {% else %}
+
+                <div class="profile-placeholder-large">
+
+                    {{ student.full_name|first|upper }}
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="current-profile-text">
+
+                <h3>
+                    {{ student.full_name }}
+                </h3>
+
+                <p>
+                    Student ID: {{ student.student_id }}
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             PROFILE FORM
+        ================================================== -->
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="profile-form"
+        >
+
+            {% csrf_token %}
+
+
+            {% if form.non_field_errors %}
+
+                <div class="form-errors">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- FULL NAME -->
+
+            <div class="form-group">
+
+                <label for="{{ form.full_name.id_for_label }}">
+
+                    Full Name
+
+                </label>
+
+                {{ form.full_name }}
+
+
+                {% if form.full_name.errors %}
+
+                    <div class="form-errors">
+
+                        {{ form.full_name.errors }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PROFILE PICTURE -->
+
+            <div class="form-group">
+
+                <label for="{{ form.profile_picture.id_for_label }}">
+
+                    Profile Picture
+
+                </label>
+
+                {{ form.profile_picture }}
+
+
+                <span class="help-text">
+
+                    Upload an image file for your profile picture.
+
+                </span>
+
+
+                {% if form.profile_picture.errors %}
+
+                    <div class="form-errors">
+
+                        {{ form.profile_picture.errors }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="profile-actions">
+
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+
+                    Save Changes
+
+                </button>
+
+
+                <a
+                    href="{% url 'student_dashboard' %}"
+                    class="back-button"
+                >
+
+                    ← Back to Student Portal
+
+                </a>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

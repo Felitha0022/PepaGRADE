@@ -18,6 +18,7 @@ AI Assessment | PepaGRADE
         padding: 30px 20px 50px;
     }
 
+
     /* =========================================================
        PAGE HEADER
     ========================================================= */
@@ -39,6 +40,7 @@ AI Assessment | PepaGRADE
         font-size: 14px;
     }
 
+
     /* =========================================================
        GENERAL CARD
     ========================================================= */
@@ -51,6 +53,7 @@ AI Assessment | PepaGRADE
         margin-bottom: 22px;
         box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
     }
+
 
     /* =========================================================
        STUDENT INFORMATION
@@ -146,6 +149,7 @@ AI Assessment | PepaGRADE
         font-size: 14px;
     }
 
+
     /* =========================================================
        SECTION HEADINGS
     ========================================================= */
@@ -175,6 +179,7 @@ AI Assessment | PepaGRADE
         font-size: 20px;
         color: #222;
     }
+
 
     /* =========================================================
        DOCUMENT CARDS
@@ -246,6 +251,7 @@ AI Assessment | PepaGRADE
         color: #333;
     }
 
+
     /* =========================================================
        FILE LINK
     ========================================================= */
@@ -261,6 +267,7 @@ AI Assessment | PepaGRADE
         color: #125936;
         text-decoration: underline;
     }
+
 
     /* =========================================================
        STATUS BADGES
@@ -291,6 +298,7 @@ AI Assessment | PepaGRADE
         color: #a83232;
     }
 
+
     /* =========================================================
        WARNING BOX
     ========================================================= */
@@ -316,6 +324,7 @@ AI Assessment | PepaGRADE
         line-height: 1.6;
     }
 
+
     /* =========================================================
        BUTTONS
     ========================================================= */
@@ -331,6 +340,9 @@ AI Assessment | PepaGRADE
         font-size: 13px;
         font-weight: 600;
         transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
     }
 
     .button-primary {
@@ -343,6 +355,12 @@ AI Assessment | PepaGRADE
         transform: translateY(-1px);
     }
 
+    .button-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
     .button-secondary {
         background: #ffffff;
         color: #197044;
@@ -352,6 +370,7 @@ AI Assessment | PepaGRADE
     .button-secondary:hover {
         background: #e9f5ed;
     }
+
 
     /* =========================================================
        AI SECTION
@@ -400,6 +419,7 @@ AI Assessment | PepaGRADE
         font-size: 13px;
     }
 
+
     /* =========================================================
        COMPLETED RESULT
     ========================================================= */
@@ -444,6 +464,7 @@ AI Assessment | PepaGRADE
         font-weight: 700;
     }
 
+
     /* =========================================================
        READY MESSAGE
     ========================================================= */
@@ -469,6 +490,7 @@ AI Assessment | PepaGRADE
         line-height: 1.6;
     }
 
+
     /* =========================================================
        MESSAGES
     ========================================================= */
@@ -487,29 +509,232 @@ AI Assessment | PepaGRADE
         font-size: 13px;
     }
 
+
+    /* =========================================================
+       AI ASSESSMENT PROGRESS MODAL
+    ========================================================= */
+
+    .ai-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(0, 0, 0, 0.55);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        z-index: 99999;
+    }
+
+    .ai-modal {
+        width: 480px;
+        max-width: 90%;
+
+        background: #ffffff;
+
+        border-radius: 14px;
+
+        padding: 35px;
+
+        text-align: center;
+
+        box-shadow:
+            0 20px 60px
+            rgba(0, 0, 0, 0.25);
+    }
+
+    .ai-modal-icon {
+        width: 65px;
+        height: 65px;
+
+        margin: 0 auto 15px;
+
+        border-radius: 50%;
+
+        background: #e8f5ec;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 30px;
+    }
+
+    .ai-modal h2 {
+        margin: 0 0 8px;
+
+        color: #16803c;
+
+        font-size: 22px;
+    }
+
+    #aiProgressMessage {
+        margin: 0 0 20px;
+
+        color: #555;
+
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       PROGRESS BAR
+    ========================================================= */
+
+    .ai-progress-container {
+        width: 100%;
+
+        height: 10px;
+
+        background: #e9ecef;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+    }
+
+    .ai-progress-bar {
+        width: 0%;
+
+        height: 100%;
+
+        background: #16803c;
+
+        border-radius: 20px;
+
+        transition: width 0.5s ease;
+    }
+
+
+    /* =========================================================
+       PROGRESS PERCENTAGE
+    ========================================================= */
+
+    .ai-progress-percent {
+        margin-top: 8px;
+
+        text-align: right;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        color: #16803c;
+    }
+
+
+    /* =========================================================
+       PROGRESS STEPS
+    ========================================================= */
+
+    .ai-progress-status {
+        margin-top: 20px;
+
+        text-align: left;
+    }
+
+    .ai-step {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 8px 0;
+
+        color: #999;
+
+        font-size: 14px;
+
+        transition: color 0.2s ease;
+    }
+
+    .ai-step .step-icon {
+        width: 20px;
+
+        text-align: center;
+
+        font-weight: bold;
+    }
+
+    .ai-step.active {
+        color: #16803c;
+
+        font-weight: 600;
+    }
+
+    .ai-step.completed {
+        color: #16803c;
+
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       ERROR STATE
+    ========================================================= */
+
+    .ai-modal-error {
+        background: #fff5f5;
+
+        border: 1px solid #f0caca;
+
+        border-radius: 9px;
+
+        padding: 12px;
+
+        margin-top: 18px;
+
+        color: #a83232;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+
+        text-align: left;
+
+        word-break: break-word;
+    }
+
+
     /* =========================================================
        BACK BUTTON
     ========================================================= */
 
     .bottom-navigation {
         border-top: 1px solid #e3e8e5;
+
         padding-top: 22px;
+
         margin-top: 25px;
     }
 
     .back-link {
         display: inline-flex;
+
         align-items: center;
+
         gap: 6px;
+
         color: #555;
+
         text-decoration: none;
+
         font-size: 14px;
+
         font-weight: 600;
     }
 
     .back-link:hover {
         color: #197044;
     }
+
 
     /* =========================================================
        RESPONSIVE
@@ -531,6 +756,7 @@ AI Assessment | PepaGRADE
 
     }
 
+
     @media (max-width: 550px) {
 
         .assessment-page {
@@ -547,560 +773,1253 @@ AI Assessment | PepaGRADE
             padding: 18px;
         }
 
+        .ai-modal {
+            padding: 25px 20px;
+        }
+
+        .ai-modal h2 {
+            font-size: 19px;
+        }
+
+        .ai-step {
+            font-size: 13px;
+        }
+
     }
 
 </style>
 
-
 <div class="assessment-page">
 
+<!-- =====================================================
+     PAGE HEADER
+====================================================== -->
 
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
+<div class="page-header">
 
-    <div class="page-header">
+    <h1>
+        {{ assignment.title }}
+    </h1>
 
-        <h1>
-            {{ assignment.title }}
-        </h1>
+    <p>
+        AI-powered academic assessment for
+        <strong>
+            {{ assignment.student.full_name }}
+        </strong>
+    </p>
 
-        <p>
-            AI-powered academic assessment for
-            <strong>
-                {{ assignment.student.full_name }}
-            </strong>
-        </p>
+</div>
+
+
+<!-- =====================================================
+     MESSAGES
+====================================================== -->
+
+{% if messages %}
+
+    <div class="messages">
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+
+<!-- =====================================================
+     STUDENT INFORMATION
+====================================================== -->
+
+<div class="student-card">
+
+    <div class="student-header">
+
+        <div class="student-icon">
+            👤
+        </div>
+
+        <div>
+
+            <h2>
+                Student Information
+            </h2>
+
+            <p>
+                Assignment details
+            </p>
+
+        </div>
 
     </div>
 
 
-    <!-- =====================================================
-         MESSAGES
-    ====================================================== -->
+    <div class="student-details">
 
-    {% if messages %}
+        <div class="detail">
 
-        <div class="messages">
+            <span class="detail-label">
+                Student
+            </span>
 
-            {% for message in messages %}
+            <span class="detail-value">
+                {{ assignment.student.full_name }}
+            </span>
 
-                <div class="message">
-                    {{ message }}
-                </div>
+        </div>
 
-            {% endfor %}
+
+        <div class="detail">
+
+            <span class="detail-label">
+                Student ID
+            </span>
+
+            <span class="detail-value">
+                {{ assignment.student.student_id }}
+            </span>
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="detail-label">
+                Document Type
+            </span>
+
+            <span class="detail-value">
+                {{ assignment.get_document_type_display }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    {% if assignment.description %}
+
+        <div class="description">
+
+            <strong>
+                Description
+            </strong>
+
+            <p>
+                {{ assignment.description }}
+            </p>
 
         </div>
 
     {% endif %}
 
+</div>
 
-    <!-- =====================================================
-         STUDENT INFORMATION
-    ====================================================== -->
 
-    <div class="student-card">
+<!-- =====================================================
+     ASSESSMENT DOCUMENTS
+====================================================== -->
 
-        <div class="student-header">
+<div class="section-heading">
 
-            <div class="student-icon">
-                👤
+    <div class="section-number">
+        1
+    </div>
+
+    <h2>
+        Assessment Documents
+    </h2>
+
+</div>
+
+
+<div class="document-grid">
+
+
+    <!-- =================================================
+         ASSIGNMENT SUBMISSION
+    ================================================== -->
+
+    <div class="document-card">
+
+        <div class="document-header">
+
+            <div class="document-icon">
+                📄
             </div>
 
             <div>
-
-                <h2>
-                    Student Information
-                </h2>
-
-                <p>
-                    Assignment details
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="student-details">
-
-            <div class="detail">
-
-                <span class="detail-label">
-                    Student
-                </span>
-
-                <span class="detail-value">
-                    {{ assignment.student.full_name }}
-                </span>
-
-            </div>
-
-
-            <div class="detail">
-
-                <span class="detail-label">
-                    Student ID
-                </span>
-
-                <span class="detail-value">
-                    {{ assignment.student.student_id }}
-                </span>
-
-            </div>
-
-
-            <div class="detail">
-
-                <span class="detail-label">
-                    Document Type
-                </span>
-
-                <span class="detail-value">
-                    {{ assignment.get_document_type_display }}
-                </span>
-
-            </div>
-
-        </div>
-
-
-        {% if assignment.description %}
-
-            <div class="description">
-
-                <strong>
-                    Description
-                </strong>
-
-                <p>
-                    {{ assignment.description }}
-                </p>
-
-            </div>
-
-        {% endif %}
-
-    </div>
-
-
-    <!-- =====================================================
-         ASSESSMENT DOCUMENTS
-    ====================================================== -->
-
-    <div class="section-heading">
-
-        <div class="section-number">
-            1
-        </div>
-
-        <h2>
-            Assessment Documents
-        </h2>
-
-    </div>
-
-
-    <div class="document-grid">
-
-
-        <!-- =================================================
-             ASSIGNMENT SUBMISSION
-        ================================================== -->
-
-        <div class="document-card">
-
-            <div class="document-header">
-
-                <div class="document-icon">
-                    📄
-                </div>
-
-                <div>
-
-                    <h3>
-                        Assignment Submission
-                    </h3>
-
-                    <p>
-                        Student's academic paper
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            {% if submission %}
-
-                <div class="document-info">
-
-                    <p>
-
-                        <strong>
-                            File:
-                        </strong>
-                        <br>
-
-                        <a
-                            href="{{ submission.file.url }}"
-                            target="_blank"
-                            rel="noopener"
-                            class="file-link"
-                        >
-                            📄 {{ submission.file.name }}
-                        </a>
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Submitted:
-                        </strong>
-                        <br>
-
-                        {{ submission.submitted_at }}
-
-                    </p>
-
-                </div>
-
-
-                {% if submission.extracted_text %}
-
-                    <div class="status status-success">
-                        ✓ Student Paper Read Successfully
-                    </div>
-
-                    <p style="
-                        margin-top: 10px;
-                        color: #666;
-                        font-size: 13px;
-                        line-height: 1.6;
-                    ">
-                        The student's paper has been successfully
-                        read and its text is ready for AI assessment.
-                    </p>
-
-                {% else %}
-
-                    <div class="status status-warning">
-                        ⚠ Student Paper Could Not Be Read
-                    </div>
-
-                    <p style="
-                        margin-top: 10px;
-                        color: #666;
-                        font-size: 13px;
-                        line-height: 1.6;
-                    ">
-                        The paper was uploaded, but PepaGRADE could
-                        not extract its text. Replace the submission
-                        and try again.
-                    </p>
-
-                {% endif %}
-
-
-                <div style="margin-top: 16px;">
-
-                    <a
-                        href="{% url 'upload_assignment_submission' assignment.id %}"
-                        class="button button-secondary"
-                    >
-                        ↻ Replace Submission
-                    </a>
-
-                </div>
-
-
-            {% else %}
-
-                <div class="warning-box">
-
-                    <h3>
-                        No Submission
-                    </h3>
-
-                    <p>
-                        No assignment submission has been uploaded.
-                    </p>
-
-                </div>
-
-
-                <a
-                    href="{% url 'upload_assignment_submission' assignment.id %}"
-                    class="button button-primary"
-                >
-                    + Upload Assignment Submission
-                </a>
-
-            {% endif %}
-
-        </div>
-
-
-        <!-- =================================================
-             MARKING GUIDE
-        ================================================== -->
-
-        <div class="document-card">
-
-            <div class="document-header">
-
-                <div class="document-icon">
-                    📋
-                </div>
-
-                <div>
-
-                    <h3>
-                        Marking Guide
-                    </h3>
-
-                    <p>
-                        Assessment criteria and rubric
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            {% if marking_guide %}
-
-                <div class="document-info">
-
-                    <p>
-                        <strong>Title:</strong><br>
-                        {{ marking_guide.title }}
-                    </p>
-
-                </div>
-
-
-                {% if marking_guide.extracted_text %}
-
-                    <div class="status status-success">
-                        ✓ Text Extraction Completed
-                    </div>
-
-                {% else %}
-
-                    <div class="status status-warning">
-                        ⚠ Text Extraction Not Available
-                    </div>
-
-                {% endif %}
-
-
-                <div style="margin-top: 16px;">
-
-                    <a
-                        href="{% url 'upload_assignment_marking_guide' assignment.id %}"
-                        class="button button-secondary"
-                    >
-                        ↻ Replace Marking Guide
-                    </a>
-
-                </div>
-
-
-            {% else %}
-
-                <div class="warning-box">
-
-                    <h3>
-                        Marking Guide Required
-                    </h3>
-
-                    <p>
-                        No marking guide has been uploaded.
-                        Upload one before running the AI assessment.
-                    </p>
-
-                </div>
-
-
-                <a
-                    href="{% url 'upload_assignment_marking_guide' assignment.id %}"
-                    class="button button-primary"
-                >
-                    + Upload Marking Guide
-                </a>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         AI ASSESSMENT
-    ====================================================== -->
-
-    <div class="section-heading">
-
-        <div class="section-number">
-            2
-        </div>
-
-        <h2>
-            AI Assessment
-        </h2>
-
-    </div>
-
-
-    <div class="ai-card">
-
-        <div class="ai-header">
-
-            <div class="ai-icon">
-                ✨
-            </div>
-
-            <div>
-
-                <h2>
-                    AI-Powered Assessment
-                </h2>
-
-                <p>
-                    Analyse the submission against the marking guide
-                </p>
-
-            </div>
-
-        </div>
-
-
-        {% if assessment %}
-
-            <!-- =============================================
-                 COMPLETED
-            ============================================== -->
-
-            <div class="completed-status">
-
-                <span class="status status-success">
-                    ✓ Assessment Completed
-                </span>
-
-            </div>
-
-
-            <div class="result-grid">
-
-                <div class="result-card">
-
-                    <span>
-                        AI Score
-                    </span>
-
-                    <div class="result-score">
-                        {{ assessment.ai_score|floatformat:2 }}%
-                    </div>
-
-                </div>
-
-
-                <div class="result-card">
-
-                    <span>
-                        AI Grade
-                    </span>
-
-                    <div class="result-grade">
-                        {{ assessment.ai_grade }}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <a
-                href="{% url 'assessment_result' assessment.id %}"
-                class="button button-primary"
-            >
-                View Assessment Result →
-            </a>
-
-
-        {% elif submission and marking_guide %}
-
-            <!-- =============================================
-                 READY
-            ============================================== -->
-
-            <div class="ready-box">
 
                 <h3>
-                    ✓ Ready for Assessment
+                    Assignment Submission
                 </h3>
 
                 <p>
-                    Both the assignment submission and marking
-                    guide are available. You can now run the
-                    AI assessment.
+                    Student's academic paper
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if submission %}
+
+            <div class="document-info">
+
+                <p>
+
+                    <strong>
+                        File:
+                    </strong>
+
+                    <br>
+
+                    <a
+                        href="{{ submission.file.url }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="file-link"
+                    >
+                        📄 {{ submission.file.name }}
+                    </a>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Submitted:
+                    </strong>
+
+                    <br>
+
+                    {{ submission.submitted_at }}
+
                 </p>
 
             </div>
 
 
-            <a
-                href="{% url 'assess_assignment' submission.id %}"
-                class="button button-primary"
-            >
-                ✨ Assess with AI
-            </a>
+            {% if submission.extracted_text %}
+
+                <div class="status status-success">
+                    ✓ Student Paper Read Successfully
+                </div>
+
+                <p style="
+                    margin-top: 10px;
+                    color: #666;
+                    font-size: 13px;
+                    line-height: 1.6;
+                ">
+                    The student's paper has been successfully
+                    read and its text is ready for AI assessment.
+                </p>
+
+            {% else %}
+
+                <div class="status status-warning">
+                    ⚠ Student Paper Could Not Be Read
+                </div>
+
+                <p style="
+                    margin-top: 10px;
+                    color: #666;
+                    font-size: 13px;
+                    line-height: 1.6;
+                ">
+                    The paper was uploaded, but PepaGRADE could
+                    not extract its text. Replace the submission
+                    and try again.
+                </p>
+
+            {% endif %}
+
+
+            <div style="margin-top: 16px;">
+
+                <a
+                    href="{% url 'upload_assignment_submission' assignment.id %}"
+                    class="button button-secondary"
+                >
+                    ↻ Replace Submission
+                </a>
+
+            </div>
 
 
         {% else %}
 
-            <!-- =============================================
-                 NOT READY
-            ============================================== -->
-
             <div class="warning-box">
 
                 <h3>
-                    ⚠ Assessment Not Ready
+                    No Submission
                 </h3>
 
                 <p>
-                    Upload both the assignment submission and
-                    marking guide before running the AI assessment.
+                    No assignment submission has been uploaded.
                 </p>
 
             </div>
+
+
+            <a
+                href="{% url 'upload_assignment_submission' assignment.id %}"
+                class="button button-primary"
+            >
+                + Upload Assignment Submission
+            </a>
 
         {% endif %}
 
     </div>
 
 
-    <!-- =====================================================
-         BACK NAVIGATION
-    ====================================================== -->
+    <!-- =================================================
+         MARKING GUIDE
+    ================================================== -->
 
-    <div class="bottom-navigation">
+    <div class="document-card">
 
-        <a
-            href="{% url 'student_detail' assignment.student.id %}"
-            class="back-link"
-        >
-            ← Back to Student Profile
-        </a>
+        <div class="document-header">
+
+            <div class="document-icon">
+                📋
+            </div>
+
+            <div>
+
+                <h3>
+                    Marking Guide
+                </h3>
+
+                <p>
+                    Assessment criteria and rubric
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if marking_guide %}
+
+            <div class="document-info">
+
+                <p>
+                    <strong>Title:</strong><br>
+                    {{ marking_guide.title }}
+                </p>
+
+            </div>
+
+
+            {% if marking_guide.extracted_text %}
+
+                <div class="status status-success">
+                    ✓ Text Extraction Completed
+                </div>
+
+            {% else %}
+
+                <div class="status status-warning">
+                    ⚠ Text Extraction Not Available
+                </div>
+
+            {% endif %}
+
+
+            <div style="margin-top: 16px;">
+
+                <a
+                    href="{% url 'upload_assignment_marking_guide' assignment.id %}"
+                    class="button button-secondary"
+                >
+                    ↻ Replace Marking Guide
+                </a>
+
+            </div>
+
+
+        {% else %}
+
+            <div class="warning-box">
+
+                <h3>
+                    Marking Guide Required
+                </h3>
+
+                <p>
+                    No marking guide has been uploaded.
+                    Upload one before running the AI assessment.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'upload_assignment_marking_guide' assignment.id %}"
+                class="button button-primary"
+            >
+                + Upload Marking Guide
+            </a>
+
+        {% endif %}
 
     </div>
 
 </div>
+
+
+<!-- =====================================================
+     AI ASSESSMENT
+====================================================== -->
+
+<div class="section-heading">
+
+    <div class="section-number">
+        2
+    </div>
+
+    <h2>
+        AI Assessment
+    </h2>
+
+</div>
+
+
+<div class="ai-card">
+
+    <div class="ai-header">
+
+        <div class="ai-icon">
+            ✨
+        </div>
+
+        <div>
+
+            <h2>
+                AI-Powered Assessment
+            </h2>
+
+            <p>
+                Analyse the submission against the marking guide
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if assessment %}
+
+        <!-- =============================================
+             COMPLETED
+        ============================================== -->
+
+        <div class="completed-status">
+
+            <span class="status status-success">
+                ✓ Assessment Completed
+            </span>
+
+        </div>
+
+
+        <div class="result-grid">
+
+            <div class="result-card">
+
+                <span>
+                    AI Score
+                </span>
+
+                <div class="result-score">
+                    {{ assessment.ai_score|floatformat:2 }}%
+                </div>
+
+            </div>
+
+
+            <div class="result-card">
+
+                <span>
+                    AI Grade
+                </span>
+
+                <div class="result-grade">
+                    {{ assessment.ai_grade }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="{% url 'assessment_result' assessment.id %}"
+            class="button button-primary"
+        >
+            View Assessment Result →
+        </a>
+
+
+    {% elif submission and marking_guide %}
+
+        <!-- =============================================
+             READY
+        ============================================== -->
+
+        <div class="ready-box">
+
+            <h3>
+                ✓ Ready for Assessment
+            </h3>
+
+            <p>
+                Both the assignment submission and marking
+                guide are available. You can now run the
+                AI assessment.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             ASSESS WITH AI BUTTON
+        ================================================== -->
+
+        <button
+            type="button"
+            class="button button-primary"
+            id="assessAIButton"
+            data-assessment-url="{% url 'assess_assignment' submission.id %}"
+            onclick="startAIAssessment(this.dataset.assessmentUrl)"
+        >
+            ✨ Assess with AI
+        </button>
+
+
+    {% else %}
+
+        <!-- =============================================
+             NOT READY
+        ============================================== -->
+
+        <div class="warning-box">
+
+            <h3>
+                ⚠ Assessment Not Ready
+            </h3>
+
+            <p>
+                Upload both the assignment submission and
+                marking guide before running the AI assessment.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     AI ASSESSMENT PROGRESS MODAL
+====================================================== -->
+
+<div
+    id="aiAssessmentModal"
+    class="ai-modal-overlay"
+    style="display: none;"
+>
+
+    <div class="ai-modal">
+
+        <div class="ai-modal-icon">
+            ✨
+        </div>
+
+
+        <h2>
+            AI Assessment in Progress
+        </h2>
+
+
+        <p id="aiProgressMessage">
+            Preparing the assessment...
+        </p>
+
+
+        <!-- Progress Bar -->
+
+        <div class="ai-progress-container">
+
+            <div
+                id="aiProgressBar"
+                class="ai-progress-bar"
+            ></div>
+
+        </div>
+
+
+        <!-- Percentage -->
+
+        <div class="ai-progress-percent">
+
+            <span id="aiProgressPercent">
+                0%
+            </span>
+
+        </div>
+
+
+        <!-- Progress Steps -->
+
+        <div class="ai-progress-status">
+
+            <div
+                id="aiStep1"
+                class="ai-step active"
+            >
+
+                <span class="step-icon">
+                    ●
+                </span>
+
+                Preparing assessment
+
+            </div>
+
+
+            <div
+                id="aiStep2"
+                class="ai-step"
+            >
+
+                <span class="step-icon">
+                    ○
+                </span>
+
+                Reading student paper
+
+            </div>
+
+
+            <div
+                id="aiStep3"
+                class="ai-step"
+            >
+
+                <span class="step-icon">
+                    ○
+                </span>
+
+                Comparing with marking guide
+
+            </div>
+
+
+            <div
+                id="aiStep4"
+                class="ai-step"
+            >
+
+                <span class="step-icon">
+                    ○
+                </span>
+
+                AI assessment in progress
+
+            </div>
+
+
+            <div
+                id="aiStep5"
+                class="ai-step"
+            >
+
+                <span class="step-icon">
+                    ○
+                </span>
+
+                Completing assessment
+
+            </div>
+
+        </div>
+
+
+        <!-- Error Message -->
+
+        <div
+            id="aiAssessmentError"
+            class="ai-modal-error"
+            style="display: none;"
+        >
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     BACK NAVIGATION
+====================================================== -->
+
+<div class="bottom-navigation">
+
+    <a
+        href="{% url 'student_detail' assignment.student.id %}"
+        class="back-link"
+    >
+        ← Back to Student Profile
+    </a>
+
+</div>
+
+</div>
+
+<!-- =========================================================
+     AI ASSESSMENT JAVASCRIPT
+========================================================= -->
+
+<script>
+
+function startAIAssessment(assessmentUrl) {
+
+    /* =====================================================
+       GET ELEMENTS
+    ===================================================== */
+
+    const modal =
+        document.getElementById(
+            "aiAssessmentModal"
+        );
+
+    const progressBar =
+        document.getElementById(
+            "aiProgressBar"
+        );
+
+    const progressPercent =
+        document.getElementById(
+            "aiProgressPercent"
+        );
+
+    const progressMessage =
+        document.getElementById(
+            "aiProgressMessage"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "aiAssessmentError"
+        );
+
+    const assessButton =
+        document.getElementById(
+            "assessAIButton"
+        );
+
+
+    /* =====================================================
+       SHOW MODAL
+    ===================================================== */
+
+    modal.style.display = "flex";
+
+    document.body.style.overflow = "hidden";
+
+
+    /* =====================================================
+       DISABLE BUTTON
+    ===================================================== */
+
+    if (assessButton) {
+
+        assessButton.disabled = true;
+
+    }
+
+
+    /* =====================================================
+       RESET ERROR
+    ===================================================== */
+
+    errorBox.style.display = "none";
+
+    errorBox.textContent = "";
+
+
+    /* =====================================================
+       RESET PROGRESS
+    ===================================================== */
+
+    progressBar.style.width = "0%";
+
+    progressPercent.textContent = "0%";
+
+    progressMessage.textContent =
+        "Preparing the assessment...";
+
+
+    /* =====================================================
+       RESET STEPS
+    ===================================================== */
+
+    document
+        .querySelectorAll(".ai-step")
+        .forEach(function(step) {
+
+            step.classList.remove(
+                "active",
+                "completed"
+            );
+
+            const icon =
+                step.querySelector(
+                    ".step-icon"
+                );
+
+            if (icon) {
+
+                icon.textContent = "○";
+
+            }
+
+        });
+
+
+    /* =====================================================
+       STEP 1
+    ===================================================== */
+
+    activateStep("aiStep1");
+
+    setProgress(
+        10,
+        "Preparing the assessment..."
+    );
+
+
+    /* =====================================================
+       STEP 2
+    ===================================================== */
+
+    setTimeout(function() {
+
+        completeStep("aiStep1");
+
+        activateStep("aiStep2");
+
+        setProgress(
+            25,
+            "Reading the student's paper..."
+        );
+
+    }, 800);
+
+
+    /* =====================================================
+       STEP 3
+    ===================================================== */
+
+    setTimeout(function() {
+
+        completeStep("aiStep2");
+
+        activateStep("aiStep3");
+
+        setProgress(
+            45,
+            "Comparing the paper with the marking guide..."
+        );
+
+    }, 1800);
+
+
+    /* =====================================================
+       STEP 4
+    ===================================================== */
+
+    setTimeout(function() {
+
+        completeStep("aiStep3");
+
+        activateStep("aiStep4");
+
+        setProgress(
+            60,
+            "AI is analysing the submission..."
+        );
+
+    }, 2800);
+
+
+    /* =====================================================
+       SEND REQUEST TO DJANGO
+    ===================================================== */
+
+    fetch(
+        assessmentUrl,
+        {
+            method: "GET",
+
+            headers: {
+                "X-Requested-With":
+                    "XMLHttpRequest",
+
+                "Accept":
+                    "application/json"
+            },
+
+            credentials:
+                "same-origin"
+        }
+    )
+
+
+    /* =====================================================
+       READ SERVER RESPONSE
+    ===================================================== */
+
+    .then(function(response) {
+
+        return response.text()
+            .then(function(responseText) {
+
+                console.log(
+                    "AI assessment response status:",
+                    response.status
+                );
+
+                console.log(
+                    "AI assessment response:",
+                    responseText
+                );
+
+
+                /* =========================================
+                   SERVER RETURNED ERROR STATUS
+                ========================================== */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "The assessment request failed. " +
+                        "Server status: " +
+                        response.status
+                    );
+
+                }
+
+
+                /* =========================================
+                   EMPTY RESPONSE
+                ========================================== */
+
+                if (!responseText) {
+
+                    throw new Error(
+                        "The server returned an empty response."
+                    );
+
+                }
+
+
+                /* =========================================
+                   CONVERT RESPONSE TO JSON
+                ========================================== */
+
+                let data;
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            responseText
+                        );
+
+                } catch (error) {
+
+                    console.error(
+                        "Server returned non-JSON:",
+                        responseText
+                    );
+
+                    throw new Error(
+                        "The server returned an HTML page " +
+                        "instead of the AI assessment result. " +
+                        "Please check the browser console."
+                    );
+
+                }
+
+
+                return data;
+
+            });
+
+    })
+
+
+    /* =====================================================
+       PROCESS DJANGO RESPONSE
+    ===================================================== */
+
+    .then(function(data) {
+
+        if (!data.success) {
+
+            throw new Error(
+                data.error ||
+                "AI assessment could not be completed."
+            );
+
+        }
+
+
+        /* =================================================
+           AI ASSESSMENT FINISHED
+        ================================================= */
+
+        completeStep("aiStep4");
+
+        activateStep("aiStep5");
+
+
+        setProgress(
+            90,
+            "Completing the assessment..."
+        );
+
+
+        /* =================================================
+           COMPLETE FINAL STEP
+        ================================================= */
+
+        setTimeout(function() {
+
+            completeStep("aiStep5");
+
+
+            setProgress(
+                100,
+                "AI assessment completed successfully."
+            );
+
+
+            /* =============================================
+               MOVE TO RESULT PAGE
+            ============================================= */
+
+            setTimeout(function() {
+
+                document.body.style.overflow = "";
+
+                window.location.href =
+                    data.result_url;
+
+            }, 1000);
+
+        }, 700);
+
+    })
+
+
+    /* =====================================================
+       HANDLE ERRORS
+    ===================================================== */
+
+    .catch(function(error) {
+
+        console.error(
+            "AI assessment error:",
+            error
+        );
+
+
+        progressMessage.textContent =
+            "AI assessment could not be completed.";
+
+
+        progressPercent.textContent =
+            "Error";
+
+
+        progressBar.style.width =
+            "0%";
+
+
+        errorBox.textContent =
+            error.message ||
+            "An unexpected error occurred while running the AI assessment.";
+
+
+        errorBox.style.display =
+            "block";
+
+
+        /* =================================================
+           RE-ENABLE BUTTON
+        ================================================= */
+
+        if (assessButton) {
+
+            assessButton.disabled = false;
+
+        }
+
+
+        /* =================================================
+           CLOSE MODAL AFTER ERROR
+        ================================================= */
+
+        setTimeout(function() {
+
+            modal.style.display = "none";
+
+            document.body.style.overflow = "";
+
+        }, 5000);
+
+    });
+
+}
+
+
+/* =========================================================
+   SET PROGRESS
+========================================================= */
+
+function setProgress(
+    percentage,
+    message
+) {
+
+    const progressBar =
+        document.getElementById(
+            "aiProgressBar"
+        );
+
+    const progressPercent =
+        document.getElementById(
+            "aiProgressPercent"
+        );
+
+    const progressMessage =
+        document.getElementById(
+            "aiProgressMessage"
+        );
+
+
+    progressBar.style.width =
+        percentage + "%";
+
+
+    progressPercent.textContent =
+        percentage + "%";
+
+
+    progressMessage.textContent =
+        message;
+
+}
+
+
+/* =========================================================
+   ACTIVATE STEP
+========================================================= */
+
+function activateStep(stepId) {
+
+    const step =
+        document.getElementById(
+            stepId
+        );
+
+
+    if (!step) {
+
+        return;
+
+    }
+
+
+    step.classList.add(
+        "active"
+    );
+
+
+    const icon =
+        step.querySelector(
+            ".step-icon"
+        );
+
+
+    if (icon) {
+
+        icon.textContent =
+            "●";
+
+    }
+
+}
+
+
+/* =========================================================
+   COMPLETE STEP
+========================================================= */
+
+function completeStep(stepId) {
+
+    const step =
+        document.getElementById(
+            stepId
+        );
+
+
+    if (!step) {
+
+        return;
+
+    }
+
+
+    step.classList.remove(
+        "active"
+    );
+
+
+    step.classList.add(
+        "completed"
+    );
+
+
+    const icon =
+        step.querySelector(
+            ".step-icon"
+        );
+
+
+    if (icon) {
+
+        icon.textContent =
+            "✓";
+
+    }
+
+}
+
+</script>
 
 {% endblock %}

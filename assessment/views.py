@@ -1,3 +1,4 @@
+
 import json
 import logging
 
@@ -28,6 +29,22 @@ logger = logging.getLogger(__name__)
 
 
 # =========================================================
+# HELPER: CHECK AJAX REQUEST
+# =========================================================
+
+def is_ajax_request(request):
+    """
+    Check whether the request was made using AJAX/fetch.
+    """
+
+    return (
+        request.headers.get(
+            'x-requested-with'
+        ) == 'XMLHttpRequest'
+    )
+
+
+# =========================================================
 # HELPER: CONVERT AI RESPONSE TO DICTIONARY
 # =========================================================
 
@@ -48,7 +65,7 @@ def normalize_ai_result(result):
 
         result = result.strip()
 
-        # Remove Markdown code fences if the AI included them
+        # Remove Markdown code fences
         if result.startswith('```json'):
             result = result[7:]
 
@@ -85,7 +102,7 @@ def normalize_ai_result(result):
 
 
 # =========================================================
-# HELPER FUNCTION
+# HELPER: CALCULATE ASSESSMENT SCORE
 # =========================================================
 
 def calculate_assessment_score(criterion_scores):
@@ -131,12 +148,15 @@ def calculate_assessment_score(criterion_scores):
 
             maximum = 0
 
+        # Prevent negative scores
         if score < 0:
             score = 0
 
+        # Prevent negative maximum marks
         if maximum < 0:
             maximum = 0
 
+        # Prevent score from exceeding maximum
         if maximum > 0 and score > maximum:
             score = maximum
 
@@ -146,6 +166,7 @@ def calculate_assessment_score(criterion_scores):
         total_score += score
         max_score += maximum
 
+    # Calculate percentage
     if max_score > 0:
 
         percentage = (
@@ -164,6 +185,58 @@ def calculate_assessment_score(criterion_scores):
 
 
 # =========================================================
+# HELPER: CALCULATE SUGGESTED GRADE
+# =========================================================
+
+def calculate_suggested_grade(percentage):
+    """
+    Convert the final percentage into the DWU
+    suggested grading scale.
+
+    0-49   = F
+    50-55  = P
+    56-65  = UP
+    66-75  = C
+    76-85  = D
+    86-100 = HD
+    """
+
+    try:
+
+        percentage = float(percentage)
+
+    except (TypeError, ValueError):
+
+        return ''
+
+    # Keep percentage within valid range
+    if percentage < 0:
+        percentage = 0
+
+    if percentage > 100:
+        percentage = 100
+
+    # DWU grading scale
+    if percentage < 50:
+        return 'F'
+
+    elif percentage < 56:
+        return 'P'
+
+    elif percentage < 66:
+        return 'UP'
+
+    elif percentage < 76:
+        return 'C'
+
+    elif percentage < 86:
+        return 'D'
+
+    else:
+        return 'HD'
+
+
+# =========================================================
 # STUDENT AI ASSESSMENT
 # =========================================================
 
@@ -171,9 +244,8 @@ def student_ai_assessment(request, student_id):
     """
     Create and run an AI assessment for a specific student.
 
-    Gemini is used as the primary AI service.
-    Mistral is automatically used as the backup service
-    if Gemini fails.
+    This workflow is used when creating a new assignment
+    together with the student's paper and marking guide.
     """
 
     student = get_object_or_404(
@@ -311,6 +383,14 @@ def student_ai_assessment(request, student_id):
                 )
 
                 # =================================================
+                # CALCULATE SUGGESTED GRADE
+                # =================================================
+
+                grade = calculate_suggested_grade(
+                    percentage
+                )
+
+                # =================================================
                 # GET AI ANALYSIS
                 # =================================================
 
@@ -349,11 +429,6 @@ def student_ai_assessment(request, student_id):
                     ''
                 )
 
-                grade = result.get(
-                    'grade',
-                    ''
-                )
-
                 # =================================================
                 # SAVE ASSESSMENT
                 # =================================================
@@ -380,18 +455,18 @@ def student_ai_assessment(request, student_id):
 
                 messages.success(
                     request,
-                    'AI assessment completed successfully.'
+                    'Assignment created successfully.'
                 )
 
                 return redirect(
-                    'assessment_result',
-                    assessment_id=assessment.id
+                    'assignment_detail',
+                    assignment_id=assignment.id
                 )
 
             except AIAssessmentError as error:
 
                 logger.warning(
-                    'Both AI assessment services failed '
+                    'AI assessment failed '
                     'for student %s: %s',
                     student.id,
                     error
@@ -509,8 +584,11 @@ def assess_assignment(request, submission_id):
     """
     Run the AI assessment for an existing student submission.
 
-    Gemini is used first.
-    Mistral is automatically used as a backup if Gemini fails.
+    When called by the AI progress popup using AJAX/fetch,
+    this function returns JSON.
+
+    When opened normally in the browser, it redirects to
+    the assessment result page.
     """
 
     submission = get_object_or_404(
@@ -519,6 +597,8 @@ def assess_assignment(request, submission_id):
     )
 
     assignment = submission.assignment
+
+    ajax_request = is_ajax_request(request)
 
     # =========================================================
     # CHECK MARKING GUIDE
@@ -535,9 +615,7 @@ def assess_assignment(request, submission_id):
             'for this assignment.'
         )
 
-        if request.headers.get(
-            'x-requested-with'
-        ) == 'XMLHttpRequest':
+        if ajax_request:
 
             return JsonResponse(
                 {
@@ -553,7 +631,8 @@ def assess_assignment(request, submission_id):
         )
 
         return redirect(
-            'upload_submission'
+            'assignment_detail',
+            assignment_id=assignment.id
         )
 
     # =========================================================
@@ -567,9 +646,7 @@ def assess_assignment(request, submission_id):
             'Please upload a valid document and try again.'
         )
 
-        if request.headers.get(
-            'x-requested-with'
-        ) == 'XMLHttpRequest':
+        if ajax_request:
 
             return JsonResponse(
                 {
@@ -585,7 +662,8 @@ def assess_assignment(request, submission_id):
         )
 
         return redirect(
-            'upload_submission'
+            'assignment_detail',
+            assignment_id=assignment.id
         )
 
     # =========================================================
@@ -599,9 +677,7 @@ def assess_assignment(request, submission_id):
             'Please upload a valid marking guide and try again.'
         )
 
-        if request.headers.get(
-            'x-requested-with'
-        ) == 'XMLHttpRequest':
+        if ajax_request:
 
             return JsonResponse(
                 {
@@ -617,7 +693,8 @@ def assess_assignment(request, submission_id):
         )
 
         return redirect(
-            'upload_submission'
+            'assignment_detail',
+            assignment_id=assignment.id
         )
 
     # =========================================================
@@ -664,6 +741,14 @@ def assess_assignment(request, submission_id):
         )
 
         # =====================================================
+        # CALCULATE SUGGESTED GRADE
+        # =====================================================
+
+        grade = calculate_suggested_grade(
+            percentage
+        )
+
+        # =====================================================
         # GET AI ANALYSIS
         # =====================================================
 
@@ -702,11 +787,6 @@ def assess_assignment(request, submission_id):
             ''
         )
 
-        grade = result.get(
-            'grade',
-            ''
-        )
-
         # =====================================================
         # SAVE OR UPDATE ASSESSMENT
         # =====================================================
@@ -735,42 +815,47 @@ def assess_assignment(request, submission_id):
         # AJAX SUCCESS RESPONSE
         # =====================================================
 
-        if request.headers.get(
-            'x-requested-with'
-        ) == 'XMLHttpRequest':
+        if ajax_request:
 
             return JsonResponse(
                 {
                     'success': True,
-                    'assessment_id': assessment.id,
-                    'score': round(
-                        total_score,
-                        2
-                    ),
-                    'max_score': round(
-                        max_score,
-                        2
-                    ),
-                    'percentage': round(
-                        percentage,
-                        2
-                    ),
-                    'grade': grade,
-                    'result_url': (
-                        f'/assessment/result/'
-                        f'{assessment.id}/'
-                    ),
+
+                    'assessment_id':
+                        assessment.id,
+
+                    'score':
+                        round(
+                            total_score,
+                            2
+                        ),
+
+                    'max_score':
+                        round(
+                            max_score,
+                            2
+                        ),
+
+                    'percentage':
+                        round(
+                            percentage,
+                            2
+                        ),
+
+                    'grade':
+                        grade,
+
+                    'result_url':
+                        (
+                            f'/assessment/result/'
+                            f'{assessment.id}/'
+                        ),
                 }
             )
 
         # =====================================================
         # NORMAL BROWSER SUCCESS
         # =====================================================
-
-        messages.success(
-            request,
-            'AI assessment completed successfully.'
-        )
 
         return redirect(
             'assessment_result',
@@ -784,7 +869,7 @@ def assess_assignment(request, submission_id):
     except AIAssessmentError as error:
 
         logger.warning(
-            'Both AI assessment services failed '
+            'AI assessment failed '
             'for submission %s: %s',
             submission.id,
             error
@@ -792,9 +877,7 @@ def assess_assignment(request, submission_id):
 
         error_message = str(error)
 
-        if request.headers.get(
-            'x-requested-with'
-        ) == 'XMLHttpRequest':
+        if ajax_request:
 
             return JsonResponse(
                 {
@@ -810,7 +893,8 @@ def assess_assignment(request, submission_id):
         )
 
         return redirect(
-            'upload_submission'
+            'assignment_detail',
+            assignment_id=assignment.id
         )
 
     # =========================================================
@@ -853,9 +937,7 @@ def assess_assignment(request, submission_id):
             f'AI assessment error: {error}'
         )
 
-        if request.headers.get(
-            'x-requested-with'
-        ) == 'XMLHttpRequest':
+        if ajax_request:
 
             return JsonResponse(
                 {
@@ -871,7 +953,8 @@ def assess_assignment(request, submission_id):
         )
 
         return redirect(
-            'upload_submission'
+            'assignment_detail',
+            assignment_id=assignment.id
         )
 
 
@@ -947,6 +1030,32 @@ def assessment_result(request, assessment_id):
             total_score += score
             max_score += maximum
 
+    # =========================================================
+    # CALCULATE PERCENTAGE
+    # =========================================================
+
+    if max_score > 0:
+
+        percentage = (
+            total_score / max_score
+        ) * 100
+
+    else:
+
+        percentage = 0
+
+    # =========================================================
+    # CALCULATE SUGGESTED GRADE
+    # =========================================================
+
+    suggested_grade = calculate_suggested_grade(
+        percentage
+    )
+
+    # =========================================================
+    # RETURN RESULT PAGE
+    # =========================================================
+
     return render(
         request,
         'assessment/assessment_result.html',
@@ -954,5 +1063,7 @@ def assessment_result(request, assessment_id):
             'assessment': assessment,
             'total_score': total_score,
             'max_score': max_score,
+            'percentage': percentage,
+            'suggested_grade': suggested_grade,
         }
     )

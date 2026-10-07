@@ -71,6 +71,46 @@ class StudentProfileForm(forms.ModelForm):
                 f'{student_id}@DWU'
             )
 
+# =========================================================
+# STUDENT SELF PROFILE FORM
+# =========================================================
+
+class StudentSelfProfileForm(forms.ModelForm):
+
+    class Meta:
+
+        model = StudentProfile
+
+        fields = [
+            'full_name',
+            'profile_picture',
+        ]
+
+        widgets = {
+
+            'full_name': forms.TextInput(
+                attrs={
+                    'placeholder': 'Enter your full name',
+                    'class': 'form-control'
+                }
+            ),
+
+            'profile_picture': forms.ClearableFileInput(
+                attrs={
+                    'class': 'form-control',
+                    'accept': 'image/*'
+                }
+            ),
+        }
+
+        labels = {
+
+            'full_name': 'Full Name',
+
+            'profile_picture': 'Profile Picture',
+
+        }
+
 class StudentEnrollmentForm(forms.Form):
 
     course_unit = forms.ModelChoiceField(

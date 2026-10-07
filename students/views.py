@@ -4,15 +4,21 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.db import transaction
 
 from lecturers.models import LecturerProfile
 
 from assignments.models import Assignment
+from assessment.models import Assessment
+
 from assignments.forms import AssignmentSubmissionForm
 
 from .forms import (
     StudentProfileForm,
+    StudentSelfProfileForm,
     StudentEnrollmentForm,
 )
 
@@ -37,22 +43,36 @@ def lecturer_only(view_func):
             return view_func(request, *args, **kwargs)
 
         try:
+
             lecturer_profile = request.user.lecturer_profile
+
         except LecturerProfile.DoesNotExist:
+
             messages.error(
                 request,
                 "You do not have lecturer access."
             )
-            return redirect("student_login")
+
+            return redirect(
+                "student_login"
+            )
 
         if not lecturer_profile:
+
             messages.error(
                 request,
                 "You do not have lecturer access."
             )
-            return redirect("student_login")
 
-        return view_func(request, *args, **kwargs)
+            return redirect(
+                "student_login"
+            )
+
+        return view_func(
+            request,
+            *args,
+            **kwargs
+        )
 
     return wrapper
 
@@ -66,9 +86,11 @@ def student_login(request):
     if request.user.is_authenticated:
 
         try:
+
             student = request.user.student_profile
 
             if student.must_change_password:
+
                 return redirect(
                     "student_change_password"
                 )
@@ -78,8 +100,8 @@ def student_login(request):
             )
 
         except StudentProfile.DoesNotExist:
-            pass
 
+            pass
 
     if request.method == "POST":
 
@@ -105,7 +127,6 @@ def student_login(request):
                 "students/student_login.html"
             )
 
-
         try:
 
             student = StudentProfile.objects.get(
@@ -124,13 +145,11 @@ def student_login(request):
                 "students/student_login.html"
             )
 
-
         user = authenticate(
             request,
             username=student.user.username,
             password=password
         )
-
 
         if user is not None:
 
@@ -139,24 +158,20 @@ def student_login(request):
                 user
             )
 
-
             if student.must_change_password:
 
                 return redirect(
                     "student_change_password"
                 )
 
-
             return redirect(
                 "student_dashboard"
             )
-
 
         messages.error(
             request,
             "Invalid Student ID or password."
         )
-
 
     return render(
         request,
@@ -176,7 +191,6 @@ def student_change_password(request):
         user=request.user
     )
 
-
     if request.method == "POST":
 
         new_password = request.POST.get(
@@ -188,7 +202,6 @@ def student_change_password(request):
             "confirm_password",
             ""
         )
-
 
         if not new_password or not confirm_password:
 
@@ -205,7 +218,6 @@ def student_change_password(request):
                 }
             )
 
-
         if new_password != confirm_password:
 
             messages.error(
@@ -220,7 +232,6 @@ def student_change_password(request):
                     "student": student,
                 }
             )
-
 
         if len(new_password) < 8:
 
@@ -237,24 +248,19 @@ def student_change_password(request):
                 }
             )
 
-
         request.user.set_password(
             new_password
         )
 
         request.user.save()
 
-
         student.must_change_password = False
+
         student.save(
             update_fields=[
                 "must_change_password"
             ]
         )
-
-
-        # Log the student back in because changing the
-        # password invalidates the existing session.
 
         user = authenticate(
             request,
@@ -269,17 +275,14 @@ def student_change_password(request):
                 user
             )
 
-
         messages.success(
             request,
             "Your password has been changed successfully."
         )
 
-
         return redirect(
             "student_dashboard"
         )
-
 
     return render(
         request,
@@ -316,7 +319,6 @@ def student_dashboard(request):
         user=request.user
     )
 
-
     enrollments = (
         Enrollment.objects
         .filter(
@@ -330,13 +332,11 @@ def student_dashboard(request):
         )
     )
 
-
     selected_unit = None
 
     unit_id = request.GET.get(
         "unit"
     )
-
 
     if unit_id:
 
@@ -345,11 +345,9 @@ def student_dashboard(request):
             id=unit_id
         )
 
-
         is_enrolled = enrollments.filter(
             course_unit=selected_unit
         ).exists()
-
 
         if not is_enrolled:
 
@@ -360,9 +358,7 @@ def student_dashboard(request):
 
             selected_unit = None
 
-
     assignments = Assignment.objects.none()
-
 
     if selected_unit:
 
@@ -378,7 +374,6 @@ def student_dashboard(request):
                 "-id"
             )
         )
-
 
     return render(
         request,
@@ -399,19 +394,10 @@ def student_dashboard(request):
 @login_required
 def student_gradebook_page(request):
 
-    # =====================================================
-    # GET STUDENT PROFILE
-    # =====================================================
-
     student = get_object_or_404(
         StudentProfile,
         user=request.user
     )
-
-
-    # =====================================================
-    # GET ENROLLED COURSE UNITS
-    # =====================================================
 
     enrollments = (
         Enrollment.objects
@@ -426,17 +412,11 @@ def student_gradebook_page(request):
         )
     )
 
-
-    # =====================================================
-    # GET SELECTED COURSE UNIT
-    # =====================================================
-
     selected_unit = None
 
     unit_id = request.GET.get(
         "unit"
     )
-
 
     if unit_id:
 
@@ -445,14 +425,9 @@ def student_gradebook_page(request):
             id=unit_id
         )
 
-
-        # Make sure the student is enrolled
-        # in the selected course unit.
-
         is_enrolled = enrollments.filter(
             course_unit=selected_unit
         ).exists()
-
 
         if not is_enrolled:
 
@@ -465,11 +440,6 @@ def student_gradebook_page(request):
                 "student_gradebook_page"
             )
 
-
-    # =====================================================
-    # NO COURSE UNIT SELECTED
-    # =====================================================
-
     if not selected_unit:
 
         return render(
@@ -477,33 +447,22 @@ def student_gradebook_page(request):
             "students/student_portal_gradebook.html",
             {
                 "student": student,
-
                 "enrollments": enrollments,
-
                 "selected_unit": None,
-
                 "gradebook_entries": [],
-
                 "visible_final_grade": "",
-
                 "final_grade_released": False,
-
                 "total_score": Decimal("0"),
-
                 "max_score": Decimal("0"),
             }
         )
 
-
-    # =====================================================
-    # GET ALL GRADEBOOK ENTRIES
-    # =====================================================
-
-    all_entries = (
+    visible_entries = (
         GradebookEntry.objects
         .filter(
             student=student,
-            course_unit=selected_unit
+            course_unit=selected_unit,
+            is_visible=True
         )
         .exclude(
             assessment_type=""
@@ -513,30 +472,23 @@ def student_gradebook_page(request):
         )
     )
 
-
-    # =====================================================
-    # FIND FINAL GRADE
-    #
-    # The final grade is stored independently from
-    # individual assessment visibility.
-    # =====================================================
-
     final_grade_entry = (
-        all_entries
+        visible_entries
         .exclude(
             final_grade=""
         )
         .exclude(
             final_grade__isnull=True
         )
+        .order_by(
+            "-updated_at"
+        )
         .first()
     )
-
 
     visible_final_grade = ""
 
     final_grade_released = False
-
 
     if final_grade_entry:
 
@@ -546,51 +498,15 @@ def student_gradebook_page(request):
 
         final_grade_released = True
 
-
-    # =====================================================
-    # ONLY SHOW ASSESSMENTS RELEASED TO STUDENT
-    # =====================================================
-
-    visible_entries = (
-        all_entries
-        .filter(
-            is_visible=True
-        )
-    )
-
-
-    gradebook_entries = visible_entries
-
-
-    # =====================================================
-    # CALCULATE SCORE
-    #
-    # Each GradebookEntry mark is stored out of 100.
-    #
-    # Example:
-    #
-    # Tutorial 1       85
-    # Assignment 1    78
-    # Mid-Sem Test    72
-    #
-    # Total = 235
-    # Maximum = 300
-    #
-    # Student sees:
-    #
-    # Score     235 / 300
-    # =====================================================
-
     total_score = Decimal("0")
 
     max_score = Decimal("0")
 
-
-    for entry in gradebook_entries:
+    for entry in visible_entries:
 
         if entry.mark is None:
-            continue
 
+            continue
 
         try:
 
@@ -598,11 +514,9 @@ def student_gradebook_page(request):
                 str(entry.mark)
             )
 
-
             total_score += mark
 
             max_score += Decimal("100")
-
 
         except (
             InvalidOperation,
@@ -612,29 +526,17 @@ def student_gradebook_page(request):
 
             continue
 
-
-    # =====================================================
-    # RENDER STUDENT GRADEBOOK
-    # =====================================================
-
     return render(
         request,
         "students/student_portal_gradebook.html",
         {
             "student": student,
-
             "enrollments": enrollments,
-
             "selected_unit": selected_unit,
-
-            "gradebook_entries": gradebook_entries,
-
+            "gradebook_entries": visible_entries,
             "visible_final_grade": visible_final_grade,
-
             "final_grade_released": final_grade_released,
-
             "total_score": total_score,
-
             "max_score": max_score,
         }
     )
@@ -655,7 +557,6 @@ def student_list(request):
             LecturerProfile,
             user=request.user
         )
-
 
     if request.user.is_superuser:
 
@@ -684,12 +585,17 @@ def student_list(request):
             )
         )
 
+    student_created = request.session.pop(
+        "student_created",
+        None
+    )
 
     return render(
         request,
         "students/student_list.html",
         {
             "students": students,
+            "student_created": student_created,
         }
     )
 
@@ -713,10 +619,6 @@ def student_create(request):
                 commit=False
             )
 
-
-            # Assign the logged-in lecturer
-            # unless this is the administrator.
-
             if not request.user.is_superuser:
 
                 student.lecturer = get_object_or_404(
@@ -724,16 +626,31 @@ def student_create(request):
                     user=request.user
                 )
 
+            default_password = (
+                f"{student.student_id}@DWU"
+            )
+
+            user = User.objects.create_user(
+                username=student.student_id,
+                password=default_password,
+                first_name=student.full_name
+            )
+
+            student.user = user
+
+            student.must_change_password = True
 
             student.save()
 
+            request.session["student_created"] = {
 
-            messages.success(
-                     request,
-                     f"Student profile created successfully. "
-                     f"Default Password: {student.student_id}@DWU"
-                 )
+                "student_id": student.student_id,
 
+                "full_name": student.full_name,
+
+                "default_password": default_password,
+
+            }
 
             return redirect(
                 "student_list"
@@ -742,7 +659,6 @@ def student_create(request):
     else:
 
         form = StudentProfileForm()
-
 
     return render(
         request,
@@ -753,39 +669,53 @@ def student_create(request):
         }
     )
 
+
+# =========================================================
+# DELETE STUDENT
+# =========================================================
+
 @lecturer_only
 def student_delete(request, student_id):
-    student = get_object_or_404(StudentProfile, id=student_id)
 
-    # Only allow the lecturer who owns the student to delete them
+    student = get_object_or_404(
+        StudentProfile,
+        id=student_id
+    )
+
     if not request.user.is_superuser:
+
         lecturer = get_object_or_404(
             LecturerProfile,
             user=request.user
         )
+
         if student.lecturer != lecturer:
+
             messages.error(
                 request,
                 "You are not allowed to delete this student."
             )
-            return redirect("student_list")
+
+            return redirect(
+                "student_list"
+            )
 
     if request.method == "POST":
-        student_name = student.full_name
+
         student.delete()
 
-        messages.success(
-            request,
-            f"Student profile for {student_name} was deleted successfully."
+        return redirect(
+            "student_list"
         )
-
-        return redirect("student_list")
 
     return render(
         request,
         "students/student_confirm_delete.html",
-        {"student": student}
+        {
+            "student": student
+        }
     )
+
 
 # =========================================================
 # STUDENT DETAIL
@@ -799,16 +729,12 @@ def student_detail(request, student_id):
         id=student_id
     )
 
-
-    # Lecturer can only access their own students.
-
     if not request.user.is_superuser:
 
         lecturer_profile = get_object_or_404(
             LecturerProfile,
             user=request.user
         )
-
 
         if student.lecturer != lecturer_profile:
 
@@ -820,7 +746,6 @@ def student_detail(request, student_id):
             return redirect(
                 "student_list"
             )
-
 
     enrollments = (
         Enrollment.objects
@@ -834,7 +759,6 @@ def student_detail(request, student_id):
             "course_unit__code"
         )
     )
-
 
     return render(
         request,
@@ -858,18 +782,12 @@ def student_enroll(request, student_id):
         id=student_id
     )
 
-
-    # =====================================================
-    # VERIFY LECTURER ACCESS
-    # =====================================================
-
     if not request.user.is_superuser:
 
         lecturer_profile = get_object_or_404(
             LecturerProfile,
             user=request.user
         )
-
 
         if student.lecturer != lecturer_profile:
 
@@ -882,36 +800,22 @@ def student_enroll(request, student_id):
                 "student_list"
             )
 
-
-    # =====================================================
-    # ENROLLMENT FORM
-    # =====================================================
-
     if request.method == "POST":
 
         form = StudentEnrollmentForm(
             request.POST
         )
 
-
         if form.is_valid():
-
-            # Get the course unit selected by the lecturer.
 
             course_unit = form.cleaned_data[
                 "course_unit"
             ]
 
-
-            # =================================================
-            # CHECK IF ALREADY ENROLLED
-            # =================================================
-
             already_enrolled = Enrollment.objects.filter(
                 student=student,
                 course_unit=course_unit
             ).exists()
-
 
             if already_enrolled:
 
@@ -926,40 +830,19 @@ def student_enroll(request, student_id):
                     student_id=student.id
                 )
 
-
-            # =================================================
-            # CREATE ENROLLMENT
-            # =================================================
-
             Enrollment.objects.create(
                 student=student,
                 course_unit=course_unit
             )
-
-
-            messages.success(
-                request,
-                f"{student.full_name} has been enrolled "
-                f"in {course_unit.code} successfully."
-            )
-
-
-            # Return to the lecturer's Student Profile page.
 
             return redirect(
                 "student_detail",
                 student_id=student.id
             )
 
-
     else:
 
         form = StudentEnrollmentForm()
-
-
-    # =====================================================
-    # DISPLAY ENROLLMENT PAGE
-    # =====================================================
 
     return render(
         request,
@@ -983,7 +866,6 @@ def student_gradebook(request, student_id):
         id=student_id
     )
 
-
     # =====================================================
     # VERIFY LECTURER ACCESS
     # =====================================================
@@ -994,7 +876,6 @@ def student_gradebook(request, student_id):
             LecturerProfile,
             user=request.user
         )
-
 
         if student.lecturer != lecturer_profile:
 
@@ -1007,15 +888,13 @@ def student_gradebook(request, student_id):
                 "student_list"
             )
 
-
     # =====================================================
-    # COURSE UNIT
+    # COURSE UNITS
     # =====================================================
 
     unit_id = request.GET.get(
         "unit"
     )
-
 
     course_units = (
         CourseUnit.objects
@@ -1028,9 +907,7 @@ def student_gradebook(request, student_id):
         )
     )
 
-
     selected_unit = None
-
 
     if unit_id:
 
@@ -1039,12 +916,10 @@ def student_gradebook(request, student_id):
             id=unit_id
         )
 
-
         is_enrolled = Enrollment.objects.filter(
             student=student,
             course_unit=selected_unit
         ).exists()
-
 
         if not is_enrolled:
 
@@ -1058,7 +933,6 @@ def student_gradebook(request, student_id):
                 student_id=student.id
             )
 
-
     # =====================================================
     # POST - SAVE GRADEBOOK
     # =====================================================
@@ -1066,9 +940,9 @@ def student_gradebook(request, student_id):
     if request.method == "POST":
 
         selected_unit_id = request.POST.get(
-            "course_unit"
-        )
-
+            "course_unit",
+            ""
+        ).strip()
 
         if not selected_unit_id:
 
@@ -1082,20 +956,19 @@ def student_gradebook(request, student_id):
                 student_id=student.id
             )
 
-
         selected_unit = get_object_or_404(
             CourseUnit,
             id=selected_unit_id
         )
 
-
-        # Make sure student is enrolled.
+        # =================================================
+        # VERIFY STUDENT ENROLLMENT
+        # =================================================
 
         is_enrolled = Enrollment.objects.filter(
             student=student,
             course_unit=selected_unit
         ).exists()
-
 
         if not is_enrolled:
 
@@ -1108,20 +981,6 @@ def student_gradebook(request, student_id):
                 "student_gradebook",
                 student_id=student.id
             )
-
-
-        # =================================================
-        # FINAL GRADE
-        # =================================================
-
-        final_grade = (
-            request.POST.get(
-                "final_grade",
-                ""
-            )
-            .strip()
-        )
-
 
         # =================================================
         # ROW COUNT
@@ -1136,25 +995,29 @@ def student_gradebook(request, student_id):
                 )
             )
 
-        except (TypeError, ValueError):
+        except (
+            TypeError,
+            ValueError
+        ):
 
             row_count = 0
 
-
         submitted_entry_ids = []
-
-
-        # =================================================
-        # READ ALL ROWS FIRST
-        #
-        # This prevents saved rows from being accidentally
-        # deleted when new rows are added.
-        # =================================================
 
         rows = []
 
+        # =================================================
+        # READ ALL ROWS
+        # =================================================
 
-        for index in range(row_count):
+        for index in range(
+            1,
+            row_count + 1
+        ):
+
+            # =============================================
+            # ENTRY ID
+            # =============================================
 
             entry_id = (
                 request.POST.get(
@@ -1164,6 +1027,9 @@ def student_gradebook(request, student_id):
                 .strip()
             )
 
+            # =============================================
+            # ASSESSMENT TYPE
+            # =============================================
 
             assessment_type = (
                 request.POST.get(
@@ -1173,6 +1039,9 @@ def student_gradebook(request, student_id):
                 .strip()
             )
 
+            # =============================================
+            # ASSESSMENT DETAILS
+            # =============================================
 
             assessment_details = (
                 request.POST.get(
@@ -1182,6 +1051,9 @@ def student_gradebook(request, student_id):
                 .strip()
             )
 
+            # =============================================
+            # MARK
+            # =============================================
 
             mark_value = (
                 request.POST.get(
@@ -1191,115 +1063,185 @@ def student_gradebook(request, student_id):
                 .strip()
             )
 
+            # =============================================
+            # FINAL GRADE
+            #
+            # IMPORTANT:
+            # Each row has its own final_grade field.
+            #
+            # Example:
+            #
+            # final_grade_1 = C
+            # final_grade_2 = F
+            # final_grade_3 = B
+            # =============================================
 
-            visibility_value = (
+            final_grade = (
                 request.POST.get(
-                    f"visibility_{index}",
+                    f"final_grade_{index}",
                     ""
                 )
                 .strip()
             )
 
+            # =============================================
+            # VISIBILITY
+            # =============================================
 
-            is_visible = (
-                visibility_value == "1"
+            visibility_value = (
+                request.POST.get(
+                    f"visibility_{index}",
+                    "0"
+                )
+                .strip()
+                .lower()
             )
 
+            is_visible = visibility_value in {
+                "1",
+                "true",
+                "on",
+                "yes",
+            }
 
-            # Completely empty row.
+            # =============================================
+            # SKIP COMPLETELY EMPTY ROWS
+            # =============================================
 
             if (
                 not entry_id
                 and not assessment_type
                 and not assessment_details
                 and not mark_value
+                and not final_grade
             ):
 
                 continue
 
+            # =============================================
+            # STORE ROW DATA
+            # =============================================
 
             rows.append(
                 {
                     "entry_id": entry_id,
+
                     "assessment_type": assessment_type,
+
                     "assessment_details": assessment_details,
+
                     "mark_value": mark_value,
+
+                    "final_grade": final_grade,
+
                     "is_visible": is_visible,
                 }
             )
 
+        # =====================================================
+        # SAVE GRADEBOOK IN ONE DATABASE TRANSACTION
+        # =====================================================
 
-        # =================================================
-        # SAVE EACH ROW
-        # =================================================
-
-        for row in rows:
-
-            entry_id = row["entry_id"]
-
-
-            if entry_id:
-
-                entry = get_object_or_404(
-                    GradebookEntry,
-                    id=entry_id,
-                    student=student,
-                    course_unit=selected_unit
-                )
-
-            else:
-
-                entry = GradebookEntry(
-                    student=student,
-                    course_unit=selected_unit
-                )
-
-
-            assessment_type = (
-                row["assessment_type"]
-            )
-
-
-            # Default assessment type for new rows.
-
-            if not assessment_type:
-
-                assessment_type = (
-                    f"Assessment {len(submitted_entry_ids) + 1}"
-                )
-
-
-            entry.assessment_type = (
-                assessment_type
-            )
-
-
-            entry.assessment_details = (
-                row["assessment_details"]
-            )
-
+        with transaction.atomic():
 
             # =================================================
-            # MARK
+            # SAVE EACH ROW
             # =================================================
 
-            mark_value = row["mark_value"]
+            for row_index, row in enumerate(
+                rows,
+                start=1
+            ):
 
+                entry_id = row["entry_id"]
 
-            if mark_value:
+                # =============================================
+                # EXISTING ENTRY
+                # =============================================
 
-                try:
+                if entry_id:
 
-                    mark = Decimal(
-                        mark_value
+                    entry = get_object_or_404(
+                        GradebookEntry,
+                        id=entry_id,
+                        student=student,
+                        course_unit=selected_unit
                     )
 
+                # =============================================
+                # NEW ENTRY
+                # =============================================
 
-                    if mark < 0 or mark > 100:
+                else:
+
+                    entry = GradebookEntry(
+                        student=student,
+                        course_unit=selected_unit
+                    )
+
+                # =============================================
+                # ASSESSMENT TYPE
+                # =============================================
+
+                assessment_type = (
+                    row["assessment_type"]
+                )
+
+                if not assessment_type:
+
+                    assessment_type = (
+                        f"Assessment {row_index}"
+                    )
+
+                entry.assessment_type = (
+                    assessment_type
+                )
+
+                # =============================================
+                # ASSESSMENT DETAILS
+                # =============================================
+
+                entry.assessment_details = (
+                    row["assessment_details"]
+                )
+
+                # =============================================
+                # MARK
+                # =============================================
+
+                mark_value = row["mark_value"]
+
+                if mark_value:
+
+                    try:
+
+                        mark = Decimal(
+                            mark_value
+                        )
+
+                        if mark < 0 or mark > 100:
+
+                            messages.error(
+                                request,
+                                "Marks must be between 0 and 100."
+                            )
+
+                            return redirect(
+                                "student_gradebook",
+                                student_id=student.id
+                            )
+
+                        entry.mark = mark
+
+                    except (
+                        InvalidOperation,
+                        TypeError,
+                        ValueError
+                    ):
 
                         messages.error(
                             request,
-                            "Marks must be between 0 and 100."
+                            "Please enter a valid mark."
                         )
 
                         return redirect(
@@ -1307,89 +1249,95 @@ def student_gradebook(request, student_id):
                             student_id=student.id
                         )
 
+                else:
 
-                    entry.mark = mark
+                    entry.mark = None
 
+                # =============================================
+                # VISIBILITY
+                # =============================================
 
-                except (
-                    InvalidOperation,
-                    TypeError,
-                    ValueError
-                ):
+                entry.is_visible = bool(
+                    row["is_visible"]
+                )
 
-                    messages.error(
-                        request,
-                        "Please enter a valid mark."
-                    )
+                # =============================================
+                # FINAL GRADE
+                #
+                # IMPORTANT:
+                #
+                # Save the final grade for EVERY row.
+                #
+                # This fixes the previous problem where only
+                # the newly-created assessment received the
+                # submitted final grade.
+                #
+                # Example:
+                #
+                # Assessment 1 -> C
+                # Assessment 2 -> F
+                #
+                # Both values are saved independently.
+                # =============================================
 
-                    return redirect(
-                        "student_gradebook",
-                        student_id=student.id
-                    )
+                entry.final_grade = (
+                    row["final_grade"]
+                )
+
+                # =============================================
+                # SAVE ENTRY
+                #
+                # Normal save() works for both:
+                #
+                # Existing entry -> UPDATE
+                # New entry      -> INSERT
+                # =============================================
+
+                entry.save()
+
+                submitted_entry_ids.append(
+                    entry.id
+                )
+
+            # =================================================
+            # DELETE OLD ROWS THAT WERE REMOVED
+            # =================================================
+
+            old_entries = GradebookEntry.objects.filter(
+                student=student,
+                course_unit=selected_unit
+            )
+
+            if submitted_entry_ids:
+
+                old_entries.exclude(
+                    id__in=submitted_entry_ids
+                ).delete()
 
             else:
 
-                entry.mark = None
-
-
-            # =================================================
-            # VISIBILITY
-            # =================================================
-
-            entry.is_visible = (
-                row["is_visible"]
-            )
-
-
-            # =================================================
-            # FINAL GRADE
-            #
-            # The same final grade is stored on the gradebook
-            # entries so that the student gradebook can retrieve
-            # it independently of individual row visibility.
-            # =================================================
-
-            entry.final_grade = final_grade
-
-
-            entry.save()
-
-
-            submitted_entry_ids.append(
-                entry.id
-            )
-
+                old_entries.delete()
 
         # =====================================================
-        # DELETE OLD ROWS THAT WERE REMOVED
+        # RETURN TO SAME GRADEBOOK
         # =====================================================
 
-        GradebookEntry.objects.filter(
-            student=student,
-            course_unit=selected_unit
-        ).exclude(
-            id__in=submitted_entry_ids
-        ).delete()
-
-
-        messages.success(
-            request,
-            "Gradebook saved successfully."
+        gradebook_url = reverse(
+            "student_gradebook",
+            kwargs={
+                "student_id": student.id
+            }
         )
-
 
         return redirect(
-            "student_gradebook",
-            student_id=student.id
+            f"{gradebook_url}?unit={selected_unit.id}"
         )
-
 
     # =====================================================
     # GET - LOAD EXISTING GRADEBOOK
     # =====================================================
 
     gradebook_entries = []
-
 
     if selected_unit:
 
@@ -1404,39 +1352,8 @@ def student_gradebook(request, student_id):
             )
         )
 
-
     # =====================================================
-    # GET SAVED FINAL GRADE
-    # =====================================================
-
-    saved_final_grade = ""
-
-
-    final_grade_entry = (
-        GradebookEntry.objects
-        .filter(
-            student=student,
-            course_unit=selected_unit
-        )
-        .exclude(
-            final_grade=""
-        )
-        .exclude(
-            final_grade__isnull=True
-        )
-        .first()
-    ) if selected_unit else None
-
-
-    if final_grade_entry:
-
-        saved_final_grade = (
-            final_grade_entry.final_grade
-        )
-
-
-    # =====================================================
-    # RENDER LECTURER GRADEBOOK
+    # RETURN LECTURER GRADEBOOK
     # =====================================================
 
     return render(
@@ -1450,36 +1367,44 @@ def student_gradebook(request, student_id):
             "selected_unit": selected_unit,
 
             "gradebook_entries": gradebook_entries,
-
-            "saved_final_grade": saved_final_grade,
         }
     )
 
 
 # =========================================================
-# STUDENT SUBMIT ASSIGNMENT
+# STUDENT SUBMIT / VIEW ASSIGNMENT
 # =========================================================
 
 @login_required
-def student_submit_assignment(
-    request,
-    assignment_id
-):
+def student_submit_assignment(request, assignment_id):
 
     student = get_object_or_404(
         StudentProfile,
         user=request.user
     )
 
-
     assignment = get_object_or_404(
         Assignment,
         id=assignment_id,
         student=student,
-        allow_student_access=True,
-        allow_submission=True
+        allow_student_access=True
     )
 
+    # =====================================================
+    # GET LATEST SUBMISSION
+    # =====================================================
+
+    submission = (
+        assignment.submissions
+        .order_by(
+            "-submitted_at"
+        )
+        .first()
+    )
+
+    # =====================================================
+    # SUBMISSION FORM
+    # =====================================================
 
     if request.method == "POST":
 
@@ -1488,44 +1413,166 @@ def student_submit_assignment(
             request.FILES
         )
 
-
         if form.is_valid():
 
-            submission = form.save(
+            new_submission = form.save(
                 commit=False
             )
 
+            new_submission.assignment = assignment
 
-            submission.assignment = (
-                assignment
-            )
-
-
-            submission.save()
-
-
-            messages.success(
-                request,
-                "Your assignment was submitted successfully."
-            )
-
+            new_submission.save()
 
             return redirect(
-                "student_dashboard"
+                "student_submit_assignment",
+                assignment_id=assignment.id
             )
-
 
     else:
 
         form = AssignmentSubmissionForm()
 
+    # =====================================================
+    # GRADING STATUS
+    # =====================================================
+
+    grading_status = "Not graded"
+
+    if submission:
+
+        grading_status = "Yet to be graded"
+
+        # =================================================
+        # CHECK WHETHER LECTURER HAS RELEASED THE GRADE
+        # =================================================
+
+        released_grade = (
+            GradebookEntry.objects
+            .filter(
+                student=student,
+                course_unit=assignment.course_unit,
+                is_visible=True
+            )
+            .exclude(
+                mark__isnull=True
+            )
+            .exclude(
+                final_grade=""
+            )
+            .exclude(
+                final_grade__isnull=True
+            )
+        )
+
+        # =================================================
+        # MATCH ASSIGNMENT WITH GRADEBOOK ENTRY
+        # =================================================
+
+        assignment_grade = released_grade.filter(
+            assessment_details__icontains=assignment.title
+        ).first()
+
+        if assignment_grade:
+
+            grading_status = "Graded"
+
+    # =====================================================
+    # RETURN PAGE
+    # =====================================================
 
     return render(
         request,
         "students/student_submit_assignment.html",
         {
             "student": student,
+
             "assignment": assignment,
+
+            "submission": submission,
+
             "form": form,
+
+            "grading_status": grading_status,
+        }
+    )
+
+
+# =========================================================
+# STUDENT MY PROFILE
+# =========================================================
+
+@login_required
+def student_profile(request):
+
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        form = StudentSelfProfileForm(
+            request.POST,
+            request.FILES,
+            instance=student
+        )
+
+        if form.is_valid():
+
+            student = form.save()
+
+            request.user.first_name = (
+                student.full_name
+            )
+
+            request.user.save(
+                update_fields=[
+                    "first_name"
+                ]
+            )
+
+            messages.success(
+                request,
+                "Your profile has been updated successfully."
+            )
+
+            return redirect(
+                "student_profile"
+            )
+
+    else:
+
+        form = StudentSelfProfileForm(
+            instance=student
+        )
+
+    return render(
+        request,
+        "students/student_profile.html",
+        {
+            "student": student,
+
+            "form": form,
+        }
+    )
+
+
+# =========================================================
+# STUDENT ACCOUNT DETAILS
+# =========================================================
+
+@login_required
+def student_account_details(request):
+
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    return render(
+        request,
+        "students/student_account_details.html",
+        {
+            "student": student,
         }
     )

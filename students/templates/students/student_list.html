@@ -1,8 +1,13 @@
+
 {% extends "base.html" %}
 
 {% block content %}
 
 <style>
+
+    /* =========================================================
+       PAGE HEADER
+    ========================================================= */
 
     .page-header {
         margin-bottom: 20px;
@@ -12,11 +17,21 @@
         margin-bottom: 5px;
     }
 
+
+    /* =========================================================
+       PAGE ACTIONS
+    ========================================================= */
+
     .page-actions {
         display: flex;
         gap: 12px;
         margin: 20px 0;
     }
+
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
 
     .btn {
         display: inline-block;
@@ -25,42 +40,57 @@
         border-radius: 6px;
         font-weight: 600;
         border: none;
+        cursor: pointer;
     }
+
 
     .btn-add {
         background-color: #f4c400;
         color: #000;
     }
 
+
     .btn-add:hover {
         background-color: #d9ad00;
     }
+
 
     .btn-back {
         background-color: #198754;
         color: white;
     }
 
+
     .btn-back:hover {
         background-color: #146c43;
     }
+
 
     .btn-view {
         background-color: #198754;
         color: white;
         padding: 7px 14px;
         border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
     }
+
 
     .btn-view:hover {
         background-color: #146c43;
     }
+
+
+    /* =========================================================
+       STUDENT TABLE
+    ========================================================= */
 
     .student-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
     }
+
 
     .student-table th {
         background-color: #198754;
@@ -69,28 +99,361 @@
         text-align: left;
     }
 
+
     .student-table td {
         padding: 12px;
         border-bottom: 1px solid #ddd;
     }
 
+
     .student-table tr:hover {
         background-color: #f5f5f5;
     }
 
-    .message {
-        padding: 10px;
-        margin: 10px 0;
-        background-color: #e8f5e9;
-        border-radius: 5px;
+
+    /* =========================================================
+       SUCCESS POPUP OVERLAY
+    ========================================================= */
+
+    .student-success-overlay {
+
+        position: fixed;
+
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.60);
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 20px;
+
+        z-index: 99999;
+
+        animation: successFadeIn 0.2s ease;
+
+    }
+
+
+    @keyframes successFadeIn {
+
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
+    }
+
+
+    /* =========================================================
+       SUCCESS POPUP
+    ========================================================= */
+
+    .student-success-modal {
+
+        width: 100%;
+
+        max-width: 480px;
+
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 35px;
+
+        text-align: center;
+
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.25);
+
+        animation: successModalAppear 0.25s ease;
+
+    }
+
+
+    @keyframes successModalAppear {
+
+        from {
+
+            opacity: 0;
+
+            transform:
+                translateY(-20px)
+                scale(0.96);
+
+        }
+
+        to {
+
+            opacity: 1;
+
+            transform:
+                translateY(0)
+                scale(1);
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SUCCESS ICON
+    ========================================================= */
+
+    .student-success-icon {
+
+        width: 70px;
+
+        height: 70px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 50%;
+
+        background: #198754;
+
+        color: #ffffff;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 38px;
+
+        font-weight: 700;
+
+    }
+
+
+    /* =========================================================
+       TITLE
+    ========================================================= */
+
+    .student-success-modal h2 {
+
+        margin: 0;
+
+        color: #198754;
+
+        font-size: 25px;
+
+        font-weight: 700;
+
+    }
+
+
+    .student-success-message {
+
+        margin: 10px 0 25px;
+
+        color: #666666;
+
+        font-size: 15px;
+
+        line-height: 1.5;
+
+    }
+
+
+    /* =========================================================
+       STUDENT DETAILS
+    ========================================================= */
+
+    .student-success-details {
+
+        background: #f7f9f8;
+
+        border: 1px solid #e1e7e3;
+
+        border-radius: 12px;
+
+        padding: 5px 18px;
+
+        text-align: left;
+
+        margin-bottom: 18px;
+
+    }
+
+
+    .success-detail-row {
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        gap: 20px;
+
+        padding: 14px 0;
+
+        border-bottom: 1px solid #e1e7e3;
+
+    }
+
+
+    .success-detail-row:last-child {
+
+        border-bottom: none;
+
+    }
+
+
+    .success-detail-row span {
+
+        color: #666666;
+
+        font-size: 14px;
+
+    }
+
+
+    .success-detail-row strong {
+
+        color: #222222;
+
+        font-size: 14px;
+
+        text-align: right;
+
+        word-break: break-word;
+
+    }
+
+
+    /* =========================================================
+       DEFAULT PASSWORD
+    ========================================================= */
+
+    .password-row strong {
+
+        color: #198754;
+
+        font-size: 16px;
+
+        font-weight: 700;
+
+        letter-spacing: 0.3px;
+
+    }
+
+
+    /* =========================================================
+       PASSWORD NOTICE
+    ========================================================= */
+
+    .password-notice {
+
+        background: #fff9df;
+
+        border-left: 4px solid #f4c400;
+
+        padding: 13px 15px;
+
+        border-radius: 8px;
+
+        color: #5f5200;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+
+        text-align: left;
+
+        margin-bottom: 22px;
+
+    }
+
+
+    /* =========================================================
+       CLOSE BUTTON
+    ========================================================= */
+
+    .success-close-button {
+
+        width: 100%;
+
+        border: none;
+
+        border-radius: 9px;
+
+        padding: 13px 20px;
+
+        background: #198754;
+
+        color: #ffffff;
+
+        font-size: 15px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: background 0.2s ease;
+
+    }
+
+
+    .success-close-button:hover {
+
+        background: #146c43;
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @media (max-width: 600px) {
+
+        .student-success-modal {
+
+            padding: 25px 20px;
+
+        }
+
+
+        .success-detail-row {
+
+            flex-direction: column;
+
+            align-items: flex-start;
+
+            gap: 5px;
+
+        }
+
+
+        .success-detail-row strong {
+
+            text-align: left;
+
+        }
+
     }
 
 </style>
 
 
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
+
 <div class="page-header">
 
-    <h1>Student Profiles</h1>
+    <h1>
+        Student Profiles
+    </h1>
 
     <p>
         Manage student profiles and their academic work.
@@ -102,19 +465,25 @@
 <hr>
 
 
-<!-- PAGE ACTION BUTTONS -->
+<!-- =========================================================
+     PAGE ACTION BUTTONS
+========================================================= -->
 
 <div class="page-actions">
 
-    <a href="{% url 'student_create' %}" class="btn btn-add">
+    <a
+        href="{% url 'student_create' %}"
+        class="btn btn-add"
+    >
         + Add Student
     </a>
 
 </div>
 
 
-
-<!-- STUDENT TABLE -->
+<!-- =========================================================
+     STUDENT TABLE
+========================================================= -->
 
 <table class="student-table">
 
@@ -122,11 +491,25 @@
 
         <tr>
 
-            <th>Student ID</th>
-            <th>Student Name</th>
-            <th>Program</th>
-            <th>Year Level</th>
-            <th>Action</th>
+            <th>
+                Student ID
+            </th>
+
+            <th>
+                Student Name
+            </th>
+
+            <th>
+                Program
+            </th>
+
+            <th>
+                Year Level
+            </th>
+
+            <th>
+                Action
+            </th>
 
         </tr>
 
@@ -164,6 +547,7 @@
                     View Profile
                 </a>
 
+
                 <a
                     href="{% url 'student_delete' student.id %}"
                     style="
@@ -184,12 +568,15 @@
 
         </tr>
 
+
         {% empty %}
 
         <tr>
 
             <td colspan="5">
+
                 No student profiles have been created yet.
+
             </td>
 
         </tr>
@@ -200,13 +587,198 @@
 
 </table>
 
+
+<!-- =========================================================
+     BACK TO DASHBOARD
+========================================================= -->
+
 <div class="page-actions">
-    <a href="{% url 'lecturer_dashboard' %}" class="btn btn-back">
+
+    <a
+        href="{% url 'lecturer_dashboard' %}"
+        class="btn btn-back"
+    >
 
         ← Back to Dashboard
-</a>
+
+    </a>
 
 </div>
 
 
+<!-- =========================================================
+     STUDENT CREATION SUCCESS POPUP
+========================================================= -->
+
+{% if student_created %}
+
+<div
+    id="studentSuccessModal"
+    class="student-success-overlay"
+>
+
+    <div class="student-success-modal">
+
+
+        <!-- SUCCESS ICON -->
+
+        <div class="student-success-icon">
+            ✓
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h2>
+            Student Account Created
+        </h2>
+
+
+        <p class="student-success-message">
+
+            The student account has been created successfully.
+
+        </p>
+
+
+        <!-- STUDENT DETAILS -->
+
+        <div class="student-success-details">
+
+
+            <!-- STUDENT NAME -->
+
+            <div class="success-detail-row">
+
+                <span>
+                    Student Name
+                </span>
+
+                <strong>
+                    {{ student_created.full_name }}
+                </strong>
+
+            </div>
+
+
+            <!-- STUDENT ID -->
+
+            <div class="success-detail-row">
+
+                <span>
+                    Student ID
+                </span>
+
+                <strong>
+                    {{ student_created.student_id }}
+                </strong>
+
+            </div>
+
+
+            <!-- DEFAULT PASSWORD -->
+
+            <div class="success-detail-row password-row">
+
+                <span>
+                    Default Password
+                </span>
+
+                <strong>
+                    {{ student_created.default_password }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PASSWORD NOTICE -->
+
+        <div class="password-notice">
+
+            <strong>
+                Important:
+            </strong>
+
+            Give this default password to the student.
+
+            The student will be required to change
+            it after their first login.
+
+        </div>
+
+
+        <!-- CLOSE BUTTON -->
+
+        <button
+            type="button"
+            class="success-close-button"
+            onclick="closeStudentSuccessModal()"
+        >
+
+            Close
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function closeStudentSuccessModal() {
+
+        const modal =
+            document.getElementById(
+                "studentSuccessModal"
+            );
+
+
+        if (!modal) {
+
+            return;
+
+        }
+
+
+        modal.style.transition =
+            "opacity 0.2s ease";
+
+        modal.style.opacity = "0";
+
+
+        setTimeout(function() {
+
+            modal.remove();
+
+        }, 200);
+
+    }
+
+
+    /* =========================================================
+       ESCAPE KEY
+    ========================================================= */
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Escape") {
+
+                closeStudentSuccessModal();
+
+            }
+
+        }
+    );
+
+</script>
+
+{% endif %}
+
+
 {% endblock %}
+

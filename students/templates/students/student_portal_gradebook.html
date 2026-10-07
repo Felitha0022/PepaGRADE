@@ -568,7 +568,7 @@ PepaGRADE - Gradebook
 
     border-collapse: collapse;
 
-    min-width: 500px;
+    min-width: 600px;
 }
 
 
@@ -622,52 +622,62 @@ PepaGRADE - Gradebook
 
 
 /* =========================================================
-   MARK / FINAL GRADE COLUMN
+   MARK COLUMN
 ========================================================= */
 
 .mark-cell {
     font-weight: 700;
 
     color: #176b42;
+
+    white-space: nowrap;
 }
 
 
 /* =========================================================
-   OVERALL FINAL GRADE ROW
+   INDIVIDUAL FINAL GRADE COLUMN
 ========================================================= */
 
-.overall-final-grade {
-    background: #f1f8f3;
-}
+.final-grade-cell {
+    font-weight: 800;
 
-
-.overall-final-grade:hover {
-    background: #f1f8f3 !important;
-}
-
-
-.overall-final-grade td {
-    border-top: 2px solid #d6e4da;
-
-    padding-top: 17px;
-
-    padding-bottom: 17px;
-}
-
-
-.overall-final-grade .grade-item-cell {
     color: #174d32;
 
+    text-align: center;
+
+    white-space: nowrap;
+}
+
+
+.final-grade-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 42px;
+
+    padding: 6px 10px;
+
+    background: #f1f8f3;
+
+    border: 1px solid #d6e4da;
+
+    border-radius: 6px;
+
+    color: #176b42;
+
+    font-size: 14px;
+
     font-weight: 800;
 }
 
 
-.overall-final-grade .mark-cell {
-    color: #16803c;
+.no-grade {
+    color: #8a938d;
 
-    font-size: 18px;
-
-    font-weight: 800;
+    font-weight: 500;
 }
 
 
@@ -704,16 +714,6 @@ PepaGRADE - Gradebook
     font-size: 17px;
 
     margin-bottom: 7px;
-}
-
-
-.not-released {
-    border-left: 5px solid #d99a00;
-}
-
-
-.not-released strong {
-    color: #9a6900;
 }
 
 
@@ -907,7 +907,7 @@ PepaGRADE - Gradebook
 
 
     .gradebook-table {
-        min-width: 450px;
+        min-width: 520px;
     }
 
 
@@ -1274,14 +1274,21 @@ PepaGRADE - Gradebook
 
                         <th>
 
-                            Grade Item
+                            Assignment Task
 
                         </th>
 
 
                         <th>
 
-                            Final Grade
+                            Mark
+
+                        </th>
+
+
+                        <th>
+
+                            Grade
 
                         </th>
 
@@ -1303,6 +1310,10 @@ PepaGRADE - Gradebook
                         <tr>
 
 
+                            <!-- =================================
+                                 ASSIGNMENT / ASSESSMENT
+                            ================================== -->
+
                             <td class="grade-item-cell">
 
 
@@ -1319,6 +1330,10 @@ PepaGRADE - Gradebook
 
                             </td>
 
+
+                            <!-- =================================
+                                 MARK
+                            ================================== -->
 
                             <td class="mark-cell">
 
@@ -1337,67 +1352,61 @@ PepaGRADE - Gradebook
                             </td>
 
 
+                            <!-- =================================
+                                 INDIVIDUAL GRADE
+                            ================================== -->
+
+                            <td class="final-grade-cell">
+
+
+                                {% if entry.final_grade %}
+
+                                    <span class="final-grade-badge">
+
+                                        {{ entry.final_grade }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="no-grade">
+
+                                        —
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+
                         </tr>
 
 
                     {% empty %}
 
-                        {% if not final_grade_released %}
 
+                        <tr>
 
-                            <tr>
+                            <td
+                                colspan="3"
+                                style="
+                                    text-align:center;
+                                    padding:30px 20px;
+                                    color:#68736c;
+                                "
+                            >
 
-                                <td
-                                    colspan="2"
-                                    style="
-                                        text-align:center;
-                                        padding:30px 20px;
-                                        color:#68736c;
-                                    "
-                                >
-
-                                    No grades have been released
-                                    for this course unit yet.
-
-                                </td>
-
-                            </tr>
-
-
-                        {% endif %}
-
-
-                    {% endfor %}
-
-
-                    <!-- =====================================
-                         OVERALL FINAL GRADE
-                    ====================================== -->
-
-                    {% if final_grade_released %}
-
-
-                        <tr class="overall-final-grade">
-
-
-                            <td class="grade-item-cell">
-
-                                Overall Final Grade
+                                No grades have been released
+                                for this course unit yet.
 
                             </td>
-
-
-                            <td class="mark-cell">
-
-                                {{ visible_final_grade }}
-
-                            </td>
-
 
                         </tr>
 
 
-                    {% endif %}
+                    {% endfor %}
 
 
                 </tbody>
@@ -1407,39 +1416,6 @@ PepaGRADE - Gradebook
 
 
         </div>
-
-
-        <!-- =================================================
-             FINAL GRADE NOT RELEASED MESSAGE
-        ================================================== -->
-
-        {% if not final_grade_released %}
-
-
-            <div class="gradebook-notice not-released">
-
-
-                <strong>
-
-                    Final Grade Not Yet Released
-
-                </strong>
-
-
-                Your lecturer has not released the final grade
-                for this course unit yet.
-
-
-                <br><br>
-
-
-                Grades will appear here once they are released.
-
-
-            </div>
-
-
-        {% endif %}
 
 
         <!-- =================================================

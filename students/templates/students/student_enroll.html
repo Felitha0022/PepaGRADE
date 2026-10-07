@@ -32,9 +32,21 @@ Enroll Student | PepaGRADE
             Enroll Student
         </button>
 
-        <a href="{% url 'student_detail' student.id %}">
-            Cancel
-        </a>
+        <a
+    href="{% url 'student_detail' student.id %}"
+    style="
+        display:inline-block;
+        background:#6c757d;
+        color:white;
+        padding:10px 18px;
+        border-radius:6px;
+        text-decoration:none;
+        font-weight:600;
+        border:1px solid #6c757d;
+    "
+>
+    Cancel
+</a>
 
     </form>
 

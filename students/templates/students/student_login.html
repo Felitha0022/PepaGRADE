@@ -32,14 +32,6 @@ login-container-page
             submissions and gradebook.
         </p>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
         <form method="POST">
 
             {% csrf_token %}

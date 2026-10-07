@@ -1,0 +1,1340 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ assignment.title }} | PepaGRADE
+{% endblock %}
+
+{% block content %}
+
+<div class="student-assignment-page">
+
+    <!-- =====================================================
+         BREADCRUMB
+    ====================================================== -->
+
+    <div class="assignment-breadcrumb">
+
+        <a href="{% url 'student_dashboard' %}">
+            Home
+        </a>
+
+        <span>›</span>
+
+        <span>My Courses</span>
+
+        {% if assignment.course_unit %}
+
+            <span>›</span>
+
+            <span>
+                {{ assignment.course_unit.code }}
+            </span>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         ASSIGNMENT HEADER
+    ====================================================== -->
+
+    <div class="assignment-heading">
+
+        <h1>
+            {{ assignment.title }}
+        </h1>
+
+        <p class="assignment-type">
+            {{ assignment.get_document_type_display }}
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUBMISSION STATUS
+    ====================================================== -->
+
+    <div class="submission-section">
+
+        <h2>
+            Submission status
+        </h2>
+
+
+        <div class="submission-table">
+
+            <!-- Submission status -->
+
+            <div class="submission-row">
+
+                <div class="submission-label">
+                    Submission status
+                </div>
+
+                <div class="submission-value">
+
+                    {% if submission %}
+
+                        <span class="status submitted">
+                            Submitted for grading
+                        </span>
+
+                    {% else %}
+
+                        <span class="status no-attempt">
+                            No attempt
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Grading status -->
+
+            <div class="submission-row">
+
+                <div class="submission-label">
+                    Grading status
+                </div>
+
+                <div class="submission-value">
+
+                    {% if submission %}
+
+                        {% if grading_status == "Graded" %}
+
+                            <span class="status graded">
+                                Graded
+                            </span>
+
+                        {% else %}
+
+                            <span class="status waiting">
+                                Yet to be graded
+                            </span>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <span>
+                            Not graded
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Due date -->
+
+            <div class="submission-row">
+
+                <div class="submission-label">
+                    Due date
+                </div>
+
+                <div class="submission-value">
+
+                    {% if assignment.due_date %}
+
+                        {{ assignment.due_date|date:"l, d F Y, h:i A" }}
+
+                    {% else %}
+
+                        No due date
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Time remaining -->
+
+            <div class="submission-row">
+
+                <div class="submission-label">
+                    Time remaining
+                </div>
+
+                <div
+                    class="submission-value"
+                    id="timeRemaining"
+                    data-due-date="{% if assignment.due_date %}{{ assignment.due_date|date:'c' }}{% endif %}"
+                    data-submitted-date="{% if submission %}{{ submission.submitted_at|date:'c' }}{% endif %}"
+                >
+
+                    Calculating...
+
+                </div>
+
+            </div>
+
+
+            <!-- Last modified -->
+
+            <div class="submission-row">
+
+                <div class="submission-label">
+                    Last modified
+                </div>
+
+                <div class="submission-value">
+
+                    {% if submission %}
+
+                        {{ submission.submitted_at|date:"l, d F Y, h:i A" }}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Submission comments -->
+
+            <div class="submission-row">
+
+                <div class="submission-label">
+                    Submission comments
+                </div>
+
+                <div class="submission-value">
+
+                    Comments (0)
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADD / VIEW SUBMISSION
+    ====================================================== -->
+
+    <div class="submission-section">
+
+        {% if submission %}
+
+            <h2>
+                File submissions
+            </h2>
+
+
+            <!-- Submitted file -->
+
+            <div class="submitted-file">
+
+                <div class="file-symbol">
+                    📄
+                </div>
+
+                <div class="file-information">
+
+                    <a
+                        href="{{ submission.file.url }}"
+                        target="_blank"
+                        class="file-link"
+                    >
+                        {{ submission.file.name }}
+                    </a>
+
+                    <div class="file-time">
+
+                        Submitted
+                        {{ submission.submitted_at|date:"d F Y, h:i A" }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Submission message -->
+
+            <div class="submitted-message">
+
+                <strong>
+                    Your assignment has been submitted.
+                </strong>
+
+                <p>
+                    You can still make changes to your submission.
+                </p>
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <div class="submission-actions">
+
+                <a
+                    href="{% url 'student_submit_assignment' assignment.id %}"
+                    class="edit-button"
+                >
+                    Edit submission
+                </a>
+
+
+                <button
+                    type="button"
+                    class="remove-button"
+                    onclick="showRemoveMessage()"
+                >
+                    Remove submission
+                </button>
+
+            </div>
+
+
+            <div
+                id="removeMessage"
+                class="remove-message"
+                style="display:none;"
+            >
+
+                <strong>
+                    Remove submission?
+                </strong>
+
+                <p>
+                    The remove function will be connected to
+                    the submission system.
+                </p>
+
+            </div>
+
+
+        {% else %}
+
+            <h2>
+                Add submission
+            </h2>
+
+
+            <p class="no-submission-text">
+
+                You have not made a submission yet.
+
+            </p>
+
+
+            {% if assignment.allow_submission %}
+
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="submission-form"
+                >
+
+                    {% csrf_token %}
+
+
+                    <div class="upload-field">
+
+                        <label
+                            for="{{ form.file.id_for_label }}"
+                        >
+                            Upload your assignment
+                        </label>
+
+
+                        <p>
+                            Select your completed academic paper
+                            to submit.
+                        </p>
+
+
+                        {{ form.file }}
+
+
+                        {% if form.file.errors %}
+
+                            <div class="field-error">
+
+                                {{ form.file.errors }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="add-submission-button"
+                    >
+                        Add submission
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <div class="submission-closed">
+
+                    Submission is currently closed.
+
+                </div>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         BACK
+    ====================================================== -->
+
+    <div class="page-back">
+
+        <a href="{% url 'student_dashboard' %}">
+            ← Back to My Assignments
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TIME REMAINING
+========================================================= -->
+
+<script>
+
+function updateTimeRemaining() {
+
+    const element =
+        document.getElementById("timeRemaining");
+
+    if (!element) {
+        return;
+    }
+
+
+    const dueDateValue =
+        element.dataset.dueDate;
+
+    const submittedDateValue =
+        element.dataset.submittedDate;
+
+
+    if (!dueDateValue) {
+
+        element.textContent =
+            "No due date";
+
+        return;
+
+    }
+
+
+    const dueDate =
+        new Date(dueDateValue);
+
+
+    /*
+     * Student already submitted
+     */
+
+    if (submittedDateValue) {
+
+        const submittedDate =
+            new Date(submittedDateValue);
+
+
+        const difference =
+            dueDate - submittedDate;
+
+
+        if (difference >= 0) {
+
+            const totalMinutes =
+                Math.floor(
+                    difference /
+                    (1000 * 60)
+                );
+
+
+            const days =
+                Math.floor(
+                    totalMinutes / 1440
+                );
+
+
+            const hours =
+                Math.floor(
+                    (totalMinutes % 1440) / 60
+                );
+
+
+            const minutes =
+                totalMinutes % 60;
+
+
+            element.textContent =
+                "Assignment was submitted " +
+                days +
+                " days " +
+                hours +
+                " hours " +
+                minutes +
+                " minutes early";
+
+        } else {
+
+            const overdue =
+                Math.abs(difference);
+
+
+            const totalMinutes =
+                Math.floor(
+                    overdue /
+                    (1000 * 60)
+                );
+
+
+            const days =
+                Math.floor(
+                    totalMinutes / 1440
+                );
+
+
+            const hours =
+                Math.floor(
+                    (totalMinutes % 1440) / 60
+                );
+
+
+            const minutes =
+                totalMinutes % 60;
+
+
+            element.textContent =
+                "Assignment was submitted " +
+                days +
+                " days " +
+                hours +
+                " hours " +
+                minutes +
+                " minutes overdue";
+
+        }
+
+        return;
+
+    }
+
+
+    /*
+     * Student has not submitted
+     */
+
+    const now =
+        new Date();
+
+
+    const difference =
+        dueDate - now;
+
+
+    if (difference <= 0) {
+
+        element.textContent =
+            "Assignment is overdue";
+
+        element.classList.add("overdue");
+
+        return;
+
+    }
+
+
+    const totalMinutes =
+        Math.floor(
+            difference /
+            (1000 * 60)
+        );
+
+
+    const days =
+        Math.floor(
+            totalMinutes / 1440
+        );
+
+
+    const hours =
+        Math.floor(
+            (totalMinutes % 1440) / 60
+        );
+
+
+    const minutes =
+        totalMinutes % 60;
+
+
+    element.textContent =
+        days +
+        " days " +
+        hours +
+        " hours " +
+        minutes +
+        " minutes";
+
+}
+
+
+function showRemoveMessage() {
+
+    const message =
+        document.getElementById("removeMessage");
+
+
+    if (!message) {
+        return;
+    }
+
+
+    if (message.style.display === "none") {
+
+        message.style.display = "block";
+
+    } else {
+
+        message.style.display = "none";
+
+    }
+
+}
+
+
+updateTimeRemaining();
+
+setInterval(
+    updateTimeRemaining,
+    60000
+);
+
+</script>
+
+
+<!-- =========================================================
+     CSS
+========================================================= -->
+
+<style>
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.student-assignment-page {
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding: 25px 30px 50px;
+
+    background: #fff;
+
+}
+
+
+/* =========================================================
+   BREADCRUMB
+========================================================= */
+
+.assignment-breadcrumb {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 22px;
+
+    font-size: 14px;
+
+    color: #6c757d;
+
+}
+
+
+.assignment-breadcrumb a {
+
+    color: #16803c;
+
+    text-decoration: none;
+
+}
+
+
+.assignment-breadcrumb a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+/* =========================================================
+   ASSIGNMENT HEADER
+========================================================= */
+
+.assignment-heading {
+
+    border-bottom: 1px solid #dee2e6;
+
+    padding-bottom: 20px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.assignment-heading h1 {
+
+    margin: 0;
+
+    color: #212529;
+
+    font-size: 30px;
+
+    font-weight: 600;
+
+}
+
+
+.assignment-type {
+
+    margin: 8px 0 0;
+
+    color: #6c757d;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.submission-section {
+
+    background: #fff;
+
+    border: 1px solid #dee2e6;
+
+    border-radius: 4px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.submission-section h2 {
+
+    margin: 0;
+
+    padding: 17px 20px;
+
+    background: #f7f7f7;
+
+    border-bottom: 1px solid #dee2e6;
+
+    color: #212529;
+
+    font-size: 20px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   STATUS TABLE
+========================================================= */
+
+.submission-table {
+
+    width: 100%;
+
+}
+
+
+.submission-row {
+
+    display: grid;
+
+    grid-template-columns: 230px 1fr;
+
+    min-height: 55px;
+
+    border-bottom: 1px solid #e9ecef;
+
+}
+
+
+.submission-row:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.submission-label {
+
+    padding: 16px 20px;
+
+    background: #fafafa;
+
+    color: #495057;
+
+    font-weight: 600;
+
+}
+
+
+.submission-value {
+
+    padding: 16px 20px;
+
+    color: #343a40;
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status {
+
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 3px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+.status.no-attempt {
+
+    background: #e9ecef;
+
+    color: #495057;
+
+}
+
+
+.status.submitted {
+
+    background: #dff2e5;
+
+    color: #146c35;
+
+}
+
+
+.status.waiting {
+
+    background: #fff3cd;
+
+    color: #856404;
+
+}
+
+
+.status.graded {
+
+    background: #d1e7dd;
+
+    color: #0f5132;
+
+}
+
+
+.overdue {
+
+    color: #b02a37;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   FILE
+========================================================= */
+
+.submitted-file {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 20px;
+
+    border-bottom: 1px solid #e9ecef;
+
+}
+
+
+.file-symbol {
+
+    font-size: 28px;
+
+}
+
+
+.file-information {
+
+    min-width: 0;
+
+}
+
+
+.file-link {
+
+    color: #16803c;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    word-break: break-word;
+
+}
+
+
+.file-link:hover {
+
+    text-decoration: underline;
+
+}
+
+
+.file-time {
+
+    color: #6c757d;
+
+    font-size: 13px;
+
+    margin-top: 5px;
+
+}
+
+
+/* =========================================================
+   SUBMISSION MESSAGE
+========================================================= */
+
+.submitted-message {
+
+    margin: 20px;
+
+    padding: 15px 18px;
+
+    border-left: 4px solid #16803c;
+
+    background: #f1f8f3;
+
+    color: #333;
+
+}
+
+
+.submitted-message strong {
+
+    color: #146c35;
+
+}
+
+
+.submitted-message p {
+
+    margin: 5px 0 0;
+
+    color: #666;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.submission-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    padding: 0 20px 20px;
+
+}
+
+
+.edit-button {
+
+    display: inline-block;
+
+    padding: 10px 18px;
+
+    background: #16803c;
+
+    color: white;
+
+    border-radius: 4px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+.edit-button:hover {
+
+    background: #116b31;
+
+}
+
+
+.remove-button {
+
+    padding: 9px 18px;
+
+    background: white;
+
+    color: #b02a37;
+
+    border: 1px solid #ced4da;
+
+    border-radius: 4px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+.remove-button:hover {
+
+    background: #fff5f5;
+
+    border-color: #b02a37;
+
+}
+
+
+/* =========================================================
+   REMOVE MESSAGE
+========================================================= */
+
+.remove-message {
+
+    margin: 0 20px 20px;
+
+    padding: 15px;
+
+    background: #fff5f5;
+
+    border: 1px solid #f1c1c5;
+
+    border-radius: 4px;
+
+    color: #842029;
+
+}
+
+
+.remove-message p {
+
+    margin: 6px 0 0;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   NO SUBMISSION
+========================================================= */
+
+.no-submission-text {
+
+    padding: 20px;
+
+    margin: 0;
+
+    color: #555;
+
+}
+
+
+/* =========================================================
+   UPLOAD FORM
+========================================================= */
+
+.submission-form {
+
+    padding: 0 20px 25px;
+
+}
+
+
+.upload-field {
+
+    margin-bottom: 20px;
+
+}
+
+
+.upload-field label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-weight: 600;
+
+    color: #343a40;
+
+}
+
+
+.upload-field p {
+
+    margin: 0 0 12px;
+
+    color: #6c757d;
+
+    font-size: 14px;
+
+}
+
+
+.upload-field input[type="file"] {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 10px;
+
+    border: 1px solid #ced4da;
+
+    border-radius: 4px;
+
+    background: white;
+
+}
+
+
+.add-submission-button {
+
+    padding: 10px 20px;
+
+    border: none;
+
+    border-radius: 4px;
+
+    background: #16803c;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+.add-submission-button:hover {
+
+    background: #116b31;
+
+}
+
+
+/* =========================================================
+   CLOSED
+========================================================= */
+
+.submission-closed {
+
+    margin: 20px;
+
+    padding: 15px;
+
+    background: #fff3cd;
+
+    color: #856404;
+
+    border: 1px solid #ffe69c;
+
+    border-radius: 4px;
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.field-error {
+
+    margin-top: 8px;
+
+    color: #b02a37;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   BACK
+========================================================= */
+
+.page-back {
+
+    margin-top: 10px;
+
+}
+
+
+.page-back a {
+
+    color: #16803c;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+.page-back a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .student-assignment-page {
+
+        padding:
+            20px 15px 40px;
+
+    }
+
+
+    .assignment-heading h1 {
+
+        font-size: 24px;
+
+    }
+
+
+    .submission-row {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .submission-label {
+
+        padding:
+            12px 15px 5px;
+
+        background: white;
+
+        font-size: 13px;
+
+    }
+
+
+    .submission-value {
+
+        padding:
+            5px 15px 14px;
+
+    }
+
+
+    .submission-actions {
+
+        flex-direction: column;
+
+    }
+
+
+    .edit-button,
+    .remove-button {
+
+        width: 100%;
+
+        text-align: center;
+
+        box-sizing: border-box;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}

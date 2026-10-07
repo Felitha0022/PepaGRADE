@@ -9,7 +9,9 @@ from .views import (
     upload_assignment_marking_guide,
     upload_submission,
     marking_guide_success,
+    
 )
+from assessment.views import assess_assignment
 
 
 urlpatterns = [
@@ -43,6 +45,12 @@ urlpatterns = [
         upload_assignment_marking_guide,
         name='upload_assignment_marking_guide'
     ),
+
+    path(
+    'assess/<int:submission_id>/',
+    assess_assignment,
+    name='assess_assignment'
+),
 
     # Legacy upload route.
     # It redirects instead of creating an orphan submission.
